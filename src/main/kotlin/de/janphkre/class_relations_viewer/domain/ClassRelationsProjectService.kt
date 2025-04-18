@@ -2,6 +2,7 @@ package de.janphkre.class_relations_viewer.domain
 
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
+import com.intellij.openapi.editor.Document
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
@@ -21,23 +22,34 @@ class ClassRelationsProjectService(
         ClassRelationsPumlGenerator.Settings("asdf","#ff0000")
     )
 
-    fun getInitialFile(): VirtualFile? {
+    fun getInitialDocument(): Document? {
         val currentDoc = fileEditorManager.selectedTextEditor?.document ?: return null
-        val currentFile = fileDocumentManager.getFile(currentDoc) ?: return null
-        return currentFile
+        return currentDoc
+    }
+
+    fun getAdjacentFileContents(document: Document): List<KlassDefinition> {
+        val currentFile = fileDocumentManager.getFile(document) ?: return emptyList()
+        return currentFile.parent.children.mapNotNull {
+            if (it == currentFile) {
+                return@mapNotNull null
+            }
+            getFileContent(it)
+        }
+    }
+
+    //TODO: title
+    fun getOpenEditorContent(document: Document): KlassDefinition? {
+        return parser.parse(document.text, document.toString())
     }
 
     fun getFileContent(file: VirtualFile): KlassDefinition? {
-        if (!file.isFile || !file.isInLocalFileSystem) {
-            return null
-        }
         if (file.extension != "kt") {
             return null
         }
-        val input = parser.parse(file)
+        val fileContent = String(file.contentsToByteArray())
+        val input = parser.parse(fileContent, file.presentableName)
         return input
     }
-
 
     companion object {
         @JvmStatic

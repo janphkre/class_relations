@@ -3,6 +3,7 @@ package de.janphkre.class_relations_viewer.presentation
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent
 import com.intellij.openapi.fileEditor.FileEditorManagerListener
+import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.ui.content.ContentFactory
 
@@ -25,7 +26,7 @@ class ClassRelationsToolWindowContentUpdater(
 
     override fun selectionChanged(event: FileEditorManagerEvent) {
         val content = contentFactory.createContent(
-            event.newFile?.let { toolWindowContent.getOpenFileContent(it) } ?: toolWindowContent.getEmptyContent(),
+            (event.newEditor as? TextEditor)?.editor?.document?.let { toolWindowContent.getDataContent(it) } ?: toolWindowContent.getEmptyContent(),
             null,
             false
         )//TODO: DO NOT RECREATE WHOLE UI AT ALL TIMES -> create canvas for plantuml renderer!

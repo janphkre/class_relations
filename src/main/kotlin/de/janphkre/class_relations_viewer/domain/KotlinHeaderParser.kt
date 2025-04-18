@@ -1,13 +1,11 @@
 package de.janphkre.class_relations_viewer.domain
 
-import com.intellij.openapi.vfs.VirtualFile
 import de.janphkre.class_relations_viewer.model.KlassDefinition
 import de.janphkre.class_relations_viewer.model.KlassType
 import kotlinx.ast.common.AstFailure
 import kotlinx.ast.common.AstSource
 import kotlinx.ast.common.AstSuccess
-import kotlinx.ast.common.ast.*
-import kotlinx.ast.common.klass.Klass
+import kotlinx.ast.common.ast.DefaultAstNode
 import kotlinx.ast.common.klass.KlassDeclaration
 import kotlinx.ast.grammar.kotlin.common.summary
 import kotlinx.ast.grammar.kotlin.common.summary.Import
@@ -18,8 +16,8 @@ import kotlinx.ast.grammar.kotlin.target.antlr.kotlin.KotlinGrammarAntlrKotlinPa
  * Grabs package name, imports and primary constructor parameters from file.
  */
 class KotlinHeaderParser {
-    fun parse(file: VirtualFile): KlassDefinition? {
-        val kotlinFileSummary = KotlinGrammarAntlrKotlinParser.parseKotlinFile(AstSource.File(file.path)).summary(attachRawAst = false)
+    fun parse(fileContent: String, presentableName: String): KlassDefinition? {
+        val kotlinFileSummary = KotlinGrammarAntlrKotlinParser.parseKotlinFile(AstSource.String(description = presentableName, content = fileContent)).summary(attachRawAst = false)
         if (kotlinFileSummary is AstFailure) {
             kotlinFileSummary.errors.forEach(::println)
             return null
@@ -29,7 +27,7 @@ class KotlinHeaderParser {
         val klassDeclaration: KlassDeclaration? = kotlinFileSummary.success.find { it is KlassDeclaration } as? KlassDeclaration
         val importList: DefaultAstNode? = kotlinFileSummary.success.find { it is DefaultAstNode } as? DefaultAstNode
         return KlassDefinition(
-            name = klassDeclaration?.identifier?.identifier ?: file.presentableName,
+            name = klassDeclaration?.identifier?.identifier ?: presentableName,
             filePackage = packageHeader?.identifier?.map { it.identifier } ?: emptyList(),
             classType = klassDeclaration?.keyword?.let { keyword -> KlassType.values().firstOrNull { it.id == keyword } } ?: KlassType.UNKNOWN,
             fileImports = importList?.children?.map { import -> (import as Import).identifier.map { it.identifier } } ?: emptyList(),

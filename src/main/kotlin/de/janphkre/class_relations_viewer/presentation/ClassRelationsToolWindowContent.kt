@@ -1,5 +1,6 @@
 package de.janphkre.class_relations_viewer.presentation
 
+import com.intellij.openapi.editor.Document
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBPanel
@@ -14,11 +15,11 @@ class ClassRelationsToolWindowContent(
     private var updateContentAction: () -> Unit = {}
 
     fun getInitialContent(): JBPanel<JBPanel<*>> {
-        val file = service.getInitialFile()
-        return if(file == null) {
+        val document = service.getInitialDocument()
+        return if(document == null) {
             getEmptyContent()
         } else {
-            getOpenFileContent(file)
+            getDataContent(document)
         }
     }
 
@@ -26,12 +27,13 @@ class ClassRelationsToolWindowContent(
         showEmpty()
     }
 
-    fun getOpenFileContent(file: VirtualFile) = JBPanel<JBPanel<*>>().apply {
-        val content = service.getFileContent(file)
+    fun getDataContent(document: Document) = JBPanel<JBPanel<*>>().apply {
+        val content = service.getOpenEditorContent(document)
         if (content == null) {
             showEmpty()
         } else {
-            showForFile(content)
+            //TODO: CHECK ADJACENT FILES IN OPEN EDITORS
+            showForFiles(content, service.getAdjacentFileContents(document))
         }
     }
 
@@ -40,8 +42,8 @@ class ClassRelationsToolWindowContent(
         add(label)
     }
 
-    private fun JBPanel<JBPanel<*>>.showForFile(klassDefinition: KlassDefinition) {
-        add(JBLabel(klassDefinition.name))
+    private fun JBPanel<JBPanel<*>>.showForFiles(openFile: KlassDefinition, otherFiles: List<KlassDefinition>) {
+        add(JBLabel(openFile.name))
         add(JButton("Refresh").apply {
             addActionListener {
                 updateContentAction()
@@ -49,16 +51,16 @@ class ClassRelationsToolWindowContent(
         })
         val contentPanel = JBPanel<JBPanel<*>>()
         contentPanel.add(JBLabel("PACKAGE:"))
-        contentPanel.add(JBLabel(klassDefinition.filePackage.joinToString(".")))
+        contentPanel.add(JBLabel(openFile.filePackage.joinToString(".")))
         contentPanel.add(JBLabel("IMPORTS:"))
-        klassDefinition.fileImports.forEach { contentPanel.add(JBLabel(it.joinToString("."))) }
+        openFile.fileImports.forEach { contentPanel.add(JBLabel(it.joinToString("."))) }
         contentPanel.add(JBLabel("PARAMETERS:"))
-        klassDefinition.parameters.forEach { contentPanel.add(JBLabel(it)) }
+        openFile.parameters.forEach { contentPanel.add(JBLabel(it)) }
         contentPanel.add(JBLabel("INHERITANCES:"))
-        klassDefinition.inheritances.forEach { contentPanel.add(JBLabel(it)) }
+        openFile.inheritances.forEach { contentPanel.add(JBLabel(it)) }
         add(contentPanel)
         val contentPanel2 = JBPanel<JBPanel<*>>()
-        val generatedPuml = service.pumlGenerator.generate(listOf(klassDefinition.toKlassWithRelations()))
+        val generatedPuml = service.pumlGenerator.generate(otherFiles.plus(openFile).map { it.toKlassWithRelations() })
         println(generatedPuml)
         contentPanel2.add(JBLabel(generatedPuml))
         add(contentPanel2)
