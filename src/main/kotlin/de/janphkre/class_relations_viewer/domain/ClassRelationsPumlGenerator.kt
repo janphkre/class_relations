@@ -1,0 +1,195 @@
+package de.janphkre.class_relations_viewer.domain
+
+import de.janphkre.class_relations_viewer.model.*
+import java.util.*
+
+class ClassRelationsPumlGenerator(
+    private val generatorSettings: Settings
+) {
+
+    data class Settings(
+        val projectPackagePrefix: String,
+        val selfColor: String
+    )
+
+    private val openPackages = Stack<String>()
+
+    // All klasses must belong to the same package!
+    fun generate(klasses: List<KlassWithRelations>): String {
+        return StringBuilder(2048*klasses.size).apply {
+            appendLine("@startuml")
+            //STRUCTURE
+            createPackageStructure(klasses)
+            createClasses(klasses)
+            createImports(klasses)
+
+            if (openPackages.isNotEmpty()) {
+                println(this.toString())
+                throw IllegalStateException("Should have closed all packages, BUG in PUML Generator?!")
+            }
+            //CONNECTIONS
+            createConnections(klasses)
+
+            appendLine("@enduml")
+        }.toString()
+    }
+
+    private fun StringBuilder.createPackageStructure(klasses: List<KlassWithRelations>) {
+        val projectPrefix = generatorSettings.projectPackagePrefix.split('.')
+        val anyKlass = klasses.first()
+        if (!projectPrefix.withIndex().all { (index, item) -> anyKlass.item.filePackage[index] == item }) {
+            beginSelfPackage(anyKlass.item.filePackage.joinToString("."))
+        } else {
+            val packages = anyKlass.item.filePackage.drop(projectPrefix.size)
+            if (packages.size > 1) {
+                beginPackage(generatorSettings.projectPackagePrefix, null) //TODO: ADD LINK TARGETS?
+                for (i in 1 until packages.size - 1) {
+                    beginPackage(packages[i], null) //TODO: ADD LINK TARGETS?
+                }
+                beginSelfPackage(packages.last())
+            } else {
+                beginSelfPackage(generatorSettings.projectPackagePrefix)
+            }
+        }
+    }
+
+    private fun StringBuilder.createClasses(klasses: List<KlassWithRelations>) {
+        klasses.forEach { klass ->
+            createClass(klass.item)
+        }
+    }
+
+    private fun StringBuilder.createImports(klasses: List<KlassWithRelations>) {
+        val imports = groupImports(klasses.flatMap { it.fileImports })
+        //CurrentPackage tree first:
+        val currentImports = mutableListOf<KlassImport.Package>()
+        var previousImports = imports
+        for (openPackage in openPackages) {
+            val openPackageImports = (previousImports as? KlassImport.Package)?.elements?.firstOrNull { it.name == openPackage } as? KlassImport.Package
+            if(openPackageImports == null) {
+                break
+            }
+            currentImports.add(openPackageImports)
+            previousImports = openPackageImports
+        }
+
+        // Close packages that do not have used classes:
+        for (i in openPackages.size - 1 downTo currentImports.size ) {
+            closePackage()
+        }
+        // Create imported classes in open package tree:
+        var lastOpenPackage = openPackages.lastOrNull()
+        for (i in currentImports.size - 1 downTo 0) {
+            createImportedClassesInPackage(currentImports[i], lastOpenPackage)
+            lastOpenPackage = openPackages.last()
+            closePackage()
+        }
+
+        //Remaining imports:
+        createImportedClassesInPackage(imports, lastOpenPackage)
+    }
+
+    private fun groupImports(input: List<KlassItem>): KlassImport.Package {
+        if (input.isEmpty()) return KlassImport.Package("", emptyList())
+        return KlassImport.Package("", groupImportsInner(input))
+    }
+
+    private fun groupImportsInner(input: List<KlassItem>):  List<KlassImport> {
+        return input.groupBy { if (it.filePackage.isEmpty()) null else it.filePackage.first() }
+            .map { (key, subLists) ->
+                if (key == null) {
+                    return@map subLists.map { KlassImport.Klass(it.name) }
+                }
+                val nested = subLists.map { KlassItem(it.name, it.filePackage.drop(1)) }
+                listOf(KlassImport.Package(key, groupImportsInner(nested)))
+            }.flatten()
+    }
+
+    private fun StringBuilder.createImportedClassesInPackage(imports: KlassImport.Package, skipPreviousKey: String?) {
+        for (element in imports.elements) {
+            if (element.name == skipPreviousKey) {
+                // Skip already visited key
+                continue
+            }
+            when(element) {
+                is KlassImport.Package -> {
+                    beginPackage(element.name, null)
+                    createImportedClassesInPackage(element)
+                    closePackage()
+                }
+                is KlassImport.Klass -> {
+                    createImportedClass(element.name)
+                }
+            }
+        }
+    }
+
+    private fun StringBuilder.createImportedClassesInPackage(imports: KlassImport.Package) {
+        for (element in imports.elements) {
+            when(element) {
+                is KlassImport.Package -> {
+                    beginPackage(element.name, null)
+                    createImportedClassesInPackage(element)
+                    closePackage()
+                }
+                is KlassImport.Klass -> {
+                    createImportedClass(element.name)
+                }
+            }
+        }
+    }
+
+    private fun StringBuilder.createImportedClass(name: String) {
+        appendLine("circle \"${name}\"") //TODO: LINK TARGET
+    }
+
+    private fun StringBuilder.createClass(klassItem: KlassItemWithType) {
+        val plantUmlType = when(klassItem.type) {
+            KlassType.DATA_CLASS -> "entity"
+            KlassType.CLASS -> "class"
+            KlassType.ABSTRACT_CLASS -> "abstract class"
+            KlassType.OBJECT -> "class" //TODO?
+            KlassType.INTERFACE -> "interface"
+            KlassType.ENUM_CLASS -> "enum"
+            KlassType.UNKNOWN -> "diamond"
+        }
+        appendLine("$plantUmlType \"${klassItem.name}\" as ${klassItem.name} {")
+        klassItem.methods.forEach { method ->
+            appendLine("{method} $method")
+        }
+        appendLine("}")
+    }
+
+    private fun StringBuilder.beginPackage(name: String, linkTarget: String?) {
+        if (linkTarget != null) {
+            appendLine("package \"[[$linkTarget $name]]\" #ffffff {")
+        } else {
+            appendLine("package \"$name\" #ffffff {")
+        }
+        openPackages.push(name)
+    }
+
+    private fun StringBuilder.beginSelfPackage(name: String) {
+        appendLine("package \"$name\" ${generatorSettings.selfColor} {")
+        openPackages.push(name)
+    }
+    private fun StringBuilder.closePackage() {
+        appendLine("}")
+        openPackages.pop()
+    }
+
+
+    private fun StringBuilder.createConnections(klasses: List<KlassWithRelations>) {
+        klasses.forEach { definition ->
+            definition.inheritances.forEach { inheritance ->
+                appendLine("${definition.item.name} .up.|> ${inheritance.name}")
+            }
+            definition.parameters.forEach { parameter ->
+                appendLine("${definition.item.name} o-down- ${parameter.name}")
+            }
+            definition.usages.forEach { parameter ->
+                appendLine("${definition.item.name} -down-> ${parameter.name}")
+            }
+        }
+    }
+}
