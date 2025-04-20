@@ -1,6 +1,8 @@
 package de.janphkre.class_relations_viewer.presentation
 
 import com.intellij.openapi.editor.Document
+import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBPanel
@@ -15,11 +17,11 @@ class ClassRelationsToolWindowContent(
     private var updateContentAction: () -> Unit = {}
 
     fun getInitialContent(): JBPanel<JBPanel<*>> {
-        val document = service.getInitialDocument()
-        return if(document == null) {
+        val editor = service.getInitialContent()
+        return if(editor == null) {
             getEmptyContent()
         } else {
-            getDataContent(document)
+            getDataContent(editor)
         }
     }
 
@@ -27,13 +29,12 @@ class ClassRelationsToolWindowContent(
         showEmpty()
     }
 
-    fun getDataContent(document: Document) = JBPanel<JBPanel<*>>().apply {
-        val content = service.getOpenEditorContent(document)
+    fun getDataContent(editor: TextEditor) = JBPanel<JBPanel<*>>().apply {
+        val content = service.getOpenEditorContent(editor)
         if (content == null) {
             showEmpty()
         } else {
-            //TODO: CHECK ADJACENT FILES IN OPEN EDITORS
-            showForFiles(content, service.getAdjacentFileContents(document))
+            showForFiles(content, service.getAdjacentFileContents(editor))
         }
     }
 

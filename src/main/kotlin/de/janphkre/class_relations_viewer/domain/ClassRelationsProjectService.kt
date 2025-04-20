@@ -3,8 +3,10 @@ package de.janphkre.class_relations_viewer.domain
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.Document
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileEditorManager
+import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.isFile
@@ -19,27 +21,41 @@ class ClassRelationsProjectService(
     private val fileDocumentManager = FileDocumentManager.getInstance()
     private val parser: KotlinHeaderParser = KotlinHeaderParser()
     val pumlGenerator = ClassRelationsPumlGenerator(
-        ClassRelationsPumlGenerator.Settings("asdf","#ff0000")
+        ClassRelationsPumlGenerator.Settings(
+            projectPackagePrefix = "asdf",
+            selfColor = "#ff0000",
+            spaceCount = 2
+        )
     )
 
-    fun getInitialDocument(): Document? {
-        val currentDoc = fileEditorManager.selectedTextEditor?.document ?: return null
-        return currentDoc
+    fun getInitialContent(): TextEditor? {
+        val currentEditor = fileEditorManager.selectedTextEditor ?: return null
+        return currentEditor as? TextEditor
     }
 
-    fun getAdjacentFileContents(document: Document): List<KlassDefinition> {
-        val currentFile = fileDocumentManager.getFile(document) ?: return emptyList()
-        return currentFile.parent.children.mapNotNull {
-            if (it == currentFile) {
+    fun getAdjacentFileContents(baseEditor: TextEditor): List<KlassDefinition> {
+        val currentFile = fileDocumentManager.getFile(baseEditor.editor.document) ?: return emptyList()
+        val editors = fileEditorManager.allEditors.filterIsInstance<TextEditor>()
+        return currentFile.parent.children.mapNotNull { file ->
+            if (file == currentFile) {
                 return@mapNotNull null
             }
-            getFileContent(it)
+            val editor = editors.firstOrNull { editor ->
+                editor.file == file
+            }
+            if (editor != null) {
+                getOpenEditorContent(editor)
+            } else {
+                getFileContent(file)
+            }
         }
     }
 
-    //TODO: title
-    fun getOpenEditorContent(document: Document): KlassDefinition? {
-        return parser.parse(document.text, document.toString())
+    fun getOpenEditorContent(editor: TextEditor): KlassDefinition? {
+        if (editor.file.extension != "kt") {
+            return null
+        }
+        return parser.parse(editor.editor.document.text, editor.name)
     }
 
     fun getFileContent(file: VirtualFile): KlassDefinition? {

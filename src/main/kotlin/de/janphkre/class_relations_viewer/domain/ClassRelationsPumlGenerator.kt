@@ -9,7 +9,8 @@ class ClassRelationsPumlGenerator(
 
     data class Settings(
         val projectPackagePrefix: String,
-        val selfColor: String
+        val selfColor: String,
+        val spaceCount: Int
     )
 
     private val openPackages = Stack<String>()
@@ -17,12 +18,12 @@ class ClassRelationsPumlGenerator(
     // All klasses must belong to the same package!
     fun generate(klasses: List<KlassWithRelations>): String {
         return StringBuilder(2048*klasses.size).apply {
-            appendLine("@startuml")
+            appendContent("@startuml")
             //STRUCTURE
             createPackageStructure(klasses)
             createClasses(klasses)
             createImports(klasses)
-
+            appendLine()
             if (openPackages.isNotEmpty()) {
                 println(this.toString())
                 throw IllegalStateException("Should have closed all packages, BUG in PUML Generator?!")
@@ -30,7 +31,7 @@ class ClassRelationsPumlGenerator(
             //CONNECTIONS
             createConnections(klasses)
 
-            appendLine("@enduml")
+            appendContent("@enduml")
         }.toString()
     }
 
@@ -140,7 +141,7 @@ class ClassRelationsPumlGenerator(
     }
 
     private fun StringBuilder.createImportedClass(name: String) {
-        appendLine("circle \"${name}\"") //TODO: LINK TARGET
+        appendContent("circle \"${name}\"") //TODO: LINK TARGET
     }
 
     private fun StringBuilder.createClass(klassItem: KlassItemWithType) {
@@ -153,43 +154,48 @@ class ClassRelationsPumlGenerator(
             KlassType.ENUM_CLASS -> "enum"
             KlassType.UNKNOWN -> "diamond"
         }
-        appendLine("$plantUmlType \"${klassItem.name}\" as ${klassItem.name} {")
+        appendContent("$plantUmlType \"${klassItem.name}\" as ${klassItem.name} {")
         klassItem.methods.forEach { method ->
-            appendLine("{method} $method")
+            appendContent("${" ".repeat(generatorSettings.spaceCount)}{method} $method")
         }
-        appendLine("}")
+        appendContent("}")
     }
 
     private fun StringBuilder.beginPackage(name: String, linkTarget: String?) {
         if (linkTarget != null) {
-            appendLine("package \"[[$linkTarget $name]]\" #ffffff {")
+            appendContent("package \"[[$linkTarget $name]]\" #ffffff {")
         } else {
-            appendLine("package \"$name\" #ffffff {")
+            appendContent("package \"$name\" #ffffff {")
         }
         openPackages.push(name)
     }
 
     private fun StringBuilder.beginSelfPackage(name: String) {
-        appendLine("package \"$name\" ${generatorSettings.selfColor} {")
+        appendContent("package \"$name\" ${generatorSettings.selfColor} {")
         openPackages.push(name)
     }
     private fun StringBuilder.closePackage() {
-        appendLine("}")
         openPackages.pop()
+        appendContent("}")
     }
 
 
     private fun StringBuilder.createConnections(klasses: List<KlassWithRelations>) {
         klasses.forEach { definition ->
             definition.inheritances.forEach { inheritance ->
-                appendLine("${definition.item.name} .up.|> ${inheritance.name}")
+                appendContent("${definition.item.name} .up.|> ${inheritance.name}")
             }
             definition.parameters.forEach { parameter ->
-                appendLine("${definition.item.name} o-down- ${parameter.name}")
+                appendContent("${definition.item.name} o-down- ${parameter.name}")
             }
             definition.usages.forEach { parameter ->
-                appendLine("${definition.item.name} -down-> ${parameter.name}")
+                appendContent("${definition.item.name} -down-> ${parameter.name}")
             }
         }
+    }
+
+    private fun StringBuilder.appendContent(string: String) {
+        append(" ".repeat(openPackages.size * generatorSettings.spaceCount))
+        appendLine(string)
     }
 }

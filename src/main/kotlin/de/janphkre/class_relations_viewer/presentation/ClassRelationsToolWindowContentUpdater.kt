@@ -26,7 +26,7 @@ class ClassRelationsToolWindowContentUpdater(
 
     override fun selectionChanged(event: FileEditorManagerEvent) {
         val content = contentFactory.createContent(
-            (event.newEditor as? TextEditor)?.editor?.document?.let { toolWindowContent.getDataContent(it) } ?: toolWindowContent.getEmptyContent(),
+            (event.newEditor as? TextEditor)?.let { toolWindowContent.getDataContent(it) } ?: toolWindowContent.getEmptyContent(),
             null,
             false
         )//TODO: DO NOT RECREATE WHOLE UI AT ALL TIMES -> create canvas for plantuml renderer!
