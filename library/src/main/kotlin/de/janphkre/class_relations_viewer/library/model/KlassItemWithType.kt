@@ -4,5 +4,6 @@ data class KlassItemWithType(
     val name: String,
     val filePackage: List<String>,
     val methods: List<String>,
-    val type: KlassType
+    val type: KlassType,
+    val filePath: String
 )

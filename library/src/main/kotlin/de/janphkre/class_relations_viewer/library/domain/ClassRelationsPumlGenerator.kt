@@ -1,6 +1,5 @@
 package de.janphkre.class_relations_viewer.library.domain
 
-import de.janphkre.class_relations_viewer.idea_plugin.model.*
 import de.janphkre.class_relations_viewer.library.model.*
 import java.util.*
 
@@ -11,19 +10,21 @@ class ClassRelationsPumlGenerator(
     data class Settings(
         val projectPackagePrefix: String,
         val selfColor: String,
-        val spaceCount: Int
+        val spaceCount: Int,
+        val generatedFileName: String,
+        val initialCapacitySize : Int = 2048
     )
 
     private val openPackages = Stack<String>()
 
     // All klasses must belong to the same package!
-    fun generate(klasses: List<KlassWithRelations>): String {
-        return StringBuilder(2048*klasses.size).apply {
+    fun generate(klasses: List<KlassWithRelations>, rootGeneratedLink: String): String {
+        return StringBuilder(generatorSettings.initialCapacitySize * klasses.size).apply {
             appendContent("@startuml")
             //STRUCTURE
-            createPackageStructure(klasses)
+            createPackageStructure(klasses, rootGeneratedLink)
             createClasses(klasses)
-            createImports(klasses)
+            createImports(klasses, rootGeneratedLink)
             appendLine()
             if (openPackages.isNotEmpty()) {
                 println(this.toString())
@@ -36,7 +37,7 @@ class ClassRelationsPumlGenerator(
         }.toString()
     }
 
-    private fun StringBuilder.createPackageStructure(klasses: List<KlassWithRelations>) {
+    private fun StringBuilder.createPackageStructure(klasses: List<KlassWithRelations>, rootGeneratedLink: String) {
         val projectPrefix = generatorSettings.projectPackagePrefix.split('.')
         val anyKlass = klasses.first()
         if (!projectPrefix.withIndex().all { (index, item) -> anyKlass.item.filePackage[index] == item }) {
@@ -44,9 +45,11 @@ class ClassRelationsPumlGenerator(
         } else {
             val packages = anyKlass.item.filePackage.drop(projectPrefix.size)
             if (packages.size > 1) {
-                beginPackage(generatorSettings.projectPackagePrefix, null) //TODO: ADD LINK TARGETS?
-                for (i in 1 until packages.size - 1) {
-                    beginPackage(packages[i], null) //TODO: ADD LINK TARGETS?
+                beginPackage(generatorSettings.projectPackagePrefix, rootGeneratedLink)
+                var packageLink = rootGeneratedLink
+                for (i in 0 until packages.size - 1) {
+                    packageLink += "/${packages[i]}"
+                    beginPackage(packages[i], packageLink)
                 }
                 beginSelfPackage(packages.last())
             } else {
@@ -61,7 +64,7 @@ class ClassRelationsPumlGenerator(
         }
     }
 
-    private fun StringBuilder.createImports(klasses: List<KlassWithRelations>) {
+    private fun StringBuilder.createImports(klasses: List<KlassWithRelations>, rootGeneratedLink: String) {
         val imports = groupImports(klasses.flatMap { it.fileImports })
         //CurrentPackage tree first:
         val currentImports = mutableListOf<KlassImport.Package>()
@@ -82,13 +85,13 @@ class ClassRelationsPumlGenerator(
         // Create imported classes in open package tree:
         var lastOpenPackage = openPackages.lastOrNull()
         for (i in currentImports.size - 1 downTo 0) {
-            createImportedClassesInPackage(currentImports[i], lastOpenPackage)
+            createImportedClassesInPackage(currentImports[i], lastOpenPackage, rootGeneratedLink)
             lastOpenPackage = openPackages.last()
             closePackage()
         }
 
         //Remaining imports:
-        createImportedClassesInPackage(imports, lastOpenPackage)
+        createImportedClassesInPackage(imports, lastOpenPackage, rootGeneratedLink)
     }
 
     private fun groupImports(input: List<KlassItem>): KlassImport.Package {
@@ -107,7 +110,11 @@ class ClassRelationsPumlGenerator(
             }.flatten()
     }
 
-    private fun StringBuilder.createImportedClassesInPackage(imports: KlassImport.Package, skipPreviousKey: String?) {
+    private fun StringBuilder.createImportedClassesInPackage(
+        imports: KlassImport.Package,
+        skipPreviousKey: String?,
+        rootGeneratedLink: String
+    ) {
         for (element in imports.elements) {
             if (element.name == skipPreviousKey) {
                 // Skip already visited key
@@ -115,8 +122,9 @@ class ClassRelationsPumlGenerator(
             }
             when(element) {
                 is KlassImport.Package -> {
-                    beginPackage(element.name, null)
-                    createImportedClassesInPackage(element)
+                    val packageTarget = "${rootGeneratedLink}/${element.name}"
+                    beginPackage(element.name, packageTarget)
+                    createImportedClassesInPackage(element, packageTarget)
                     closePackage()
                 }
                 is KlassImport.Klass -> {
@@ -126,12 +134,16 @@ class ClassRelationsPumlGenerator(
         }
     }
 
-    private fun StringBuilder.createImportedClassesInPackage(imports: KlassImport.Package) {
+    private fun StringBuilder.createImportedClassesInPackage(
+        imports: KlassImport.Package,
+        rootGeneratedLink: String
+    ) {
         for (element in imports.elements) {
             when(element) {
                 is KlassImport.Package -> {
-                    beginPackage(element.name, null)
-                    createImportedClassesInPackage(element)
+                    val packageTarget = "${rootGeneratedLink}/${element.name}"
+                    beginPackage(element.name, packageTarget)
+                    createImportedClassesInPackage(element, packageTarget)
                     closePackage()
                 }
                 is KlassImport.Klass -> {
@@ -142,7 +154,7 @@ class ClassRelationsPumlGenerator(
     }
 
     private fun StringBuilder.createImportedClass(name: String) {
-        appendContent("circle \"${name}\"") //TODO: LINK TARGET
+        appendContent("circle \"${name}\"")
     }
 
     private fun StringBuilder.createClass(klassItem: KlassItemWithType) {
@@ -150,12 +162,12 @@ class ClassRelationsPumlGenerator(
             KlassType.DATA_CLASS -> "entity"
             KlassType.CLASS -> "class"
             KlassType.ABSTRACT_CLASS -> "abstract class"
-            KlassType.OBJECT -> "class" //TODO?
+            KlassType.OBJECT -> "class"
             KlassType.INTERFACE -> "interface"
             KlassType.ENUM_CLASS -> "enum"
             KlassType.UNKNOWN -> "diamond"
         }
-        appendContent("$plantUmlType \"${klassItem.name}\" as ${klassItem.name} {")
+        appendContent("$plantUmlType \"[[${klassItem.filePath} ${klassItem.name}]]\" as ${klassItem.name} {")
         klassItem.methods.forEach { method ->
             appendContent("${" ".repeat(generatorSettings.spaceCount)}{method} $method")
         }
@@ -164,7 +176,7 @@ class ClassRelationsPumlGenerator(
 
     private fun StringBuilder.beginPackage(name: String, linkTarget: String?) {
         if (linkTarget != null) {
-            appendContent("package \"[[$linkTarget $name]]\" #ffffff {")
+            appendContent("package \"[[$linkTarget/$${generatorSettings.generatedFileName} $name]]\" #ffffff {")
         } else {
             appendContent("package \"$name\" #ffffff {")
         }
