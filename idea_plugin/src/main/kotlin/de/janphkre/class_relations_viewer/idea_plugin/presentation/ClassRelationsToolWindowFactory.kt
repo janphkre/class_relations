@@ -1,9 +1,9 @@
-package de.janphkre.class_relations_viewer.presentation
+package de.janphkre.class_relations_viewer.idea_plugin.presentation
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
-import de.janphkre.class_relations_viewer.domain.ClassRelationsProjectService
+import de.janphkre.class_relations_viewer.idea_plugin.domain.ClassRelationsProjectService
 
 class ClassRelationsToolWindowFactory: ToolWindowFactory {
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {

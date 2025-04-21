@@ -1,7 +1,7 @@
-package de.janphkre.class_relations_viewer.domain
+package de.janphkre.class_relations_viewer.library.domain
 
-import de.janphkre.class_relations_viewer.model.KlassDefinition
-import de.janphkre.class_relations_viewer.model.KlassType
+import de.janphkre.class_relations_viewer.library.model.KlassDefinition
+import de.janphkre.class_relations_viewer.library.model.KlassType
 import kotlinx.ast.common.AstFailure
 import kotlinx.ast.common.AstSource
 import kotlinx.ast.common.AstSuccess

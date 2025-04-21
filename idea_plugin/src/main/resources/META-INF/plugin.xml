@@ -23,7 +23,7 @@
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow
-                factoryClass="de.janphkre.class_relations_viewer.presentation.ClassRelationsToolWindowFactory"
+                factoryClass="de.janphkre.class_relations_viewer.idea_plugin.presentation.ClassRelationsToolWindowFactory"
                 id="Class_Relations"
                 anchor="right"
                 secondary="false"

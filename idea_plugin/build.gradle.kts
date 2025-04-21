@@ -20,7 +20,7 @@ intellij {
 
     plugins.set(listOf(/* Plugin Dependencies */))
     dependencies {
-        implementation("com.github.kotlinx.ast:grammar-kotlin-parser-antlr-kotlin-jvm:0.1.0")
+        implementation(project(":library"))
     }
 }
 

@@ -1,4 +1,4 @@
-package de.janphkre.class_relations_viewer.model
+package de.janphkre.class_relations_viewer.library.model
 
 data class KlassItem(
     val name: String,
