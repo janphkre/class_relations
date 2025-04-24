@@ -34,23 +34,19 @@ abstract class GenerateTask: DefaultTask() {
         )
         val parser = KotlinHeaderParser()
         val sourceDir = source.get()
-        sourceDir.walkBottomUp()
-            .onEnter {
-                println("Entering $it")
-                if (definitions.isNotEmpty()) {
-                    println("Entered directory $it before all definitions of parent(?) were generated!")
-                }
-                generateDiagram(it.toRelativeString(sourceDir))
-                true
-            }
-            .onLeave {
-                println("Leaving $it")
-                generateDiagram(it.toRelativeString(sourceDir))
-            }
+        Sequence { SortedFileTreeWalker(sourceDir, onLeave = {
+            println("Leaving $it")
+            generateDiagram(it.toRelativeString(sourceDir))
+        }) }
+            .filter { it.extension == "kt" }
             .forEach { file ->
-                val definition = parser.parse(file.readText(), file.nameWithoutExtension)
-                definitions.add(definition?.toKlassWithRelations() ?: return@forEach)
+                parser.readDefinition(file)
             }
+    }
+
+    private fun KotlinHeaderParser.readDefinition(file: File) {
+        val definition = parse(file.readText(), file.nameWithoutExtension)
+        definitions.add(definition?.toKlassWithRelations() ?: return)
     }
 
     private fun generateDiagram(destinationDiagramPath: String) {
@@ -59,7 +55,7 @@ abstract class GenerateTask: DefaultTask() {
             return
         }
         val pumlDiagram = generator.generate(definitions, destinationPathFromModule)
-        val destinationFile = File(destination.get(), destinationDiagramPath))
+        val destinationFile = File(destination.get(), destinationDiagramPath)
         destinationFile.parentFile.mkdirs()
         destinationFile.writeText(pumlDiagram)
         definitions.clear()
