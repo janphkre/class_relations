@@ -1,10 +1,10 @@
-package de.janphkre.class_relations_viewer.idea_plugin.presentation
+package de.janphkre.class_relations.idea_plugin.presentation
 
 import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBPanel
-import de.janphkre.class_relations_viewer.idea_plugin.domain.ClassRelationsProjectService
-import de.janphkre.class_relations_viewer.library.model.KlassDefinition
+import de.janphkre.class_relations.idea_plugin.domain.ClassRelationsProjectService
+import de.janphkre.class_relations.library.model.KlassDefinition
 import javax.swing.JButton
 
 class ClassRelationsToolWindowContent(

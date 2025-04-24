@@ -1,8 +1,8 @@
-package de.janphkre.class_relations_viewer.generator
+package de.janphkre.class_relations.generator
 
-import de.janphkre.class_relations_viewer.library.domain.ClassRelationsPumlGenerator
-import de.janphkre.class_relations_viewer.library.domain.KotlinHeaderParser
-import de.janphkre.class_relations_viewer.library.model.KlassWithRelations
+import de.janphkre.class_relations.library.domain.ClassRelationsPumlGenerator
+import de.janphkre.class_relations.library.domain.KotlinHeaderParser
+import de.janphkre.class_relations.library.model.KlassWithRelations
 import org.gradle.api.DefaultTask
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*

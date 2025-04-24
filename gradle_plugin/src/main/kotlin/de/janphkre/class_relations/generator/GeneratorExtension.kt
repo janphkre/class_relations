@@ -1,4 +1,4 @@
-package de.janphkre.class_relations_viewer.generator
+package de.janphkre.class_relations.generator
 
 import org.gradle.api.provider.Property
 import java.io.File

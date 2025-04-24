@@ -1,7 +1,7 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
     <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
-    <id>de.janphkre.class_relations_viewer</id>
+    <id>de.janphkre.class_relations.idea_plugin</id>
 
     <!-- Public plugin name should be written in Title Case.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
@@ -23,7 +23,7 @@
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow
-                factoryClass="de.janphkre.class_relations_viewer.idea_plugin.presentation.ClassRelationsToolWindowFactory"
+                factoryClass="de.janphkre.class_relations.idea_plugin.presentation.ClassRelationsToolWindowFactory"
                 id="Class_Relations"
                 anchor="right"
                 secondary="false"

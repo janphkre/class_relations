@@ -1,6 +1,6 @@
-package de.janphkre.class_relations_viewer.library.domain
+package de.janphkre.class_relations.library.domain
 
-import de.janphkre.class_relations_viewer.library.model.*
+import de.janphkre.class_relations.library.model.*
 import java.util.*
 
 class ClassRelationsPumlGenerator(

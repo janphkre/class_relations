@@ -19,8 +19,8 @@ dependencies {
 gradlePlugin {
     plugins {
         create("classRelationsGenerator") {
-            id = "de.janphkre.class_relations_viewer"
-            implementationClass = "de.janphkre.class_relations_viewer.generator.GeneratorPlugin"
+            id = "de.janphkre.class_relations"
+            implementationClass = "de.janphkre.class_relations.generator.GeneratorPlugin"
         }
     }
 }

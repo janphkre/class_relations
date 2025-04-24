@@ -1,4 +1,4 @@
-package de.janphkre.class_relations_viewer.idea_plugin.domain
+package de.janphkre.class_relations.idea_plugin.domain
 
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
@@ -7,9 +7,9 @@ import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
-import de.janphkre.class_relations_viewer.library.model.KlassDefinition
-import de.janphkre.class_relations_viewer.library.domain.KotlinHeaderParser
-import de.janphkre.class_relations_viewer.library.domain.ClassRelationsPumlGenerator
+import de.janphkre.class_relations.library.model.KlassDefinition
+import de.janphkre.class_relations.library.domain.KotlinHeaderParser
+import de.janphkre.class_relations.library.domain.ClassRelationsPumlGenerator
 
 @Service(Service.Level.PROJECT)
 class ClassRelationsProjectService(

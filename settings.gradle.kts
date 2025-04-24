@@ -5,7 +5,7 @@ pluginManagement {
     }
 }
 
-rootProject.name = "class_relations_viewer"
+rootProject.name = "class_relations"
 
 include("idea_plugin")
 include("gradle_plugin")

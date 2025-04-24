@@ -1,4 +1,4 @@
-package de.janphkre.class_relations_viewer.idea_plugin.presentation
+package de.janphkre.class_relations.idea_plugin.presentation
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent

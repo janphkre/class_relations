@@ -1,4 +1,4 @@
-package de.janphkre.class_relations_viewer.library.model
+package de.janphkre.class_relations.library.model
 
 data class KlassDefinition(
     val name: String,
