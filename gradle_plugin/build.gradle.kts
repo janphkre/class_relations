@@ -14,6 +14,9 @@ repositories {
 
 dependencies {
     implementation(project(":library"))
+    testImplementation(kotlin("test"))
+    testImplementation("io.mockk:mockk:1.14.0")
+    testImplementation("ch.tutteli.atrium:atrium-fluent:1.2.0")
 }
 
 gradlePlugin {

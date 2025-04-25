@@ -1,5 +1,6 @@
 package de.janphkre.class_relations.generator
 
+import de.janphkre.class_relations.generator.filetree.SortedFileTreeWalker
 import de.janphkre.class_relations.library.domain.ClassRelationsPumlGenerator
 import de.janphkre.class_relations.library.domain.KotlinHeaderParser
 import de.janphkre.class_relations.library.model.KlassWithRelations
@@ -39,13 +40,13 @@ abstract class GenerateTask: DefaultTask() {
             generateDiagram(it.toRelativeString(sourceDir))
         }) }
             .filter { it.extension == "kt" }
-            .forEach { file ->
-                parser.readDefinition(file)
+            .forEach { path ->
+                parser.readDefinition(path)
             }
     }
 
     private fun KotlinHeaderParser.readDefinition(file: File) {
-        val definition = parse(file.readText(), file.nameWithoutExtension)
+        val definition = parse(file.readText(), file.nameWithoutExtension, filePath = file.absolutePath)
         definitions.add(definition?.toKlassWithRelations() ?: return)
     }
 

@@ -1,4 +1,4 @@
-package de.janphkre.class_relations.generator
+package de.janphkre.class_relations.generator.filetree
 
 import java.io.File
 import java.util.Stack
@@ -23,29 +23,36 @@ class SortedFileTreeWalker(root: File, private val onLeave: (File) -> Unit): Ite
         remainingDirectories.add(listOf(root).iterator())
     }
 
-    private fun computeNext() {
+    private fun computeNextDirectory(): Boolean {
         while (remainingDirectories.isNotEmpty() && !remainingDirectories.peek().hasNext()) {
             remainingDirectories.pop()
         }
         if (remainingDirectories.isEmpty()) {
             openDirectory = null
-            return
+            return false
         }
         val directory = listFiles(remainingDirectories.peek().next())
         openDirectory = directory
         remainingDirectories.push(directory.subDirectories)
+        if (!directory.files.hasNext()) {
+            onLeave(directory.directory)
+            return computeNextDirectory()
+        }
+        return true
     }
 
     override fun hasNext(): Boolean {
         if (remainingDirectories.isEmpty()) {
             return false
         }
+        if(openDirectory == null) {
+            return computeNextDirectory()
+        }
         if (openDirectory!!.files.hasNext() ) {
             return true
         }
         onLeave(openDirectory!!.directory)
-        computeNext()
-        return openDirectory != null
+        return computeNextDirectory()
     }
 
     override fun next(): File {
@@ -54,7 +61,7 @@ class SortedFileTreeWalker(root: File, private val onLeave: (File) -> Unit): Ite
 
     private fun listFiles(directory: File): Directory {
         val content = directory.listFiles() ?: emptyArray()
-        val contentFiles = ArrayList<File>( content.size + 1)
+        val contentFiles = ArrayList<File>(content.size)
         val contentDirectories = ArrayList<File>(content.size)
         for (element in content) {
             if (element.isFile) {
@@ -63,7 +70,6 @@ class SortedFileTreeWalker(root: File, private val onLeave: (File) -> Unit): Ite
                 contentDirectories.add(element)
             }
         }
-        contentFiles.add(directory)
         return Directory(contentFiles.iterator(), directory, contentDirectories.iterator())
     }
 

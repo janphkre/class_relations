@@ -7,7 +7,8 @@ data class KlassDefinition(
     val fileImports: List<List<String>>,
     val parameters: List<String>,
     val inheritances: List<String>,
-    val methods: List<String>
+    val methods: List<String>,
+    val filePath: String
 ) {
 
     fun toKlassWithRelations(): KlassWithRelations {
@@ -17,7 +18,8 @@ data class KlassDefinition(
                 name = name,
                 filePackage = filePackage,
                 type = classType,
-                methods = methods
+                methods = methods,
+                filePath = filePath
             ),
             fileImports = fileImportItems,
             parameters = parameters.map { parameter -> fileImportItems.firstOrNull { it.name == parameter } ?: KlassItem(parameter, filePackage) }, //TODO: SUPPORT ALIAS IMPORTS
