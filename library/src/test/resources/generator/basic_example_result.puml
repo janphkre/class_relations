@@ -1,0 +1,51 @@
+@startuml
+package "[[example/root/generated/example_relations.puml org.example]]" #ffffff {
+    package "a" #00FFFF {
+        class "[[src/main/org/example/a/ExampleClassName1.kt ExampleClassName1]]" as ExampleClassName1 {
+            {method} methodA
+            {method} methodB
+            {method} methodC
+        }
+        class "[[src/main/org/example/a/ExampleClassName5.kt ExampleClassName5]]" as ExampleClassName5 {
+            {method} methodD
+            {method} methodE
+            {method} methodF
+        }
+        enum "[[src/main/org/example/a/ExampleEnumClassName6.kt ExampleEnumClassName6]]" as ExampleEnumClassName6 {
+            {method} methodG
+        }
+        entity "[[src/main/org/example/a/ExampleDataClassName7.kt ExampleDataClassName7]]" as ExampleDataClassName7 {
+        }
+        interface "[[src/main/org/example/a/ExampleInterface.kt ExampleInterface]]" as ExampleInterface {
+            {method} methodB
+        }
+        abstract class "[[src/main/org/example/a/ExampleAbstractClassName8.kt ExampleAbstractClassName8]]" as ExampleAbstractClassName8 {
+            {method} methodH
+            {method} methodC
+        }
+        class "[[src/main/org/example/a/ExampleObject.kt ExampleObject]]" as ExampleObject {
+            {method} methodI
+        }
+    }
+    package "[[example/root/generated/org/example/b/example_relations.puml b]]" #ffffff {
+        circle "ExampleClassName2"
+        circle "ExampleClassName3"
+        circle "ExampleClassName4"
+    }
+}
+package "io.different" #ffffff {
+    circle "Something"
+}
+
+ExampleClassName1 .up.|> ExampleInterface
+ExampleClassName1 .up.|> ExampleAbstractClassName8
+ExampleClassName1 o-down- ExampleClassName5
+ExampleClassName1 o-down- ExampleEnumClassName6
+ExampleClassName1 o-down- ExampleDataClassName7
+ExampleClassName1 o-down- Something
+ExampleClassName1 o-down- ExampleObject
+ExampleClassName1 -down-> ExampleClassName2
+ExampleClassName1 -down-> ExampleClassName3
+ExampleClassName1 -down-> ExampleClassName4
+ExampleClassName5 -down-> Something
+@enduml

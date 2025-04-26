@@ -11,34 +11,40 @@ import java.io.File
 
 class ClassRelationsPumlGeneratorTest {
 
-    private val defaultGeneratorSettings = ClassRelationsPumlGenerator.Settings(
-        projectPackagePrefix = "org.example",
-        selfColor = "#00FFFF",
-        spaceCount = 4,
-        generatedFileName = "example_relations.puml"
-    )
-
     @Test
-    fun testBasicExample() {
-        val generator = ClassRelationsPumlGenerator(
-            defaultGeneratorSettings
-        )
+    fun testBasicExample() = verifyGenerator("basic_example")
 
-        val klasses = readJson("basic_example.json")
+    private fun verifyGenerator(id: String) {
+        val (generatorSettings, klasses) = readInput(id)
+        val generator = ClassRelationsPumlGenerator(
+            generatorSettings
+        )
         val result = generator.generate(
             klasses,
             rootGeneratedLink = "example/root/generated"
         )
-        Truth.assertThat(result.lines()).isEqualTo(readResource("basic_example_result.puml").lines())
+        Truth.assertThat(result).isEqualTo(readOutput(id))
+
     }
 
-    private fun readResource(file: String): String {
-        return File("src/test/resources/$file").readText()
+    private fun readFile(file: String): String {
+        return File("src/test/resources/generator/$file").readText()
     }
 
-    private fun readJson(file: String): List<KlassWithRelations> {
-        val json = Json.parseToJsonElement(readResource(file))
-        return json.jsonArray.map { jsonElement ->
+    private fun readOutput(file: String): String {
+        return readFile("$file$OUTPUT_POSTFIX")
+    }
+
+    private fun readInput(file: String): Pair<ClassRelationsPumlGenerator.Settings,List<KlassWithRelations>> {
+        val json = Json.parseToJsonElement(readFile("$file$INPUT_POSTFIX")).jsonObject
+        val jsonSettings = json["generatorSettings"]!!.jsonObject
+        val settings = ClassRelationsPumlGenerator.Settings(
+            projectPackagePrefix = jsonSettings["projectPackagePrefix"]!!.jsonPrimitive.content,
+            selfColor = jsonSettings["selfColor"]!!.jsonPrimitive.content,
+            spaceCount = jsonSettings["spaceCount"]!!.jsonPrimitive.int,
+            generatedFileName = jsonSettings["generatedFileName"]!!.jsonPrimitive.content,
+        )
+        val files = json["files"]!!.jsonArray.map { jsonElement ->
             val element = jsonElement.jsonObject
             val elementType = element["type"]!!.jsonPrimitive.content
             KlassWithRelations(
@@ -54,13 +60,19 @@ class ClassRelationsPumlGeneratorTest {
                 inheritances = element["inheritances"]!!.jsonArray.map { it.toKlassItem()},
             )
         }
+        return settings to files
     }
 
     private fun JsonElement.toKlassItem(): KlassItem {
         val json = this.jsonObject
         return KlassItem(
             name = json["name"]!!.jsonPrimitive.content,
-            filePackage = json["package"]!!.toString().split(".")
+            filePackage = json["package"]!!.jsonPrimitive.content.split(".")
         )
+    }
+
+    companion object {
+        private const val INPUT_POSTFIX = "_input.json"
+        private const val OUTPUT_POSTFIX = "_result.puml"
     }
 }
