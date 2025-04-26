@@ -23,12 +23,11 @@ class ClassRelationsPumlGeneratorTest {
             klasses,
             rootGeneratedLink = "example/root/generated"
         )
-        Truth.assertThat(result.lines()).isEqualTo(readOutput(id).lines())
-
+        Truth.assertThat(result).isEqualTo(readOutput(id))
     }
 
     private fun readFile(file: String): String {
-        return File("src/test/resources/generator/$file").readText()
+        return File("src/test/resources/generator/$file").readText().replace("\r","")
     }
 
     private fun readOutput(file: String): String {

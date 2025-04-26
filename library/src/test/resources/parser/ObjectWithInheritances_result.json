@@ -1,0 +1,14 @@
+{
+  "name": "ObjectWithInheritances",
+  "filePackage": "com.example.a",
+  "type": "object",
+  "fileImports": [
+    "io.other.SomeAbstractClass"
+  ],
+  "parameters": [],
+  "inheritances": [
+    "SomeAbstractClass",
+    "ExampleInterface"
+  ],
+  "methods": []
+}

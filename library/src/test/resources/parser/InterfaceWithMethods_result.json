@@ -1,0 +1,14 @@
+{
+  "name": "InterfaceWithMethods",
+  "filePackage": "com.example.a",
+  "type": "interface",
+  "fileImports": [],
+  "parameters": [],
+  "inheritances": [],
+  "methods": [
+    "methodA",
+    "methodB",
+    "methodC",
+    "methodD"
+  ]
+}

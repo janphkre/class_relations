@@ -1,0 +1,9 @@
+{
+  "name": "BasicClass",
+  "filePackage": "com.example.a",
+  "type": "class",
+  "fileImports": [],
+  "parameters": [],
+  "inheritances": [],
+  "methods": []
+}

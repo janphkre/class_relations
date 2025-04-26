@@ -1,0 +1,13 @@
+{
+  "name": "ClassWithMethods",
+  "filePackage": "com.example.a",
+  "type": "class",
+  "fileImports": [],
+  "parameters": [],
+  "inheritances": [],
+  "methods": [
+    "methodA",
+    "methodB",
+    "methodC"
+  ]
+}
