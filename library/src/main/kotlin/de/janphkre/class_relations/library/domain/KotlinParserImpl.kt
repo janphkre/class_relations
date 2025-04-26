@@ -15,8 +15,8 @@ import kotlinx.ast.grammar.kotlin.target.antlr.kotlin.KotlinGrammarAntlrKotlinPa
 /**
  * Grabs package name, imports and primary constructor parameters from file.
  */
-class KotlinHeaderParser {
-    fun parse(fileContent: String, presentableName: String, filePath: String): KlassDefinition? {
+internal object KotlinParserImpl: KotlinParser {
+    override fun parse(fileContent: String, presentableName: String, filePath: String): KlassDefinition? {
         val kotlinFileSummary = KotlinGrammarAntlrKotlinParser.parseKotlinFile(AstSource.String(description = presentableName, content = fileContent)).summary(attachRawAst = false)
         if (kotlinFileSummary is AstFailure) {
             kotlinFileSummary.errors.forEach(::println)

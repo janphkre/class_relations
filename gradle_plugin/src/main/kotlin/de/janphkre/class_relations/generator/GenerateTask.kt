@@ -2,7 +2,7 @@ package de.janphkre.class_relations.generator
 
 import de.janphkre.class_relations.generator.filetree.SortedFileTreeWalker
 import de.janphkre.class_relations.library.domain.ClassRelationsPumlGenerator
-import de.janphkre.class_relations.library.domain.KotlinHeaderParser
+import de.janphkre.class_relations.library.domain.KotlinParser
 import de.janphkre.class_relations.library.model.KlassWithRelations
 import org.gradle.api.DefaultTask
 import org.gradle.api.provider.Property
@@ -30,10 +30,10 @@ abstract class GenerateTask: DefaultTask() {
     @TaskAction
     fun action() {
         destinationPathFromModule = moduleDirectory.get().toRelativeString(destination.get())
-        generator = ClassRelationsPumlGenerator(
-            generatorSettings = generatorSettings.get()
+        generator = ClassRelationsPumlGenerator.getInstance(
+            settings = generatorSettings.get()
         )
-        val parser = KotlinHeaderParser()
+        val parser = KotlinParser.getInstance()
         val sourceDir = source.get()
         Sequence { SortedFileTreeWalker(sourceDir, onLeave = {
             println("Leaving $it")
@@ -45,7 +45,7 @@ abstract class GenerateTask: DefaultTask() {
             }
     }
 
-    private fun KotlinHeaderParser.readDefinition(file: File) {
+    private fun KotlinParser.readDefinition(file: File) {
         val definition = parse(file.readText(), file.nameWithoutExtension, filePath = file.absolutePath)
         definitions.add(definition?.toKlassWithRelations() ?: return)
     }

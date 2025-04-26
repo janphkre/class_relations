@@ -8,7 +8,7 @@ import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import de.janphkre.class_relations.library.model.KlassDefinition
-import de.janphkre.class_relations.library.domain.KotlinHeaderParser
+import de.janphkre.class_relations.library.domain.KotlinParser
 import de.janphkre.class_relations.library.domain.ClassRelationsPumlGenerator
 
 @Service(Service.Level.PROJECT)
@@ -18,8 +18,8 @@ class ClassRelationsProjectService(
 
     private val fileEditorManager = FileEditorManager.getInstance(project)
     private val fileDocumentManager = FileDocumentManager.getInstance()
-    private val parser: KotlinHeaderParser = KotlinHeaderParser()
-    val pumlGenerator = ClassRelationsPumlGenerator(
+    private val parser: KotlinParser = KotlinParser.getInstance()
+    val pumlGenerator = ClassRelationsPumlGenerator.getInstance(
         ClassRelationsPumlGenerator.Settings(
             projectPackagePrefix = "asdf",
             selfColor = "#ff0000",
