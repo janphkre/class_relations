@@ -2,6 +2,7 @@ package de.janphkre.class_relations.library.domain
 
 import de.janphkre.class_relations.library.model.*
 import java.util.*
+import kotlin.collections.ArrayList
 
 class ClassRelationsPumlGenerator(
     private val generatorSettings: Settings
@@ -15,9 +16,11 @@ class ClassRelationsPumlGenerator(
         val initialCapacitySize : Int = 2048
     )
 
+    private val projectPrefix = generatorSettings.projectPackagePrefix.split('.')
+
     private val openPackages = Stack<String>()
 
-    // All klasses must belong to the same package!
+    // All klasses must belong to the same package / folder!
     fun generate(klasses: List<KlassWithRelations>, rootGeneratedLink: String): String {
         return StringBuilder(generatorSettings.initialCapacitySize * klasses.size).apply {
             appendContent("@startuml")
@@ -38,24 +41,30 @@ class ClassRelationsPumlGenerator(
     }
 
     private fun StringBuilder.createPackageStructure(klasses: List<KlassWithRelations>, rootGeneratedLink: String) {
-        val projectPrefix = generatorSettings.projectPackagePrefix.split('.')
         val anyKlass = klasses.first()
-        if (!projectPrefix.withIndex().all { (index, item) -> anyKlass.item.filePackage[index] == item }) {
+        if (!anyKlass.item.filePackage.hasProjectPrefix()) {
             beginSelfPackage(anyKlass.item.filePackage.joinToString("."))
-        } else {
-            val packages = anyKlass.item.filePackage.drop(projectPrefix.size)
-            if (packages.size > 1) {
-                beginPackage(generatorSettings.projectPackagePrefix, rootGeneratedLink)
-                var packageLink = rootGeneratedLink
-                for (i in 0 until packages.size - 1) {
-                    packageLink += "/${packages[i]}"
-                    beginPackage(packages[i], packageLink)
-                }
-                beginSelfPackage(packages.last())
-            } else {
-                beginSelfPackage(generatorSettings.projectPackagePrefix)
-            }
+            return
         }
+        if (projectPrefix.size == anyKlass.item.filePackage.size) {
+            beginSelfPackage(anyKlass.item.filePackage.joinToString("."))
+            return
+        }
+        beginPackage(generatorSettings.projectPackagePrefix, rootGeneratedLink)
+        val packages = anyKlass.item.filePackage.drop(projectPrefix.size)
+        var packageLink = rootGeneratedLink
+        for (i in 0 until packages.size - 1) {
+            packageLink += "/${packages[i]}"
+            beginPackage(packages[i], packageLink)
+        }
+        beginSelfPackage(packages.last())
+    }
+
+    private fun List<String>.hasProjectPrefix(): Boolean {
+        if (size < projectPrefix.size) {
+            return false
+        }
+        return projectPrefix.withIndex().all { (index, item) -> this[index] == item }
     }
 
     private fun StringBuilder.createClasses(klasses: List<KlassWithRelations>) {
@@ -65,10 +74,10 @@ class ClassRelationsPumlGenerator(
     }
 
     private fun StringBuilder.createImports(klasses: List<KlassWithRelations>, rootGeneratedLink: String) {
-        val imports = groupImports(klasses.flatMap { it.fileImports })
+        val (projectImports, externalImports) = groupAllImports(klasses.flatMap { it.fileImports })
         //CurrentPackage tree first:
         val currentImports = mutableListOf<KlassImport.Package>()
-        var previousImports = imports
+        var previousImports = projectImports
         for (openPackage in openPackages) {
             val openPackageImports = (previousImports as? KlassImport.Package)?.elements?.firstOrNull { it.name == openPackage } as? KlassImport.Package
             if(openPackageImports == null) {
@@ -85,70 +94,92 @@ class ClassRelationsPumlGenerator(
         // Create imported classes in open package tree:
         var lastOpenPackage = openPackages.lastOrNull()
         for (i in currentImports.size - 1 downTo 0) {
-            createImportedClassesInPackage(currentImports[i], lastOpenPackage, rootGeneratedLink)
+            createImportedClassesInPackage(currentImports[i], lastOpenPackage, "$rootGeneratedLink/${projectPrefix.joinToString("/")}")
             lastOpenPackage = openPackages.last()
             closePackage()
         }
 
         //Remaining imports:
-        createImportedClassesInPackage(imports, lastOpenPackage, rootGeneratedLink)
+        createImportedClassesInPackage(externalImports, lastOpenPackage, null)
     }
 
-    private fun groupImports(input: List<KlassItem>): KlassImport.Package {
-        if (input.isEmpty()) return KlassImport.Package("", emptyList())
-        return KlassImport.Package("", groupImportsInner(input))
+    private fun groupAllImports(imports: List<KlassItem>): Pair<KlassImport.Package, KlassImport.Package> {
+        if (imports.isEmpty()) return KlassImport.Package("", emptyList()) to KlassImport.Package("", emptyList())
+        val projectImports = ArrayList<KlassItem>(imports.size)
+        val externalImports = ArrayList<KlassItem>(imports.size)
+        imports.forEach { input ->
+            if (input.filePackage.hasProjectPrefix()) {
+                projectImports.add(KlassItem(input.name, input.filePackage.drop(projectPrefix.size)))
+            } else {
+                externalImports.add(input)
+            }
+        }
+        return KlassImport.Package("", listOf(KlassImport.Package(generatorSettings.projectPackagePrefix, groupProjectImportsInner(projectImports)))) to KlassImport.Package("", groupExternalImportsInner(externalImports))
     }
 
-    private fun groupImportsInner(input: List<KlassItem>):  List<KlassImport> {
+    private fun groupProjectImportsInner(input: List<KlassItem>): List<KlassImport> {
         return input.groupBy { if (it.filePackage.isEmpty()) null else it.filePackage.first() }
             .map { (key, subLists) ->
                 if (key == null) {
-                    return@map subLists.map { KlassImport.Klass(it.name) }
+                    return@map subLists.distinct().map { KlassImport.Klass(it.name) }
                 }
-                val nested = subLists.map { KlassItem(it.name, it.filePackage.drop(1)) }
-                listOf(KlassImport.Package(key, groupImportsInner(nested)))
+                val nested = subLists.distinct().map { KlassItem(it.name, it.filePackage.drop(1)) }
+                val nestedImports = groupProjectImportsInner(nested)
+                listOf(KlassImport.Package(key, nestedImports))
+            }.flatten()
+    }
+
+    private fun groupExternalImportsInner(input: List<KlassItem>): List<KlassImport> {
+        return input.groupBy { if (it.filePackage.isEmpty()) null else it.filePackage.first() }
+            .map { (key, subLists) ->
+                if (key == null) {
+                    return@map subLists.distinct().map { KlassImport.Klass(it.name) }
+                }
+                val nested = subLists.distinct().map { KlassItem(it.name, it.filePackage.drop(1)) }
+                val nestedImports = groupExternalImportsInner(nested)
+                if (nestedImports.size == 1) {
+                    val nestedImport = nestedImports.first()
+                    if (nestedImport is KlassImport.Package) {
+                        return@map listOf(KlassImport.Package("${key}.${nestedImport.name}", nestedImport.elements))
+                    }
+                }
+                listOf(KlassImport.Package(key, nestedImports))
             }.flatten()
     }
 
     private fun StringBuilder.createImportedClassesInPackage(
         imports: KlassImport.Package,
         skipPreviousKey: String?,
-        rootGeneratedLink: String
+        rootGeneratedLink: String?
     ) {
         for (element in imports.elements) {
             if (element.name == skipPreviousKey) {
                 // Skip already visited key
                 continue
             }
-            when(element) {
-                is KlassImport.Package -> {
-                    val packageTarget = "${rootGeneratedLink}/${element.name}"
-                    beginPackage(element.name, packageTarget)
-                    createImportedClassesInPackage(element, packageTarget)
-                    closePackage()
-                }
-                is KlassImport.Klass -> {
-                    createImportedClass(element.name)
-                }
-            }
+            createImportedElement(element, rootGeneratedLink)
         }
     }
 
-    private fun StringBuilder.createImportedClassesInPackage(
-        imports: KlassImport.Package,
-        rootGeneratedLink: String
+    private fun StringBuilder.createImportedElement(
+        element: KlassImport,
+        rootGeneratedLink: String?
     ) {
-        for (element in imports.elements) {
-            when(element) {
-                is KlassImport.Package -> {
-                    val packageTarget = "${rootGeneratedLink}/${element.name}"
-                    beginPackage(element.name, packageTarget)
-                    createImportedClassesInPackage(element, packageTarget)
-                    closePackage()
+        when(element) {
+            is KlassImport.Package -> {
+                val packageTarget = if (rootGeneratedLink == null) {
+                    null
+                } else {
+                    "${rootGeneratedLink}/${element.name}"
                 }
-                is KlassImport.Klass -> {
-                    createImportedClass(element.name)
+                beginPackage(element.name, packageTarget)
+                for (nestedElement in element.elements) {
+                    createImportedElement(nestedElement, rootGeneratedLink)
                 }
+                closePackage()
+            }
+            is KlassImport.Klass -> {
+                createImportedClass(element.name)
             }
         }
     }
@@ -176,7 +207,7 @@ class ClassRelationsPumlGenerator(
 
     private fun StringBuilder.beginPackage(name: String, linkTarget: String?) {
         if (linkTarget != null) {
-            appendContent("package \"[[$linkTarget/$${generatorSettings.generatedFileName} $name]]\" #ffffff {")
+            appendContent("package \"[[$linkTarget/${generatorSettings.generatedFileName} $name]]\" #ffffff {")
         } else {
             appendContent("package \"$name\" #ffffff {")
         }

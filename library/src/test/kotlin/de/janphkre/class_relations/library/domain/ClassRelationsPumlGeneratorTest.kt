@@ -23,7 +23,7 @@ class ClassRelationsPumlGeneratorTest {
             klasses,
             rootGeneratedLink = "example/root/generated"
         )
-        Truth.assertThat(result).isEqualTo(readOutput(id))
+        Truth.assertThat(result.lines()).isEqualTo(readOutput(id).lines())
 
     }
 
