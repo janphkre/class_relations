@@ -1,0 +1,36 @@
+{
+  "name": "ClassWithUsages",
+  "filePackage": "com.example.a",
+  "type": "class",
+  "fileImports": [
+    {
+      "package": "com.example.b",
+      "name": "UsageClassB"
+    },
+    {
+      "package": "com.example.b",
+      "name": "UsageClassC"
+    },
+    {
+      "package": "io.other",
+      "name": "UsageClassD"
+    },
+    {
+      "package": "io.other",
+      "name": "UsageClassE"
+    }
+  ],
+  "parameters": [],
+  "inheritances": [],
+  "methods": [
+    "methodA",
+    "methodB",
+    "methodC"
+  ],
+  "methodParameters": [
+    {
+      "package": "io.other",
+      "name": "UsageClassE"
+    }
+  ]
+}

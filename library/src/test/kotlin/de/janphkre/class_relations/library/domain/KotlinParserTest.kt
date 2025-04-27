@@ -32,6 +32,9 @@ internal class KotlinParserTest {
     @Test
     fun testClassWithDistinctDependencies() = verifyParser("ClassWithDistinctDeps", "example/file/path8")
 
+    @Test
+    fun testClassWithUsages() = verifyParser("ClassWithUsages", "example/file/path9")
+
     private fun verifyParser(id: String, filePath: String) {
         val parser = KotlinParser.getInstance()
         val result = parser.parse(readInput(id), id, filePath)
@@ -59,7 +62,8 @@ internal class KotlinParserTest {
             ),
             fileImports = jsonObject["fileImports"]!!.jsonArray.map { it.toKlassItem() },
             parameters = jsonObject["parameters"]!!.jsonArray.map { it.toKlassItem() },
-            inheritances = jsonObject["inheritances"]!!.jsonArray.map { it.toKlassItem() }
+            inheritances = jsonObject["inheritances"]!!.jsonArray.map { it.toKlassItem() },
+            methodParameters = jsonObject["methodParameters"]!!.jsonArray.map { it.toKlassItem() }
         )
     }
 

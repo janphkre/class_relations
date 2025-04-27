@@ -5,6 +5,7 @@ data class KlassWithRelations(
     val fileImports: List<KlassItem>,
     val parameters: List<KlassItem>,
     val inheritances: List<KlassItem>,
+    val methodParameters: List<KlassItem> = emptyList()
 ) {
     val usages: List<KlassItem> = fileImports.filterNot { parameters.contains(it) || inheritances.contains(it) }
 }
