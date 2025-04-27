@@ -1,5 +1,5 @@
 @startuml
-package "[[example/root/generated/example_relations.puml org.example]]" #ffffff {
+package "[[example/root/generated/example_relations.puml org.example]]" as p$_1 #ffffff {
     package "a" #00FFFF {
         class "[[src/main/org/example/a/ExampleClassName1.kt ExampleClassName1]]" as ExampleClassName1 {
             {method} methodA
@@ -27,7 +27,7 @@ package "[[example/root/generated/example_relations.puml org.example]]" #ffffff 
             {method} methodI
         }
     }
-    package "[[example/root/generated/org/example/b/example_relations.puml b]]" #ffffff {
+    package "[[example/root/generated/org/example/b/example_relations.puml b]]" as p$_2 #ffffff {
         circle "ExampleClassName2"
         circle "ExampleClassName3"
         circle "ExampleClassName4"

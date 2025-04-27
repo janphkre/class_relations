@@ -9,8 +9,10 @@ internal class ClassRelationsPumlGeneratorImpl(
 
     private val projectPrefix = generatorSettings.projectPackagePrefix.split('.')
     private val openPackages = Stack<String>()
+    private var packageIndex = 0
 
     override fun generate(klasses: List<KlassWithRelations>, rootGeneratedLink: String): String {
+        packageIndex = 0
         return StringBuilder(generatorSettings.initialCapacitySize * klasses.size).apply {
             appendContent("@startuml")
             //STRUCTURE
@@ -196,9 +198,9 @@ internal class ClassRelationsPumlGeneratorImpl(
 
     private fun StringBuilder.beginPackage(name: String, linkTarget: String?) {
         if (linkTarget != null) {
-            appendContent("package \"[[$linkTarget/${generatorSettings.generatedFileName} $name]]\" #ffffff {")
+            appendContent("package \"[[$linkTarget/${generatorSettings.generatedFileName} $name]]\" as p\$_${packageIndex++} #ffffff {")
         } else {
-            appendContent("package \"$name\" #ffffff {")
+            appendContent("package \"$name\" as p\$_${packageIndex++} #ffffff {")
         }
         openPackages.push(name)
     }
