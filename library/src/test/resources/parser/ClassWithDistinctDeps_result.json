@@ -1,7 +1,7 @@
 {
-  "name": "DataClassWithParameters",
+  "name": "ClassWithDistinctDeps",
   "filePackage": "com.example.a",
-  "type": "data class",
+  "type": "class",
   "fileImports": [
     {
       "package": "com.example.b",

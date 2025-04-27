@@ -27,7 +27,7 @@ internal object KotlinParserImpl: KotlinParser {
         val importList: DefaultAstNode? = kotlinFileSummary.success.find { it is DefaultAstNode } as? DefaultAstNode
 
         val filePackage = packageHeader?.identifier?.map { it.identifier } ?: emptyList()
-        val fileImportItems = importList?.children?.map { import -> (import as Import).identifier.map { it.identifier } }?.map { KlassItem(it.last(), it.dropLast(1)) } ?: emptyList()
+        val fileImportItems = importList?.children?.map { import -> (import as Import).identifier.map { it.identifier } }?.distinct()?.map { KlassItem(it.last(), it.dropLast(1)) } ?: emptyList()
         return KlassWithRelations(
             item = KlassItemWithType(
                 name = klassDeclaration?.identifier?.identifier ?: presentableName,
@@ -37,7 +37,7 @@ internal object KotlinParserImpl: KotlinParser {
                 filePath = filePath
             ),
             fileImports = fileImportItems,
-            parameters = klassDeclaration?.parameter?.flatMap { parameter -> parameter.parameter.flatMap { type -> type.type.map { it.identifier } } }?.map { parameter -> fileImportItems.firstOrNull { it.name == parameter } ?: KlassItem(parameter, filePackage) } ?: emptyList(), //TODO: SUPPORT ALIAS IMPORTS
+            parameters = klassDeclaration?.parameter?.flatMap { parameter -> parameter.parameter.flatMap { type -> type.type.map { it.identifier } } }?.distinct()?.map { parameter -> fileImportItems.firstOrNull { it.name == parameter } ?: KlassItem(parameter, filePackage) } ?: emptyList(), //TODO: SUPPORT ALIAS IMPORTS
             inheritances = klassDeclaration?.inheritance?.map { it.type.identifier }?.map { inheritance -> fileImportItems.firstOrNull { it.name == inheritance } ?: KlassItem(inheritance, filePackage) } ?: emptyList(), //TODO: SUPPORT ALIAS IMPORTS,
         )
     }
