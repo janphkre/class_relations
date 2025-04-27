@@ -3,20 +3,50 @@
   "filePackage": "com.example.a",
   "type": "data class",
   "fileImports": [
-    "com.example.b.ParameterClassB",
-    "com.example.b.ParameterClassC",
-    "com.example.c.ParameterClassD",
-    "io.other.ParameterClassE"
+    {
+      "package": "com.example.b",
+      "name": "ParameterClassB"
+    },
+    {
+      "package": "com.example.b",
+      "name": "ParameterClassC"
+    },
+    {
+      "package": "com.example.c",
+      "name": "ParameterClassD"
+    },
+    {
+      "package": "io.other",
+      "name": "ParameterClassE"
+    }
   ],
   "parameters": [
-    "ParameterClassA",
-    "ParameterClassB",
-    "ParameterClassC",
-    "ParameterClassD",
-    "ParameterClassE"
+    {
+      "package": "com.example.a",
+      "name": "ParameterClassA"
+    },
+    {
+      "package": "com.example.b",
+      "name": "ParameterClassB"
+    },
+    {
+      "package": "com.example.b",
+      "name": "ParameterClassC"
+    },
+    {
+      "package": "com.example.c",
+      "name": "ParameterClassD"
+    },
+    {
+      "package": "io.other",
+      "name": "ParameterClassE"
+    }
   ],
   "inheritances": [
-    "ParameterClassB"
+    {
+      "package": "com.example.b",
+      "name": "ParameterClassB"
+    }
   ],
   "methods": []
 }

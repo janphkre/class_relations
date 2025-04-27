@@ -1,8 +1,7 @@
 package de.janphkre.class_relations.library.domain
 
 import com.google.common.truth.Truth
-import de.janphkre.class_relations.library.model.KlassDefinition
-import de.janphkre.class_relations.library.model.KlassType
+import de.janphkre.class_relations.library.model.*
 import kotlinx.serialization.json.*
 import java.io.File
 import kotlin.test.Test
@@ -43,22 +42,32 @@ internal class KotlinParserTest {
         return File("src/test/resources/parser/$file").readText().replace("\r","")
     }
 
-    private fun readOutput(file: String, filePath: String): KlassDefinition? {
+    private fun readOutput(file: String, filePath: String): KlassWithRelations? {
         val json = Json.parseToJsonElement(readFile("$file$OUTPUT_POSTFIX"))
         if (json is JsonNull) {
             return null
         }
         val jsonObject = json.jsonObject
         val elementType = jsonObject["type"]!!.jsonPrimitive.content
-        return KlassDefinition(
-            name = jsonObject["name"]!!.jsonPrimitive.content,
-            filePackage = jsonObject["filePackage"]!!.jsonPrimitive.content.split("."),
-            classType = KlassType.entries.firstOrNull { it.id == elementType } ?: throw IllegalArgumentException("Type \'$elementType\' not supported"),
-            fileImports = jsonObject["fileImports"]!!.jsonArray.map { it.jsonPrimitive.content.split(".") },
-            parameters = jsonObject["parameters"]!!.jsonArray.map { it.jsonPrimitive.content },
-            inheritances = jsonObject["inheritances"]!!.jsonArray.map { it.jsonPrimitive.content },
-            methods = jsonObject["methods"]!!.jsonArray.map { it.jsonPrimitive.content },
-            filePath = filePath
+        return KlassWithRelations(
+            item = KlassItemWithType(
+                name = jsonObject["name"]!!.jsonPrimitive.content,
+                filePackage = jsonObject["filePackage"]!!.jsonPrimitive.content.split("."),
+                type = KlassType.entries.firstOrNull { it.id == elementType } ?: throw IllegalArgumentException("Type \'$elementType\' not supported"),
+                methods = jsonObject["methods"]!!.jsonArray.map { it.jsonPrimitive.content },
+                filePath = filePath
+            ),
+            fileImports = jsonObject["fileImports"]!!.jsonArray.map { it.toKlassItem() },
+            parameters = jsonObject["parameters"]!!.jsonArray.map { it.toKlassItem() },
+            inheritances = jsonObject["inheritances"]!!.jsonArray.map { it.toKlassItem() }
+        )
+    }
+
+    private fun JsonElement.toKlassItem(): KlassItem {
+        val json = this.jsonObject
+        return KlassItem(
+            name = json["name"]!!.jsonPrimitive.content,
+            filePackage = json["package"]!!.jsonPrimitive.content.split(".")
         )
     }
 

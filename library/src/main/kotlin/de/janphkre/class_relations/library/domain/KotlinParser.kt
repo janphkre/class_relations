@@ -1,10 +1,10 @@
 package de.janphkre.class_relations.library.domain
 
-import de.janphkre.class_relations.library.model.KlassDefinition
+import de.janphkre.class_relations.library.model.KlassWithRelations
 
 interface KotlinParser {
 
-    fun parse(fileContent: String, presentableName: String, filePath: String): KlassDefinition?
+    fun parse(fileContent: String, presentableName: String, filePath: String): KlassWithRelations?
 
     companion object {
         fun getInstance(): KotlinParser {

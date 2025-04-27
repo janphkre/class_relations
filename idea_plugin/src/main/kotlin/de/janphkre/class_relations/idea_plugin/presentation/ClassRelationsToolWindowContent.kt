@@ -4,7 +4,7 @@ import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBPanel
 import de.janphkre.class_relations.idea_plugin.domain.ClassRelationsProjectService
-import de.janphkre.class_relations.library.model.KlassDefinition
+import de.janphkre.class_relations.library.model.KlassWithRelations
 import javax.swing.JButton
 
 class ClassRelationsToolWindowContent(
@@ -40,7 +40,7 @@ class ClassRelationsToolWindowContent(
         add(label)
     }
 
-    private fun JBPanel<JBPanel<*>>.showForFiles(openFile: KlassDefinition, otherFiles: List<KlassDefinition>) {
+    private fun JBPanel<JBPanel<*>>.showForFiles(openFile: KlassWithRelations, otherFiles: List<KlassWithRelations>) {
         add(JBLabel(openFile.name))
         add(JButton("Refresh").apply {
             addActionListener {
@@ -58,7 +58,7 @@ class ClassRelationsToolWindowContent(
         openFile.inheritances.forEach { contentPanel.add(JBLabel(it)) }
         add(contentPanel)
         val contentPanel2 = JBPanel<JBPanel<*>>()
-        val generatedPuml = service.pumlGenerator.generate(otherFiles.plus(openFile).map { it.toKlassWithRelations() })
+        val generatedPuml = service.pumlGenerator.generate(otherFiles.plus(openFile))
         println(generatedPuml)
         contentPanel2.add(JBLabel(generatedPuml))
         add(contentPanel2)

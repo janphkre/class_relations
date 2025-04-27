@@ -3,12 +3,21 @@
   "filePackage": "com.example.a",
   "type": "object",
   "fileImports": [
-    "io.other.SomeAbstractClass"
+    {
+      "package": "io.other",
+      "name": "SomeAbstractClass"
+    }
   ],
   "parameters": [],
   "inheritances": [
-    "SomeAbstractClass",
-    "ExampleInterface"
+    {
+      "package": "io.other",
+      "name": "SomeAbstractClass"
+    },
+    {
+      "package": "com.example.a",
+      "name": "ExampleInterface"
+    }
   ],
   "methods": []
 }

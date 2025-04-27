@@ -47,7 +47,7 @@ abstract class GenerateTask: DefaultTask() {
 
     private fun KotlinParser.readDefinition(file: File) {
         val definition = parse(file.readText(), file.nameWithoutExtension, filePath = file.absolutePath)
-        definitions.add(definition?.toKlassWithRelations() ?: return)
+        definitions.add(definition ?: return)
     }
 
     private fun generateDiagram(destinationDiagramPath: String) {

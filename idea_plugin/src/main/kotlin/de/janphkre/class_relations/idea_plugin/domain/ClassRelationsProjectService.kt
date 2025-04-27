@@ -7,7 +7,7 @@ import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
-import de.janphkre.class_relations.library.model.KlassDefinition
+import de.janphkre.class_relations.library.model.KlassWithRelations
 import de.janphkre.class_relations.library.domain.KotlinParser
 import de.janphkre.class_relations.library.domain.ClassRelationsPumlGenerator
 
@@ -32,7 +32,7 @@ class ClassRelationsProjectService(
         return currentEditor as? TextEditor
     }
 
-    fun getAdjacentFileContents(baseEditor: TextEditor): List<KlassDefinition> {
+    fun getAdjacentFileContents(baseEditor: TextEditor): List<KlassWithRelations> {
         val currentFile = fileDocumentManager.getFile(baseEditor.editor.document) ?: return emptyList()
         val editors = fileEditorManager.allEditors.filterIsInstance<TextEditor>()
         return currentFile.parent.children.mapNotNull { file ->
@@ -50,14 +50,14 @@ class ClassRelationsProjectService(
         }
     }
 
-    fun getOpenEditorContent(editor: TextEditor): KlassDefinition? {
+    fun getOpenEditorContent(editor: TextEditor): KlassWithRelations? {
         if (editor.file.extension != "kt") {
             return null
         }
         return parser.parse(editor.editor.document.text, editor.name)
     }
 
-    fun getFileContent(file: VirtualFile): KlassDefinition? {
+    fun getFileContent(file: VirtualFile): KlassWithRelations? {
         if (file.extension != "kt") {
             return null
         }
