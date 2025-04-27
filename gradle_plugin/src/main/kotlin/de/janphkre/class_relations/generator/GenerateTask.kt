@@ -26,17 +26,18 @@ abstract class GenerateTask: DefaultTask() {
     private val definitions = ArrayList<KlassWithRelations>()
     private lateinit var generator: ClassRelationsPumlGenerator
     private lateinit var destinationPathFromModule: String
+    private lateinit var moduleDirectoryFile: File
 
     @TaskAction
     fun action() {
-        destinationPathFromModule = moduleDirectory.get().toRelativeString(destination.get())
+        moduleDirectoryFile = moduleDirectory.get()
+        destinationPathFromModule = moduleDirectoryFile.toRelativeString(destination.get())
         generator = ClassRelationsPumlGenerator.getInstance(
             settings = generatorSettings.get()
         )
         val parser = KotlinParser.getInstance()
         val sourceDir = source.get()
         Sequence { SortedFileTreeWalker(sourceDir, onLeave = {
-            println("Leaving $it")
             generateDiagram(it.toRelativeString(sourceDir))
         }) }
             .filter { it.extension == "kt" }
@@ -46,13 +47,13 @@ abstract class GenerateTask: DefaultTask() {
     }
 
     private fun KotlinParser.readDefinition(file: File) {
-        val definition = parse(file.readText(), file.nameWithoutExtension, filePath = file.absolutePath)
+        val definition = parse(file.readText(), file.nameWithoutExtension, filePath = file.toRelativeString(moduleDirectoryFile))
         definitions.add(definition ?: return)
     }
 
     private fun generateDiagram(destinationDiagramPath: String) {
         if (definitions.isEmpty()) {
-            //TODO: GENERATE EMPTY DIAGRAM FOR DIRECTORIES!
+            //TODO: GENERATE EMPTY DIAGRAM FOR EMPTY DIRECTORIES? (especially root directory?) -> would need to change file tree walker to bottom up instead of top down
             return
         }
         val pumlDiagram = generator.generate(definitions, destinationPathFromModule)
