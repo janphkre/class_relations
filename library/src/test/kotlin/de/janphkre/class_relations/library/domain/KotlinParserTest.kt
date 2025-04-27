@@ -63,7 +63,7 @@ internal class KotlinParserTest {
             fileImports = jsonObject["fileImports"]!!.jsonArray.map { it.toKlassItem() },
             parameters = jsonObject["parameters"]!!.jsonArray.map { it.toKlassItem() },
             inheritances = jsonObject["inheritances"]!!.jsonArray.map { it.toKlassItem() },
-            methodParameters = jsonObject["methodParameters"]!!.jsonArray.map { it.toKlassItem() }
+            methodParameters = jsonObject["methodParameters"]?.jsonArray?.map { it.toKlassItem() } ?: emptyList()
         )
     }
 

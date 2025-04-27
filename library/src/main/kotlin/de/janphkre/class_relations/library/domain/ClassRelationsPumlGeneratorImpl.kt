@@ -198,9 +198,9 @@ internal class ClassRelationsPumlGeneratorImpl(
 
     private fun StringBuilder.beginPackage(name: String, linkTarget: String?) {
         if (linkTarget != null) {
-            appendContent("package \"[[$linkTarget/${generatorSettings.generatedFileName} $name]]\" as p\$_${packageIndex++} #ffffff {")
+            appendContent("package \"[[$linkTarget/${generatorSettings.generatedFileName} $name]]\" as p\\\$_${packageIndex++} #ffffff {")
         } else {
-            appendContent("package \"$name\" as p\$_${packageIndex++} #ffffff {")
+            appendContent("package \"$name\" as p\\\$_${packageIndex++} #ffffff {")
         }
         openPackages.push(name)
     }

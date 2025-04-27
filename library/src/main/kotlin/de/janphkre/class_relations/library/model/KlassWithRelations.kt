@@ -7,5 +7,8 @@ data class KlassWithRelations(
     val inheritances: List<KlassItem>,
     val methodParameters: List<KlassItem> = emptyList()
 ) {
-    val usages: List<KlassItem> = fileImports.filterNot { parameters.contains(it) || inheritances.contains(it) }
+
+    val usages: List<KlassItem>
+        get() = fileImports.plus(methodParameters).filterNot { parameters.contains(it) || inheritances.contains(it) }
+        .distinct()
 }

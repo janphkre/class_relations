@@ -118,7 +118,13 @@
       "filePath": "src/main/org/example/a/ExampleInterface.kt",
       "fileImports": [],
       "parameters": [],
-      "inheritances": []
+      "inheritances": [],
+      "methodParameters": [
+        {
+          "package": "org.example.a",
+          "name": "ExampleObject"
+        }
+      ]
     },
     {
       "name": "ExampleAbstractClassName8",
@@ -130,8 +136,19 @@
       "type": "abstract class",
       "filePath": "src/main/org/example/a/ExampleAbstractClassName8.kt",
       "fileImports": [],
-      "parameters": [],
-      "inheritances": []
+      "parameters": [
+        {
+          "package": "org.example.a",
+          "name": "ExampleObject"
+        }
+      ],
+      "inheritances": [],
+      "methodParameters": [
+        {
+          "package": "org.example.a",
+          "name": "ExampleObject"
+        }
+      ]
     },
     {
       "name": "ExampleObject",

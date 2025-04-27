@@ -10,5 +10,11 @@
     "methodB",
     "methodC",
     "methodD"
+  ],
+  "methodParameters": [
+    {
+      "package": "com.example.a",
+      "name": "ParameterClassA"
+    }
   ]
 }

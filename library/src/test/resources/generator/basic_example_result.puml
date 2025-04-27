@@ -1,5 +1,5 @@
 @startuml
-package "[[example/root/generated/example_relations.puml org.example]]" as p$_1 #ffffff {
+package "[[example/root/generated/example_relations.puml org.example]]" as p\$_0 #ffffff {
     package "a" #00FFFF {
         class "[[src/main/org/example/a/ExampleClassName1.kt ExampleClassName1]]" as ExampleClassName1 {
             {method} methodA
@@ -27,13 +27,13 @@ package "[[example/root/generated/example_relations.puml org.example]]" as p$_1 
             {method} methodI
         }
     }
-    package "[[example/root/generated/org/example/b/example_relations.puml b]]" as p$_2 #ffffff {
+    package "[[example/root/generated/org/example/b/example_relations.puml b]]" as p\$_1 #ffffff {
         circle "ExampleClassName2"
         circle "ExampleClassName3"
         circle "ExampleClassName4"
     }
 }
-package "io.different" #ffffff {
+package "io.different" as p\$_2 #ffffff {
     circle "Something"
 }
 
@@ -48,4 +48,6 @@ ExampleClassName1 -down-> ExampleClassName2
 ExampleClassName1 -down-> ExampleClassName3
 ExampleClassName1 -down-> ExampleClassName4
 ExampleClassName5 -down-> Something
+ExampleInterface -down-> ExampleObject
+ExampleAbstractClassName8 o-down- ExampleObject
 @enduml

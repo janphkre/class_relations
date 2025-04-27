@@ -57,6 +57,7 @@ class ClassRelationsPumlGeneratorTest {
                 fileImports = element["fileImports"]!!.jsonArray.map { it.toKlassItem()},
                 parameters = element["parameters"]!!.jsonArray.map { it.toKlassItem()},
                 inheritances = element["inheritances"]!!.jsonArray.map { it.toKlassItem()},
+                methodParameters = element["methodParameters"]?.jsonArray?.map { it.toKlassItem() } ?: emptyList()
             )
         }
         return settings to files

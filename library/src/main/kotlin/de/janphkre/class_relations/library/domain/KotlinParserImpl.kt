@@ -100,10 +100,6 @@ internal object KotlinParserImpl: KotlinParser {
                             )
                         }
                     }
-                    //TODO: Let's not go into too much detail for the time being.. maybe add this as a feature flag / setting later
-//                    "functionBody" -> {
-//                        emptyList<KlassItem>()
-//                    }
                     else -> {
                         emptyList<KlassItem>()
                     }
