@@ -1,0 +1,9 @@
+{
+  "name": "EnumClass",
+  "filePackage": "com.example.a",
+  "type": "enum class",
+  "fileImports": [],
+  "parameters": [],
+  "inheritances": [],
+  "methods": []
+}

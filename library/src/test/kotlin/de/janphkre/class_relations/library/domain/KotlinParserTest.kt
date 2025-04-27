@@ -24,6 +24,15 @@ internal class KotlinParserTest {
     @Test
     fun testObjectWithInheritances() = verifyParser("ObjectWithInheritances", "example/file/path5")
 
+    @Test
+    fun testAbstractClass() = verifyParser("AbstractClass", "example/file/path6")
+
+    @Test
+    fun testEnumClass() = verifyParser("EnumClass", "example/file/path7")
+
+    @Test
+    fun testClassWithDistinctDependencies() = verifyParser("ClassWithDistinctDeps", "example/file/path8")
+
     private fun verifyParser(id: String, filePath: String) {
         val parser = KotlinParser.getInstance()
         val result = parser.parse(readInput(id), id, filePath)

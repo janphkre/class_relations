@@ -1,0 +1,22 @@
+{
+  "name": "DataClassWithParameters",
+  "filePackage": "com.example.a",
+  "type": "data class",
+  "fileImports": [
+    "com.example.b.ParameterClassB",
+    "com.example.b.ParameterClassC",
+    "com.example.c.ParameterClassD",
+    "io.other.ParameterClassE"
+  ],
+  "parameters": [
+    "ParameterClassA",
+    "ParameterClassB",
+    "ParameterClassC",
+    "ParameterClassD",
+    "ParameterClassE"
+  ],
+  "inheritances": [
+    "ParameterClassB"
+  ],
+  "methods": []
+}

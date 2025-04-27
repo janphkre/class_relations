@@ -1,3 +1,3 @@
 package com.example.a
 
-class BasicClass
+internal class BasicClass
