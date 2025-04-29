@@ -30,15 +30,16 @@ abstract class GenerateTask: DefaultTask() {
 
     @TaskAction
     fun action() {
+        val settings = generatorSettings.get()
         moduleDirectoryFile = moduleDirectory.get()
         destinationPathFromModule = moduleDirectoryFile.toRelativeString(destination.get())
         generator = ClassRelationsPumlGenerator.getInstance(
-            settings = generatorSettings.get()
+            settings = settings
         )
         val parser = KotlinParser.getInstance()
         val sourceDir = source.get()
         Sequence { SortedFileTreeWalker(sourceDir, onLeave = {
-            generateDiagram(it.toRelativeString(sourceDir))
+            generateDiagram("${it.toRelativeString(sourceDir)}/${settings.generatedFileName}")
         }) }
             .filter { it.extension == "kt" }
             .forEach { path ->
