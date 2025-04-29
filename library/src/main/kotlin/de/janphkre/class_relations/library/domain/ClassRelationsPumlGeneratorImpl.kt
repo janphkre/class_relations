@@ -33,6 +33,8 @@ internal class ClassRelationsPumlGeneratorImpl(
 
     private fun StringBuilder.createPackageStructure(klasses: List<KlassWithRelations>, rootGeneratedLink: String) {
         val anyKlass = klasses.first()
+        val pathDepth = anyKlass.item.filePackage.size + rootGeneratedLink.count { it == '/' || it == '\\' }
+        appendContent("!\$pathToBase = \"${"..".repeat(pathDepth, '/')}\"")
         if (!anyKlass.item.filePackage.hasProjectPrefix()) {
             beginSelfPackage(anyKlass.item.filePackage.joinToString("."))
             return
@@ -49,6 +51,22 @@ internal class ClassRelationsPumlGeneratorImpl(
             beginPackage(packages[i], packageLink)
         }
         beginSelfPackage(packages.last())
+    }
+
+    private fun String.repeat(count: Int, separator: Char): CharSequence {
+        return when (count) {
+            0 -> ""
+            1 -> this
+            else -> {
+                val sb = StringBuilder(count * (length + 1) - 1)
+                for (i in 2..count) {
+                    sb.append(this)
+                    sb.append(separator)
+                }
+                sb.append(this)
+                sb.toString()
+            }
+        }
     }
 
     private fun List<String>.hasProjectPrefix(): Boolean {
@@ -189,7 +207,7 @@ internal class ClassRelationsPumlGeneratorImpl(
             KlassType.ENUM_CLASS -> "enum"
             KlassType.UNKNOWN -> "diamond"
         }
-        appendContent("$plantUmlType \"[[${klassItem.filePath} ${klassItem.name}]]\" as ${klassItem.name} {")
+        appendContent("$plantUmlType \"[[\$pathToBase/${klassItem.filePath} ${klassItem.name}]]\" as ${klassItem.name} {")
         klassItem.methods.forEach { method ->
             appendContent("${" ".repeat(generatorSettings.spaceCount)}{method} $method")
         }
@@ -198,7 +216,7 @@ internal class ClassRelationsPumlGeneratorImpl(
 
     private fun StringBuilder.beginPackage(name: String, linkTarget: String?) {
         if (linkTarget != null) {
-            appendContent("package \"[[$linkTarget/${generatorSettings.generatedFileName} $name]]\" as p\\\$_${packageIndex++} #ffffff {")
+            appendContent("package \"[[\$pathToBase/$linkTarget/${generatorSettings.generatedFileName} $name]]\" as p\\\$_${packageIndex++} #ffffff {")
         } else {
             appendContent("package \"$name\" as p\\\$_${packageIndex++} #ffffff {")
         }

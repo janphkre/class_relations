@@ -1,33 +1,34 @@
 @startuml
-package "[[example/root/generated/example_relations.puml org.example]]" as p\$_0 #ffffff {
+!$pathToBase = "../../../../.."
+package "[[$pathToBase/example/root/generated/example_relations.puml org.example]]" as p\$_0 #ffffff {
     package "a" #00FFFF {
-        class "[[src/main/org/example/a/ExampleClassName1.kt ExampleClassName1]]" as ExampleClassName1 {
+        class "[[$pathToBase/src/main/org/example/a/ExampleClassName1.kt ExampleClassName1]]" as ExampleClassName1 {
             {method} methodA
             {method} methodB
             {method} methodC
         }
-        class "[[src/main/org/example/a/ExampleClassName5.kt ExampleClassName5]]" as ExampleClassName5 {
+        class "[[$pathToBase/src/main/org/example/a/ExampleClassName5.kt ExampleClassName5]]" as ExampleClassName5 {
             {method} methodD
             {method} methodE
             {method} methodF
         }
-        enum "[[src/main/org/example/a/ExampleEnumClassName6.kt ExampleEnumClassName6]]" as ExampleEnumClassName6 {
+        enum "[[$pathToBase/src/main/org/example/a/ExampleEnumClassName6.kt ExampleEnumClassName6]]" as ExampleEnumClassName6 {
             {method} methodG
         }
-        entity "[[src/main/org/example/a/ExampleDataClassName7.kt ExampleDataClassName7]]" as ExampleDataClassName7 {
+        entity "[[$pathToBase/src/main/org/example/a/ExampleDataClassName7.kt ExampleDataClassName7]]" as ExampleDataClassName7 {
         }
-        interface "[[src/main/org/example/a/ExampleInterface.kt ExampleInterface]]" as ExampleInterface {
+        interface "[[$pathToBase/src/main/org/example/a/ExampleInterface.kt ExampleInterface]]" as ExampleInterface {
             {method} methodB
         }
-        abstract class "[[src/main/org/example/a/ExampleAbstractClassName8.kt ExampleAbstractClassName8]]" as ExampleAbstractClassName8 {
+        abstract class "[[$pathToBase/src/main/org/example/a/ExampleAbstractClassName8.kt ExampleAbstractClassName8]]" as ExampleAbstractClassName8 {
             {method} methodH
             {method} methodC
         }
-        class "[[src/main/org/example/a/ExampleObject.kt ExampleObject]]" as ExampleObject {
+        class "[[$pathToBase/src/main/org/example/a/ExampleObject.kt ExampleObject]]" as ExampleObject {
             {method} methodI
         }
     }
-    package "[[example/root/generated/org/example/b/example_relations.puml b]]" as p\$_1 #ffffff {
+    package "[[$pathToBase/example/root/generated/org/example/b/example_relations.puml b]]" as p\$_1 #ffffff {
         circle "ExampleClassName2"
         circle "ExampleClassName3"
         circle "ExampleClassName4"
