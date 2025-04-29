@@ -2,8 +2,8 @@ package de.janphkre.class_relations.library.domain
 
 import com.google.common.truth.Truth
 import de.janphkre.class_relations.library.model.KlassItem
-import de.janphkre.class_relations.library.model.KlassItemWithType
 import de.janphkre.class_relations.library.model.KlassType
+import de.janphkre.class_relations.library.model.KlassTypeData
 import de.janphkre.class_relations.library.model.KlassWithRelations
 import kotlinx.serialization.json.*
 import org.junit.Test
@@ -47,9 +47,11 @@ class ClassRelationsPumlGeneratorTest {
             val element = jsonElement.jsonObject
             val elementType = element["type"]!!.jsonPrimitive.content
             KlassWithRelations(
-                item = KlassItemWithType(
+                item = KlassItem(
                     name = element["name"]!!.jsonPrimitive.content,
-                    filePackage = element["filePackage"]!!.jsonPrimitive.content.split("."),
+                    filePackage = element["filePackage"]!!.jsonPrimitive.content.split(".")
+                ),
+                type = KlassTypeData(
                     methods = element["methods"]!!.jsonArray.map { it.jsonPrimitive.content },
                     type = KlassType.entries.firstOrNull { it.id == elementType } ?: throw IllegalArgumentException("Type \'$elementType\' not supported"),
                     filePath = element["filePath"]!!.jsonPrimitive.content

@@ -78,7 +78,7 @@ internal class ClassRelationsPumlGeneratorImpl(
 
     private fun StringBuilder.createClasses(klasses: List<KlassWithRelations>) {
         klasses.forEach { klass ->
-            createClass(klass.item)
+            createClass(klass.item, klass.type)
         }
     }
 
@@ -197,8 +197,8 @@ internal class ClassRelationsPumlGeneratorImpl(
         appendContent("circle \"${name}\"")
     }
 
-    private fun StringBuilder.createClass(klassItem: KlassItemWithType) {
-        val plantUmlType = when(klassItem.type) {
+    private fun StringBuilder.createClass(klassItem: KlassItem, klassType: KlassTypeData) {
+        val plantUmlType = when(klassType.type) {
             KlassType.DATA_CLASS -> "entity"
             KlassType.CLASS -> "class"
             KlassType.ABSTRACT_CLASS -> "abstract class"
@@ -207,8 +207,8 @@ internal class ClassRelationsPumlGeneratorImpl(
             KlassType.ENUM_CLASS -> "enum"
             KlassType.UNKNOWN -> "diamond"
         }
-        appendContent("$plantUmlType \"[[\$pathToBase/${klassItem.filePath} ${klassItem.name}]]\" as ${klassItem.name} {")
-        klassItem.methods.forEach { method ->
+        appendContent("$plantUmlType \"[[\$pathToBase/${klassType.filePath} ${klassItem.name}]]\" as ${klassItem.name} {")
+        klassType.methods.forEach { method ->
             appendContent("${" ".repeat(generatorSettings.spaceCount)}{method} $method")
         }
         appendContent("}")

@@ -33,9 +33,11 @@ internal object KotlinParserImpl: KotlinParser {
         val fileImportItems = importList?.children?.map { import -> (import as Import).identifier.map { it.identifier } }?.distinct()?.map { KlassItem(it.last(), it.dropLast(1)) } ?: emptyList()
         val methods = (klassDeclaration?.expressions?.find { it.description == "classBody" } as? DefaultAstNode)?.children?.filterIsInstance<KlassDeclaration>()
         return KlassWithRelations(
-            item = KlassItemWithType(
+            item = KlassItem(
                 name = klassDeclaration?.identifier?.identifier ?: presentableName,
-                filePackage = filePackage,
+                filePackage = filePackage
+            ),
+            type = KlassTypeData(
                 type = klassDeclaration?.getType() ?: KlassType.UNKNOWN,
                 methods = methods?.mapNotNull { it.identifier?.identifier } ?: emptyList(),
                 filePath = filePath

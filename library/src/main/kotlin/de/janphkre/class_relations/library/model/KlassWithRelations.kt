@@ -1,7 +1,8 @@
 package de.janphkre.class_relations.library.model
 
 data class KlassWithRelations(
-    val item: KlassItemWithType,
+    val item: KlassItem,
+    val type: KlassTypeData,
     val fileImports: List<KlassItem>,
     val parameters: List<KlassItem>,
     val inheritances: List<KlassItem>,
