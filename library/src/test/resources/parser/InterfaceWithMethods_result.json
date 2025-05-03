@@ -1,6 +1,6 @@
 {
   "name": "InterfaceWithMethods",
-  "filePackage": "com.example.a",
+  "package": "com.example.a",
   "type": "interface",
   "fileImports": [],
   "parameters": [],

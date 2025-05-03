@@ -1,6 +1,6 @@
 {
   "name": "BasicClass",
-  "filePackage": "com.example.a",
+  "package": "com.example.a",
   "type": "class",
   "fileImports": [],
   "parameters": [],

@@ -1,6 +1,6 @@
 {
   "name": "ObjectWithInheritances",
-  "filePackage": "com.example.a",
+  "package": "com.example.a",
   "type": "object",
   "fileImports": [
     {

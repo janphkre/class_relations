@@ -1,6 +1,6 @@
 {
   "name": "DataClassWithParameters",
-  "filePackage": "com.example.a",
+  "package": "com.example.a",
   "type": "data class",
   "fileImports": [
     {

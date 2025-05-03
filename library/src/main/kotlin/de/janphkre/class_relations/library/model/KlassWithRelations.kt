@@ -6,7 +6,7 @@ data class KlassWithRelations(
     val fileImports: List<KlassItem>,
     val parameters: List<KlassItem>,
     val inheritances: List<KlassItem>,
-    val methodParameters: List<KlassItem> = emptyList()
+    val methodParameters: List<KlassItem>
 ) {
 
     val usages: List<KlassItem>

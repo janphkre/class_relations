@@ -35,7 +35,7 @@ internal object KotlinParserImpl: KotlinParser {
         return KlassWithRelations(
             item = KlassItem(
                 name = klassDeclaration?.identifier?.identifier ?: presentableName,
-                filePackage = filePackage
+                packageList = filePackage
             ),
             type = KlassTypeData(
                 type = klassDeclaration?.getType() ?: KlassType.UNKNOWN,
@@ -97,8 +97,8 @@ internal object KotlinParserImpl: KotlinParser {
                                 return@mapNotNull null
                             }
                             return@mapNotNull fileImportItems.firstOrNull { it.name == className } ?: KlassItem(
-                                name = className,
-                                filePackage = currentFilePackage
+                                className,
+                                currentFilePackage
                             )
                         }
                     }

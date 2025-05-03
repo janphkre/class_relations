@@ -47,10 +47,7 @@ class ClassRelationsPumlGeneratorTest {
             val element = jsonElement.jsonObject
             val elementType = element["type"]!!.jsonPrimitive.content
             KlassWithRelations(
-                item = KlassItem(
-                    name = element["name"]!!.jsonPrimitive.content,
-                    filePackage = element["filePackage"]!!.jsonPrimitive.content.split(".")
-                ),
+                item = element.toKlassItem(),
                 type = KlassTypeData(
                     methods = element["methods"]!!.jsonArray.map { it.jsonPrimitive.content },
                     type = KlassType.entries.firstOrNull { it.id == elementType } ?: throw IllegalArgumentException("Type \'$elementType\' not supported"),
@@ -69,7 +66,7 @@ class ClassRelationsPumlGeneratorTest {
         val json = this.jsonObject
         return KlassItem(
             name = json["name"]!!.jsonPrimitive.content,
-            filePackage = json["package"]!!.jsonPrimitive.content.split(".")
+            packageString = json["package"]!!.jsonPrimitive.content
         )
     }
 

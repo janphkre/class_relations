@@ -53,10 +53,7 @@ internal class KotlinParserTest {
         val jsonObject = json.jsonObject
         val elementType = jsonObject["type"]!!.jsonPrimitive.content
         return KlassWithRelations(
-            item = KlassItem(
-                name = jsonObject["name"]!!.jsonPrimitive.content,
-                filePackage = jsonObject["filePackage"]!!.jsonPrimitive.content.split(".")
-            ),
+            item = jsonObject.toKlassItem(),
             type = KlassTypeData(
                 type = KlassType.entries.firstOrNull { it.id == elementType } ?: throw IllegalArgumentException("Type \'$elementType\' not supported"),
                 methods = jsonObject["methods"]!!.jsonArray.map { it.jsonPrimitive.content },
@@ -73,7 +70,7 @@ internal class KotlinParserTest {
         val json = this.jsonObject
         return KlassItem(
             name = json["name"]!!.jsonPrimitive.content,
-            filePackage = json["package"]!!.jsonPrimitive.content.split(".")
+            packageString = json["package"]!!.jsonPrimitive.content
         )
     }
 

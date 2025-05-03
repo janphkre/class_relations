@@ -8,7 +8,7 @@
   "files": [
     {
       "name": "ExampleClassName1",
-      "filePackage": "org.example.a",
+      "package": "org.example.a",
       "methods": [
         "methodA",
         "methodB",
@@ -69,7 +69,7 @@
     },
     {
       "name": "ExampleClassName5",
-      "filePackage": "org.example.a",
+      "package": "org.example.a",
       "methods": [
         "methodD",
         "methodE",
@@ -88,7 +88,7 @@
     },
     {
       "name": "ExampleEnumClassName6",
-      "filePackage": "org.example.a",
+      "package": "org.example.a",
       "methods": [
         "methodG"
       ],
@@ -100,7 +100,7 @@
     },
     {
       "name": "ExampleDataClassName7",
-      "filePackage": "org.example.a",
+      "package": "org.example.a",
       "methods": [],
       "type": "data class",
       "filePath": "src/main/org/example/a/ExampleDataClassName7.kt",
@@ -110,7 +110,7 @@
     },
     {
       "name": "ExampleInterface",
-      "filePackage": "org.example.a",
+      "package": "org.example.a",
       "methods": [
         "methodB"
       ],
@@ -128,7 +128,7 @@
     },
     {
       "name": "ExampleAbstractClassName8",
-      "filePackage": "org.example.a",
+      "package": "org.example.a",
       "methods": [
         "methodH",
         "methodC"
@@ -152,7 +152,7 @@
     },
     {
       "name": "ExampleObject",
-      "filePackage": "org.example.a",
+      "package": "org.example.a",
       "methods": [
         "methodI"
       ],

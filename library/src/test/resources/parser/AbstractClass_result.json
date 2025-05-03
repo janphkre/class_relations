@@ -1,6 +1,6 @@
 {
   "name": "AbstractClass",
-  "filePackage": "com.example.a",
+  "package": "com.example.a",
   "type": "abstract class",
   "fileImports": [],
   "parameters": [],
