@@ -68,9 +68,11 @@ internal class KotlinParserTest {
 
     private fun JsonElement.toKlassItem(): KlassItem {
         val json = this.jsonObject
+        val filePackageString = json["package"]!!.jsonPrimitive.content
         return KlassItem(
             name = json["name"]!!.jsonPrimitive.content,
-            packageString = json["package"]!!.jsonPrimitive.content
+            filePackage = filePackageString.split("."),
+            filePackageString = filePackageString
         )
     }
 
@@ -82,5 +84,5 @@ internal class KotlinParserTest {
         private const val INPUT_POSTFIX = ".kt"
         private const val OUTPUT_POSTFIX = "_result.json"
     }
-
+//TODO: VERIFY SAME INSTANCE IS CREATED IN KOTLIN PARSER FOR ALL KLASS ITEMS
 }

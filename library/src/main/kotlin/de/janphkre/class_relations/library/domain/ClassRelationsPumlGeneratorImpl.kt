@@ -118,7 +118,7 @@ internal class ClassRelationsPumlGeneratorImpl(
         val externalImports = ArrayList<KlassItem>(imports.size)
         imports.forEach { input ->
             if (input.filePackage.hasProjectPrefix()) {
-                projectImports.add(KlassItem(input.name, input.filePackage.drop(projectPrefix.size)))
+                projectImports.add(input.copy(filePackage = input.filePackage.drop(projectPrefix.size)))
             } else {
                 externalImports.add(input)
             }
@@ -132,7 +132,7 @@ internal class ClassRelationsPumlGeneratorImpl(
                 if (key == null) {
                     return@map subLists.distinct().map { KlassImport.Klass(it.name) }
                 }
-                val nested = subLists.distinct().map { KlassItem(it.name, it.filePackage.drop(1)) }
+                val nested = subLists.distinct().map { it.copy(filePackage = it.filePackage.drop(1)) }
                 val nestedImports = groupProjectImportsInner(nested)
                 listOf(KlassImport.Package(key, nestedImports))
             }.flatten()
@@ -144,7 +144,7 @@ internal class ClassRelationsPumlGeneratorImpl(
                 if (key == null) {
                     return@map subLists.distinct().map { KlassImport.Klass(it.name) }
                 }
-                val nested = subLists.distinct().map { KlassItem(it.name, it.filePackage.drop(1)) }
+                val nested = subLists.distinct().map { it.copy(filePackage = it.filePackage.drop(1)) }
                 val nestedImports = groupExternalImportsInner(nested)
                 if (nestedImports.size == 1) {
                     val nestedImport = nestedImports.first()

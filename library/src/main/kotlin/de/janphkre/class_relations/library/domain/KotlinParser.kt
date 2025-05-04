@@ -1,5 +1,6 @@
 package de.janphkre.class_relations.library.domain
 
+import de.janphkre.class_relations.library.data.KlassItemFactory
 import de.janphkre.class_relations.library.model.KlassWithRelations
 
 interface KotlinParser {
@@ -8,7 +9,7 @@ interface KotlinParser {
 
     companion object {
         fun getInstance(): KotlinParser {
-            return KotlinParserImpl
+            return KotlinParserImpl(KlassItemFactory.getInstance())
         }
     }
 }
