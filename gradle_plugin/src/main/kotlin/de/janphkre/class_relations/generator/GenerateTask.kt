@@ -1,10 +1,14 @@
 package de.janphkre.class_relations.generator
 
 import de.janphkre.class_relations.generator.filetree.SortedFileTreeWalker
+import de.janphkre.class_relations.library.data.filter.KlassFilter
+import de.janphkre.class_relations.library.data.filter.KlassFilterFactory
+import de.janphkre.class_relations.library.data.item.KlassItemFactory
 import de.janphkre.class_relations.library.domain.ClassRelationsPumlGenerator
 import de.janphkre.class_relations.library.domain.KotlinParser
 import de.janphkre.class_relations.library.model.KlassWithRelations
 import org.gradle.api.DefaultTask
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import java.io.File
@@ -23,8 +27,13 @@ abstract class GenerateTask: DefaultTask() {
     @get:Input
     abstract val generatorSettings: Property<ClassRelationsPumlGenerator.Settings>
 
+    @get:Input
+    abstract val filters: ListProperty<String>
+
     private val definitions = ArrayList<KlassWithRelations>()
     private lateinit var generator: ClassRelationsPumlGenerator
+    private lateinit var itemFactory: KlassItemFactory
+    private lateinit var filterFactory: KlassFilterFactory
     private lateinit var destinationPathFromModule: String
     private lateinit var moduleDirectoryFile: File
 
@@ -36,6 +45,8 @@ abstract class GenerateTask: DefaultTask() {
         generator = ClassRelationsPumlGenerator.getInstance(
             settings = settings
         )
+        itemFactory = KlassItemFactory.getInstance()
+        filterFactory = KlassFilterFactory.getInstance()
         val parser = KotlinParser.getInstance()
         val sourceDir = source.get()
         Sequence { SortedFileTreeWalker(sourceDir, onLeave = {
@@ -45,6 +56,10 @@ abstract class GenerateTask: DefaultTask() {
             .forEach { path ->
                 parser.readDefinition(path)
             }
+    }
+
+    private fun parseFilters(): List<KlassFilter> {
+        return filterFactory.createFilters(filters.get())
     }
 
     private fun KotlinParser.readDefinition(file: File) {
@@ -62,5 +77,6 @@ abstract class GenerateTask: DefaultTask() {
         destinationFile.parentFile.mkdirs()
         destinationFile.writeText(pumlDiagram)
         definitions.clear()
+        itemFactory.clear()
     }
 }

@@ -1,10 +1,12 @@
-package de.janphkre.class_relations.library.data
+package de.janphkre.class_relations.library.data.item
 
+import de.janphkre.class_relations.library.data.filter.KlassFilter
 import de.janphkre.class_relations.library.model.KlassItem
 
 class KlassItemFactoryImpl: KlassItemFactory {
 
     private val itemsCache: MutableMap<String, MutableMap<String, KlassItem>> = HashMap()
+    private val filters: MutableCollection<KlassFilter> = ArrayList()
 
     override fun createItem(
         name: String,
@@ -23,6 +25,7 @@ class KlassItemFactoryImpl: KlassItemFactory {
         }
         val newResultItem = KlassItem(name, packageList, filePackageString)
         itemsInPackage[name] = newResultItem
+        filterItem(newResultItem)
         return newResultItem
     }
 
@@ -42,14 +45,24 @@ class KlassItemFactoryImpl: KlassItemFactory {
         }
         val newResultItem = KlassItem(name, packageString.split("."), packageString)
         itemsInPackage[name] = newResultItem
+        filterItem(newResultItem)
         return newResultItem
     }
 
-    override fun getItemsForPackage(packageString: String): Collection<KlassItem> {
-        return itemsCache[packageString]?.values ?: emptyList()
+    private fun filterItem(item: KlassItem) {
+        for (filter in filters) {
+            filter.filterItem(item)
+            if (item.isDisabled) {
+                return
+            }
+        }
     }
 
-    override fun getAllPackages(): Collection<String> {
-        return itemsCache.keys
+    override fun applyFilter(klassFilter: KlassFilter) {
+        filters.add(klassFilter)
+    }
+
+    override fun clear() {
+        itemsCache.clear()
     }
 }

@@ -1,6 +1,7 @@
 package de.janphkre.class_relations.library.domain
 
 import com.google.common.truth.Truth
+import de.janphkre.class_relations.library.data.item.KlassItemFactory
 import de.janphkre.class_relations.library.model.KlassItem
 import de.janphkre.class_relations.library.model.KlassType
 import de.janphkre.class_relations.library.model.KlassTypeData
@@ -11,8 +12,13 @@ import java.io.File
 
 class ClassRelationsPumlGeneratorTest {
 
+    private val klassItemFactory = KlassItemFactory.getInstance()
+
     @Test
     fun testBasicExample() = verifyGenerator("basic_example")
+
+    @Test
+    fun testFilterExample() = verifyGenerator("filter_example")
 
     private fun verifyGenerator(id: String) {
         val (generatorSettings, klasses) = readInput(id)
@@ -65,10 +71,9 @@ class ClassRelationsPumlGeneratorTest {
     private fun JsonElement.toKlassItem(): KlassItem {
         val json = this.jsonObject
         val filePackageString = json["package"]!!.jsonPrimitive.content
-        return KlassItem(
+        return klassItemFactory.createItem(
             name = json["name"]!!.jsonPrimitive.content,
-            filePackage = filePackageString.split("."),
-            filePackageString = filePackageString
+            packageString = filePackageString
         )
     }
 

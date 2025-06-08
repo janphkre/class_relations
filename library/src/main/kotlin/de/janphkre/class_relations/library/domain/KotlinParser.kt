@@ -1,6 +1,6 @@
 package de.janphkre.class_relations.library.domain
 
-import de.janphkre.class_relations.library.data.KlassItemFactory
+import de.janphkre.class_relations.library.data.item.KlassItemFactory
 import de.janphkre.class_relations.library.model.KlassWithRelations
 
 interface KotlinParser {

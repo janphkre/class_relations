@@ -1,6 +1,6 @@
 package de.janphkre.class_relations.library.domain
 
-import de.janphkre.class_relations.library.data.KlassItemFactory
+import de.janphkre.class_relations.library.data.item.KlassItemFactory
 import de.janphkre.class_relations.library.model.*
 import kotlinx.ast.common.AstFailure
 import kotlinx.ast.common.AstSource
