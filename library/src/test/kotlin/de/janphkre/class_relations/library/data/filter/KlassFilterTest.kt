@@ -113,6 +113,38 @@ class KlassFilterTest {
         globFilterMatches(klassName, klassPackage, globFilter)
     }
 
+    @Test
+    fun globFilterMiddleWildcardMatches_MatchKlassItem() {
+        val klassName = "ExampleKlassName"
+        val klassPackage = "aaa.bbb.ccc"
+        val globFilter = "a*a.bbb.ccc.ExampleKlassName"
+        globFilterMatches(klassName, klassPackage, globFilter)
+    }
+
+    @Test
+    fun globFilterFullWildcardMatches_MatchKlassItem() {
+        val klassName = "ExampleKlassName"
+        val klassPackage = "aaa.bbb.ccc"
+        val globFilter = "**"
+        globFilterMatches(klassName, klassPackage, globFilter)
+    }
+
+    @Test
+    fun globFilterSingleWildcardMatches_MatchKlassItem() {
+        val klassName = "ExampleKlassName"
+        val klassPackage = ""
+        val globFilter = "*"
+        globFilterMatches(klassName, klassPackage, globFilter)
+    }
+
+    @Test
+    fun globFilterMultiplePathWildcardMatches_MatchKlassItem() {
+        val klassName = "ExampleKlassName"
+        val klassPackage = "aaa.bbb.ccc"
+        val globFilter = "**.**.**"
+        globFilterMatches(klassName, klassPackage, globFilter)
+    }
+
     private fun globFilterMatches(klassName: String, klassPackage: String, globFilter: String) {
         val klassItemFactory = KlassItemFactoryImpl()
         val klassItem = klassItemFactory.createItem(klassName, klassPackage)

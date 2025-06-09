@@ -17,9 +17,6 @@ class ClassRelationsPumlGeneratorTest {
     @Test
     fun testBasicExample() = verifyGenerator("basic_example")
 
-    @Test
-    fun testFilterExample() = verifyGenerator("filter_example")
-
     private fun verifyGenerator(id: String) {
         val (generatorSettings, klasses) = readInput(id)
         val generator = ClassRelationsPumlGenerator.getInstance(

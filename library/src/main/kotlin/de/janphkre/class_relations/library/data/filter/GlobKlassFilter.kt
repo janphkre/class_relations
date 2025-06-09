@@ -18,12 +18,6 @@ class GlobKlassFilter(
         })
     }
 
-    init {
-        globFilters.forEach {
-            println(it.elements.joinToString())
-        }
-    }
-
     private sealed interface GlobFilterElement {
         data class Exact(val exact: String): GlobFilterElement
         data class Match(val matchElements: List<String>): GlobFilterElement

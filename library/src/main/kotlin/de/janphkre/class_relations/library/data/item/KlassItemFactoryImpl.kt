@@ -12,7 +12,18 @@ class KlassItemFactoryImpl: KlassItemFactory {
         name: String,
         packageList: List<String>
     ): KlassItem {
-        val filePackageString = packageList.joinToString(".")
+        return createItem(
+            name,
+            packageList,
+            packageList.joinToString(".")
+        )
+    }
+
+    private fun createItem(
+        name: String,
+        filePackageList: List<String>,
+        filePackageString: String
+    ): KlassItem {
         var itemsInPackage = itemsCache[filePackageString]
         if (itemsInPackage != null) {
             val resultItem = itemsInPackage[name]
@@ -23,7 +34,7 @@ class KlassItemFactoryImpl: KlassItemFactory {
             itemsInPackage = HashMap()
             itemsCache[filePackageString] = itemsInPackage
         }
-        val newResultItem = KlassItem(name, packageList, filePackageString)
+        val newResultItem = KlassItem(name, filePackageList, filePackageString)
         itemsInPackage[name] = newResultItem
         filterItem(newResultItem)
         return newResultItem
@@ -33,20 +44,19 @@ class KlassItemFactoryImpl: KlassItemFactory {
         name: String,
         packageString: String
     ): KlassItem {
-        var itemsInPackage = itemsCache[packageString]
-        if (itemsInPackage != null) {
-            val resultItem = itemsInPackage[name]
-            if (resultItem != null) {
-                return resultItem
-            }
+        return if (packageString.isEmpty()) {
+            createItem(
+                name,
+                emptyList(),
+                ""
+            )
         } else {
-            itemsInPackage = HashMap()
-            itemsCache[packageString] = itemsInPackage
+            createItem(
+                name,
+                packageString.split("."),
+                packageString
+            )
         }
-        val newResultItem = KlassItem(name, packageString.split("."), packageString)
-        itemsInPackage[name] = newResultItem
-        filterItem(newResultItem)
-        return newResultItem
     }
 
     private fun filterItem(item: KlassItem) {
