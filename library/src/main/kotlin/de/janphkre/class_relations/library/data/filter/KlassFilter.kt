@@ -7,4 +7,5 @@ import de.janphkre.class_relations.library.model.KlassItem
  */
 interface KlassFilter {
     fun filterItem(item: KlassItem)
+    fun resetCache()
 }

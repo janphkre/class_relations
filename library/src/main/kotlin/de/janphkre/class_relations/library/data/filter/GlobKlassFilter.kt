@@ -155,4 +155,6 @@ class GlobKlassFilter(
             }
         }
     }
+
+    override fun resetCache() { }
 }

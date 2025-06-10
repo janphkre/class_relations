@@ -8,12 +8,29 @@ class ExactKlassFilter(
     internal val classesToBeFiltered: Collection<KlassFilterItem>
 ): KlassFilter {
 
+    private var activeFilters = classesToBeFiltered.toMutableSet()
+
     override fun filterItem(item: KlassItem) {
-        classesToBeFiltered.forEach { klassItemFilter ->
-            if (item.name == klassItemFilter.name && item.filePackageString == klassItemFilter.packageString) {
-                item.isDisabled = true
-                return
+        val isFiltered = activeFilters.removeFirst { filter ->
+            item.name == filter.name && item.filePackageString == filter.packageString
+        }
+        if (isFiltered) {
+            item.isDisabled = true
+        }
+    }
+
+    private fun <T: Any> MutableCollection<T>.removeFirst(lambda: (T) -> Boolean): Boolean {
+        val iterator = iterator()
+        while(iterator.hasNext()) {
+            if (lambda.invoke(iterator.next())) {
+                iterator.remove()
+                return true
             }
         }
+        return false
+    }
+
+    override fun resetCache() {
+        activeFilters = classesToBeFiltered.toMutableSet()
     }
 }

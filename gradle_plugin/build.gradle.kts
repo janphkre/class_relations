@@ -15,6 +15,8 @@ repositories {
 dependencies {
     implementation(project(":library"))
     testImplementation(kotlin("test"))
+    testImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
+    testImplementation("com.google.truth:truth:1.4.4")
     testImplementation("io.mockk:mockk:1.14.0")
     testImplementation("ch.tutteli.atrium:atrium-fluent:1.2.0")
 }

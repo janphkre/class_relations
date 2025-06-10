@@ -68,11 +68,12 @@ class KlassItemFactoryImpl: KlassItemFactory {
         }
     }
 
-    override fun applyFilter(klassFilter: KlassFilter) {
-        filters.add(klassFilter)
+    override fun applyFilters(klassFilters: List<KlassFilter>) {
+        filters.addAll(klassFilters)
     }
 
     override fun clear() {
         itemsCache.clear()
+        filters.forEach { it.resetCache() }
     }
 }

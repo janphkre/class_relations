@@ -17,7 +17,7 @@ interface KlassItemFactory {
 
     fun clear()
 
-    fun applyFilter(klassFilter: KlassFilter)
+    fun applyFilters(klassFilters: List<KlassFilter>)
 
     companion object {
 

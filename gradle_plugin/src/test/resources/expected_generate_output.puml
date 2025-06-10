@@ -1,0 +1,44 @@
+@startuml
+!$pathToBase = "../.."
+package "basic_example" #00FF00 {
+    class "[[$pathToBase/..\sources\basic_example\BasicClass.kt BasicClass]]" as BasicClass {
+    }
+    class "[[$pathToBase/..\sources\basic_example\ClassWithDistinctDeps.kt ClassWithDistinctDeps]]" as ClassWithDistinctDeps {
+    }
+    class "[[$pathToBase/..\sources\basic_example\ClassWithMethods.kt ClassWithMethods]]" as ClassWithMethods {
+        {method} methodA
+        {method} methodB
+        {method} methodC
+    }
+    class "[[$pathToBase/..\sources\basic_example\ClassWithUsages.kt ClassWithUsages]]" as ClassWithUsages {
+        {method} methodA
+        {method} methodB
+        {method} methodC
+    }
+    enum "[[$pathToBase/..\sources\basic_example\EnumClass.kt EnumClass]]" as EnumClass {
+    }
+}
+package "com.example" as p\$_0 #ffffff {
+    package "b" as p\$_1 #ffffff {
+        circle "ParameterClassB"
+        circle "UsageClassB"
+        circle "UsageClassC"
+    }
+    package "c" as p\$_2 #ffffff {
+        circle "ParameterClassD"
+    }
+}
+package "io.other" as p\$_3 #ffffff {
+    circle "ParameterClassE"
+    circle "UsageClassE"
+}
+
+ClassWithDistinctDeps .up.|> ParameterClassB
+ClassWithDistinctDeps o-down- ParameterClassA
+ClassWithDistinctDeps o-down- ParameterClassB
+ClassWithDistinctDeps o-down- ParameterClassD
+ClassWithDistinctDeps o-down- ParameterClassE
+ClassWithUsages -down-> UsageClassB
+ClassWithUsages -down-> UsageClassC
+ClassWithUsages -down-> UsageClassE
+@enduml

@@ -14,6 +14,7 @@ class GeneratorPlugin : Plugin<Project> {
             task.moduleDirectory.set(extension.moduleDirectory.convention(target.rootDir))
             task.destination.set(extension.destination.convention(File(target.buildFile, "generated/puml_class_relations")))
             task.source.set(extension.source.convention(File(target.rootDir, "src")))
+            task.filters.set(extension.filters.convention(emptyList()))
             val compositeSettings = extension.projectPackagePrefix.flatMap { prefix ->
                 extension.selfColor.flatMap { color ->
                     extension.generatedFileName.flatMap { fileName ->

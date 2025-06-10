@@ -33,20 +33,15 @@ abstract class GenerateTask: DefaultTask() {
     private val definitions = ArrayList<KlassWithRelations>()
     private lateinit var generator: ClassRelationsPumlGenerator
     private lateinit var itemFactory: KlassItemFactory
-    private lateinit var filterFactory: KlassFilterFactory
     private lateinit var destinationPathFromModule: String
     private lateinit var moduleDirectoryFile: File
 
     @TaskAction
     fun action() {
         val settings = generatorSettings.get()
-        moduleDirectoryFile = moduleDirectory.get()
-        destinationPathFromModule = moduleDirectoryFile.toRelativeString(destination.get())
-        generator = ClassRelationsPumlGenerator.getInstance(
-            settings = settings
-        )
-        itemFactory = KlassItemFactory.getInstance()
-        filterFactory = KlassFilterFactory.getInstance()
+        initializeFields(settings)
+        registerKlassFilters()
+
         val parser = KotlinParser.getInstance()
         val sourceDir = source.get()
         Sequence { SortedFileTreeWalker(sourceDir, onLeave = {
@@ -58,8 +53,19 @@ abstract class GenerateTask: DefaultTask() {
             }
     }
 
-    private fun parseFilters(): List<KlassFilter> {
-        return filterFactory.createFilters(filters.get())
+    private fun initializeFields(settings: ClassRelationsPumlGenerator.Settings) {
+        moduleDirectoryFile = moduleDirectory.get()
+        destinationPathFromModule = moduleDirectoryFile.toRelativeString(destination.get())
+        generator = ClassRelationsPumlGenerator.getInstance(
+            settings = settings
+        )
+        itemFactory = KlassItemFactory.getInstance()
+    }
+
+    private fun registerKlassFilters() {
+        val filterFactory = KlassFilterFactory.getInstance()
+        val klassFilters = filterFactory.createFilters(filters.get())
+        itemFactory.applyFilters(klassFilters)
     }
 
     private fun KotlinParser.readDefinition(file: File) {
