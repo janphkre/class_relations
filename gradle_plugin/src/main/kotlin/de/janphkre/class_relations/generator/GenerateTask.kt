@@ -76,7 +76,7 @@ abstract class GenerateTask: DefaultTask() {
     private fun generateDiagram(destinationDiagramPath: String) {
         if (definitions.isEmpty()) {
             //TODO: GENERATE EMPTY DIAGRAM FOR EMPTY DIRECTORIES? (especially root directory?) -> would need to change file tree walker to bottom up instead of top down
-            return
+            //return
         }
         val pumlDiagram = generator.generate(definitions, destinationPathFromModule)
         val destinationFile = File(destination.get(), destinationDiagramPath)

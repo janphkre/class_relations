@@ -17,13 +17,17 @@ class ClassRelationsPumlGeneratorTest {
     @Test
     fun testBasicExample() = verifyGenerator("basic_example")
 
+    @Test
+    fun testNestedPackagesExample() = verifyGenerator("nested_packages")
+
     private fun verifyGenerator(id: String) {
-        val (generatorSettings, klasses) = readInput(id)
+        val (generatorSettings, klasses, packages) = readInput(id)
         val generator = ClassRelationsPumlGenerator.getInstance(
             generatorSettings
         )
         val result = generator.generate(
-            klasses,
+            klasses = klasses,
+            childPackages = packages,
             rootGeneratedLink = "example/root/generated"
         )
         Truth.assertThat(result).isEqualTo(readOutput(id))
@@ -37,7 +41,7 @@ class ClassRelationsPumlGeneratorTest {
         return readFile("$file$OUTPUT_POSTFIX")
     }
 
-    private fun readInput(file: String): Pair<ClassRelationsPumlGenerator.Settings,List<KlassWithRelations>> {
+    private fun readInput(file: String): Triple<ClassRelationsPumlGenerator.Settings,List<KlassWithRelations>, List<String>> {
         val json = Json.parseToJsonElement(readFile("$file$INPUT_POSTFIX")).jsonObject
         val jsonSettings = json["generatorSettings"]!!.jsonObject
         val settings = ClassRelationsPumlGenerator.Settings(
@@ -62,7 +66,11 @@ class ClassRelationsPumlGeneratorTest {
                 methodParameters = element["methodParameters"]?.jsonArray?.map { it.toKlassItem() } ?: emptyList()
             )
         }
-        return settings to files
+        val packages = json["packages"]?.jsonArray?.map { jsonElement ->
+            val element = jsonElement.jsonObject
+            element["name"]!!.jsonPrimitive.content
+        } ?: emptyList()
+        return Triple(settings, files, packages)
     }
 
     private fun JsonElement.toKlassItem(): KlassItem {

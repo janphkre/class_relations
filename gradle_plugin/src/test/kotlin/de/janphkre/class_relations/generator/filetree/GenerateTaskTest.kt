@@ -22,12 +22,6 @@ class GenerateTaskTest {
 
     @Test
     fun action_runsThroughFiles() {
-        val settings = ClassRelationsPumlGenerator.Settings(
-            generatedFileName = "example_relations.puml",
-            projectPackagePrefix = "basic_example",
-            spaceCount = 4,
-            selfColor = "#00FF00"
-        )
         val moduleFolder = testDirectory.newFolder("exampleModuleFolder")
         val destinationFolder = testDirectory.newFolder("destination")
         val sourceFolder = testDirectory.newFolder("sources")
@@ -63,8 +57,53 @@ class GenerateTaskTest {
             .build()
 
         Truth.assertThat(readFile(File(destinationFolder, "basic_example/example_relations.puml")))
-            .isEqualTo(readFile("src/test/resources/expected_generate_output.puml"))
+            .isEqualTo(readFile("src/test/resources/basic_example__expected_generate_output.puml"))
     }
+
+
+    @Test
+    fun action_createsEmptyDiagramsForStructure() {
+        val moduleFolder = testDirectory.newFolder("exampleModuleFolder")
+        val destinationFolder = testDirectory.newFolder("destination")
+        val sourceFolder = testDirectory.newFolder("sources")
+        val sourceDepthFolder = File(sourceFolder, "aaa/bbb/ccc/depth_example")
+        fillSourceFolder("depth_example", sourceDepthFolder)
+
+        val buildFile = testDirectory.newFile("build.gradle")
+
+        buildFile.writeText("""
+            plugins {
+                id 'de.janphkre.class_relations'
+            }
+            
+            pumlGenerate {
+                projectPackagePrefix = "aaa"
+                selfColor = "#00FF00"
+                spaceCount = 4
+                generatedFileName = "example_relations.puml"
+                destination = new File("${destinationFolder.absolutePath.replace('\\','/')}")
+                moduleDirectory = new File("${moduleFolder.absolutePath.replace('\\','/')}")
+                source = new File("${sourceFolder.absolutePath.replace('\\','/')}")
+            }
+        """.trimIndent())
+
+        val result = GradleRunner.create()
+            .withProjectDir(testDirectory.root)
+            .withPluginClasspath()
+            .withArguments("generateClassRelationsPuml")
+            .forwardOutput()
+            .build()
+
+        Truth.assertThat(readFile(File(destinationFolder, "depth_example/example_relations.puml")))
+            .isEqualTo(readFile("src/test/resources/depth_example__expected_generate_output.puml"))
+        Truth.assertThat(readFile(File(destinationFolder, "depth_example/bbb/example_relations.puml")))
+            .isEqualTo(readFile("src/test/resources/depth_example__expected_generate_output.puml"))
+        Truth.assertThat(readFile(File(destinationFolder, "depth_example/bbb/ccc/example_relations.puml")))
+            .isEqualTo(readFile("src/test/resources/depth_example__expected_generate_output.puml"))
+        Truth.assertThat(readFile(File(destinationFolder, "depth_example/bbb/ccc/depth_example/example_relations.puml")))
+            .isEqualTo(readFile("src/test/resources/depth_example__expected_generate_output.puml"))
+    }
+
 
     private fun fillSourceFolder(usecase: String, target: File) {
         target.mkdirs()

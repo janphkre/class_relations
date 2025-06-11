@@ -6,7 +6,15 @@ sealed interface KlassImport {
     data class Package(
         override val name: String,
         val elements: List<KlassImport>
-    ) : KlassImport
+    ) : KlassImport {
+        override fun hashCode(): Int {
+            return name.hashCode()
+        }
+
+        override fun equals(other: Any?): Boolean {
+            return name == ((other as? Package)?.name ?: return false)
+        }
+    }
 
     class Klass(
         override val name: String,

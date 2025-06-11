@@ -14,7 +14,7 @@ interface ClassRelationsPumlGenerator {
     ): Serializable
 
     // All klasses must belong to the same package / folder!
-    fun generate(klasses: List<KlassWithRelations>, rootGeneratedLink: String): String
+    fun generate(klasses: List<KlassWithRelations>, childPackages: List<String>, rootGeneratedLink: String): String
 
     companion object {
         fun getInstance(settings: Settings): ClassRelationsPumlGenerator {

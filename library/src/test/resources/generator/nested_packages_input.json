@@ -1,0 +1,50 @@
+{
+  "generatorSettings": {
+    "projectPackagePrefix": "org.example",
+    "selfColor": "#00FFFF",
+    "spaceCount": 4,
+    "generatedFileName": "example_relations.puml"
+  },
+  "files": [
+    {
+      "name": "ExampleClassName1",
+      "package": "org.example.a",
+      "methods": [
+        "methodA",
+        "methodB",
+        "methodC"
+      ],
+      "type": "class",
+      "filePath": "src/main/org/example/a/ExampleClassName1.kt",
+      "fileImports": [
+        {
+          "package": "org.example.b",
+          "name": "ExampleClassName2"
+        },
+        {
+          "package": "org.example.b",
+          "name": "ExampleClassName3"
+        },
+        {
+          "package": "org.example.b",
+          "name": "ExampleClassName4"
+        },
+        {
+          "package": "io.different",
+          "name": "Something"
+        },
+        {
+          "package": "org.example.a.c",
+          "name": "ExampleClassName5"
+        }
+      ],
+      "parameters": [],
+      "inheritances": []
+    }
+  ],
+  "packages": [
+    { "name":  "depth1" },
+    { "name":  "depth2" },
+    { "name":  "depth3" }
+  ]
+}
