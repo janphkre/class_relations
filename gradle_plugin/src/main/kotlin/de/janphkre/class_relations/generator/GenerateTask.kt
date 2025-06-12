@@ -35,17 +35,27 @@ abstract class GenerateTask: DefaultTask() {
     private lateinit var itemFactory: KlassItemFactory
     private lateinit var destinationPathFromModule: String
     private lateinit var moduleDirectoryFile: File
+    private lateinit var generatedFileName: String
+
+    private fun File.toRelativeForwardSlashString(base: File): String {
+        val relative = base.toPath().relativize(this.toPath())
+        println("relativePath from base $base to $this is $relative")
+        return relative.joinToString("/")
+    }
 
     @TaskAction
     fun action() {
-        val settings = generatorSettings.get()
-        initializeFields(settings)
+        initializeFields()
         registerKlassFilters()
 
         val parser = KotlinParser.getInstance()
         val sourceDir = source.get()
-        Sequence { SortedFileTreeWalker(sourceDir, onLeave = {
-            generateDiagram("${it.toRelativeString(sourceDir)}/${settings.generatedFileName}")
+        Sequence { SortedFileTreeWalker(sourceDir, onLeave = { dir ->
+            val childPackages = dir.subDirectories.map { it.name }
+            generateDiagram(
+                childPackages,
+                dir.directory.toRelativeForwardSlashString(sourceDir)
+            )
         }) }
             .filter { it.extension == "kt" }
             .forEach { path ->
@@ -53,13 +63,15 @@ abstract class GenerateTask: DefaultTask() {
             }
     }
 
-    private fun initializeFields(settings: ClassRelationsPumlGenerator.Settings) {
+    private fun initializeFields() {
+        val settings = generatorSettings.get()
         moduleDirectoryFile = moduleDirectory.get()
-        destinationPathFromModule = moduleDirectoryFile.toRelativeString(destination.get())
+        destinationPathFromModule = moduleDirectoryFile.toRelativeForwardSlashString(destination.get())
         generator = ClassRelationsPumlGenerator.getInstance(
             settings = settings
         )
         itemFactory = KlassItemFactory.getInstance()
+        generatedFileName = settings.generatedFileName
     }
 
     private fun registerKlassFilters() {
@@ -69,17 +81,18 @@ abstract class GenerateTask: DefaultTask() {
     }
 
     private fun KotlinParser.readDefinition(file: File) {
-        val definition = parse(file.readText(), file.nameWithoutExtension, filePath = file.toRelativeString(moduleDirectoryFile))
+        val definition = parse(file.readText(), file.nameWithoutExtension, filePath = file.toRelativeForwardSlashString(moduleDirectoryFile))
         definitions.add(definition ?: return)
     }
 
-    private fun generateDiagram(destinationDiagramPath: String) {
-        if (definitions.isEmpty()) {
-            //TODO: GENERATE EMPTY DIAGRAM FOR EMPTY DIRECTORIES? (especially root directory?) -> would need to change file tree walker to bottom up instead of top down
-            //return
+    private fun generateDiagram(childPackages: List<String>, destinationDiagramPath: String) {
+        val pumlDiagram = if (definitions.isEmpty()) {
+            generator.generateEmpty(destinationDiagramPath.split('/'), childPackages, destinationPathFromModule)
+        } else {
+            generator.generate(definitions, childPackages, destinationPathFromModule)
         }
-        val pumlDiagram = generator.generate(definitions, destinationPathFromModule)
-        val destinationFile = File(destination.get(), destinationDiagramPath)
+
+        val destinationFile = File(destination.get(), "${destinationDiagramPath}/${generatedFileName}")
         destinationFile.parentFile.mkdirs()
         destinationFile.writeText(pumlDiagram)
         definitions.clear()

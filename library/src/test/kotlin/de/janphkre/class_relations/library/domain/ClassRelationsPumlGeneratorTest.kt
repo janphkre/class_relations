@@ -20,6 +20,9 @@ class ClassRelationsPumlGeneratorTest {
     @Test
     fun testNestedPackagesExample() = verifyGenerator("nested_packages")
 
+    @Test
+    fun testEmptyPackagesExample() = verifyGeneratorEmpty("empty_packages")
+
     private fun verifyGenerator(id: String) {
         val (generatorSettings, klasses, packages) = readInput(id)
         val generator = ClassRelationsPumlGenerator.getInstance(
@@ -27,6 +30,18 @@ class ClassRelationsPumlGeneratorTest {
         )
         val result = generator.generate(
             klasses = klasses,
+            childPackages = packages,
+            rootGeneratedLink = "example/root/generated"
+        )
+        Truth.assertThat(result).isEqualTo(readOutput(id))
+    }
+    private fun verifyGeneratorEmpty(id: String) {
+        val (generatorSettings, klasses, packages) = readInput(id)
+        val generator = ClassRelationsPumlGenerator.getInstance(
+            generatorSettings
+        )
+        val result = generator.generateEmpty(
+            filePackage = klasses.first().item.filePackage,
             childPackages = packages,
             rootGeneratedLink = "example/root/generated"
         )

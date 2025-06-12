@@ -1,6 +1,7 @@
 package de.janphkre.class_relations.library.domain
 
 import de.janphkre.class_relations.library.model.*
+import java.io.File
 import java.util.*
 
 internal class ClassRelationsPumlGeneratorImpl(
@@ -16,7 +17,7 @@ internal class ClassRelationsPumlGeneratorImpl(
         return StringBuilder(generatorSettings.initialCapacitySize * klasses.size).apply {
             appendContent("@startuml")
             //STRUCTURE
-            createSelfPackageStructure(klasses, rootGeneratedLink)
+            createSelfPackageStructure(klasses.first().item.filePackage, rootGeneratedLink)
             createClasses(klasses)
             createImports(klasses, childPackages, rootGeneratedLink)
             appendLine()
@@ -31,20 +32,35 @@ internal class ClassRelationsPumlGeneratorImpl(
         }.toString()
     }
 
-    private fun StringBuilder.createSelfPackageStructure(klasses: List<KlassWithRelations>, rootGeneratedLink: String) {
-        val anyKlass = klasses.first()
-        val pathDepth = anyKlass.item.filePackage.size + rootGeneratedLink.count { it == '/' || it == '\\' }
+    override fun generateEmpty(
+        filePackage: List<String>,
+        childPackages: List<String>,
+        rootGeneratedLink: String
+    ): String {
+        return StringBuilder(generatorSettings.initialCapacitySize).apply {
+            appendContent("@startuml")
+            createSelfPackageStructure(filePackage, rootGeneratedLink)
+            createImports(emptyList(), childPackages, rootGeneratedLink) //TODO: SPLIT CHILD PACKAGES OFF FROM HERE?
+            for( i in 0 until openPackages.size) {
+                closePackage()
+            }
+            appendContent("@enduml")
+        }.toString()
+    }
+
+    private fun StringBuilder.createSelfPackageStructure(filePackage: List<String>, rootGeneratedLink: String) {
+        val pathDepth = filePackage.size + rootGeneratedLink.count { it == '/' }
         appendContent("!\$pathToBase = \"${"..".repeat(pathDepth, '/')}\"")
-        if (!anyKlass.item.filePackage.hasProjectPrefix()) {
-            beginSelfPackage(anyKlass.item.filePackage.joinToString("."))
+        if (!filePackage.hasProjectPrefix()) {
+            beginSelfPackage(filePackage.joinToString("."))
             return
         }
-        if (projectPrefix.size == anyKlass.item.filePackage.size) {
-            beginSelfPackage(anyKlass.item.filePackage.joinToString("."))
+        if (projectPrefix.size == filePackage.size) {
+            beginSelfPackage(filePackage.joinToString("."))
             return
         }
         beginPackage(generatorSettings.projectPackagePrefix, rootGeneratedLink)
-        val packages = anyKlass.item.filePackage.drop(projectPrefix.size)
+        val packages = filePackage.drop(projectPrefix.size)
         var packageLink = rootGeneratedLink
         for (i in 0 until packages.size - 1) {
             packageLink += "/${packages[i]}"
@@ -85,14 +101,9 @@ internal class ClassRelationsPumlGeneratorImpl(
     private fun StringBuilder.createImports(klasses: List<KlassWithRelations>, childPackages: List<String>, rootGeneratedLink: String) {
         val (projectImports, externalImports) = groupAllImports(klasses.flatMap { it.fileImports })
         val currentImports = projectImports.getCurrentImports(childPackages)
-
-        println("Current imports are ${currentImports.joinToString()}")
-
-        // Close packages that do not have used classes:
-        assert(openPackages.size == currentImports.size) //TODO?
+        //At this point, the openPackages stack matches the currentImports list
         // Create imported classes in open package tree:
         var lastOpenPackage = openPackages.lastOrNull()
-        println("Continuing with openPackage: $lastOpenPackage")
         for (i in currentImports.size - 1 downTo 0) {
             val projectRootGeneratedLink = "$rootGeneratedLink/${projectPrefix.joinToString("/")}"
             val currentPackageRootGeneratedLink = if (openPackages.size <= 1) {
@@ -137,27 +148,29 @@ internal class ClassRelationsPumlGeneratorImpl(
             childPackageImports = childPackageImports.filterNot { existingPackages.contains(it.name)  }
         }
 
-        var replacementImportChild = currentImports[currentImports.size - 1].let { import ->
-            import.copy(
-                elements = import.elements.plus(childPackageImports)
-            )
-        }
-        currentImports[currentImports.size - 1] = replacementImportChild
-        for (i in currentImports.size - 2 downTo 0) {
-            replacementImportChild = currentImports[i].let { import ->
-                val replacementElements = import.elements.toMutableList()
-                val childIndex = replacementElements.indexOf(replacementImportChild)
-                if (childIndex < 0) {
-                    throw IllegalStateException(
-                        "Package ${replacementImportChild.name} was not found in ${import.name} while building import list!"
-                    )
-                }
-                replacementElements[childIndex] = replacementImportChild
+        if (currentImports.size > 0) {
+            var replacementImportChild = currentImports[currentImports.size - 1].let { import ->
                 import.copy(
-                    elements = replacementElements
+                    elements = import.elements.plus(childPackageImports)
                 )
             }
-            currentImports[i] = replacementImportChild
+            currentImports[currentImports.size - 1] = replacementImportChild
+            for (i in currentImports.size - 2 downTo 0) {
+                replacementImportChild = currentImports[i].let { import ->
+                    val replacementElements = import.elements.toMutableList()
+                    val childIndex = replacementElements.indexOf(replacementImportChild)
+                    if (childIndex < 0) {
+                        throw IllegalStateException(
+                            "Package ${replacementImportChild.name} was not found in ${import.name} while building import list!"
+                        )
+                    }
+                    replacementElements[childIndex] = replacementImportChild
+                    import.copy(
+                        elements = replacementElements
+                    )
+                }
+                currentImports[i] = replacementImportChild
+            }
         }
         additionalImports.reverse()
         currentImports.addAll(additionalImports)
@@ -226,7 +239,6 @@ internal class ClassRelationsPumlGeneratorImpl(
         element: KlassImport,
         rootGeneratedLink: String?
     ) {
-        println("CREATING imported elements: $element in $rootGeneratedLink")
         when(element) {
             is KlassImport.Package -> {
                 val packageTarget = if (rootGeneratedLink == null) {
@@ -280,6 +292,7 @@ internal class ClassRelationsPumlGeneratorImpl(
         appendContent("package \"$name\" ${generatorSettings.selfColor} {")
         openPackages.push(name)
     }
+
     private fun StringBuilder.closePackage() {
         openPackages.pop()
         appendContent("}")

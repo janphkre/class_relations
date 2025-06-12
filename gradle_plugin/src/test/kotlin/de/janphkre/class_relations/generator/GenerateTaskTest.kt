@@ -1,12 +1,7 @@
-package de.janphkre.class_relations.generator.filetree
+package de.janphkre.class_relations.generator
 
 import com.google.common.truth.Truth
 import de.janphkre.class_relations.library.data.item.KlassItemFactory
-import de.janphkre.class_relations.library.domain.ClassRelationsPumlGenerator
-import de.janphkre.class_relations.library.model.KlassItem
-import io.mockk.every
-import io.mockk.mockk
-import kotlinx.serialization.json.*
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.Rule
 import org.junit.Test
@@ -56,6 +51,8 @@ class GenerateTaskTest {
             .forwardOutput()
             .build()
 
+        destinationFolder.printDestinationStructure()
+
         Truth.assertThat(readFile(File(destinationFolder, "basic_example/example_relations.puml")))
             .isEqualTo(readFile("src/test/resources/basic_example__expected_generate_output.puml"))
     }
@@ -66,7 +63,7 @@ class GenerateTaskTest {
         val moduleFolder = testDirectory.newFolder("exampleModuleFolder")
         val destinationFolder = testDirectory.newFolder("destination")
         val sourceFolder = testDirectory.newFolder("sources")
-        val sourceDepthFolder = File(sourceFolder, "aaa/bbb/ccc/depth_example")
+        val sourceDepthFolder = File(sourceFolder, "aaa/bbb/ccc")
         fillSourceFolder("depth_example", sourceDepthFolder)
 
         val buildFile = testDirectory.newFile("build.gradle")
@@ -94,16 +91,29 @@ class GenerateTaskTest {
             .forwardOutput()
             .build()
 
-        Truth.assertThat(readFile(File(destinationFolder, "depth_example/example_relations.puml")))
-            .isEqualTo(readFile("src/test/resources/depth_example__expected_generate_output.puml"))
-        Truth.assertThat(readFile(File(destinationFolder, "depth_example/bbb/example_relations.puml")))
-            .isEqualTo(readFile("src/test/resources/depth_example__expected_generate_output.puml"))
-        Truth.assertThat(readFile(File(destinationFolder, "depth_example/bbb/ccc/example_relations.puml")))
-            .isEqualTo(readFile("src/test/resources/depth_example__expected_generate_output.puml"))
-        Truth.assertThat(readFile(File(destinationFolder, "depth_example/bbb/ccc/depth_example/example_relations.puml")))
-            .isEqualTo(readFile("src/test/resources/depth_example__expected_generate_output.puml"))
+        destinationFolder.printDestinationStructure()
+
+        Truth.assertThat(readFile(File(destinationFolder, "aaa/example_relations.puml")))
+            .isEqualTo(readFile("src/test/resources/depth_example__aaa__expected_generate_output.puml"))
+        Truth.assertThat(readFile(File(destinationFolder, "aaa/bbb/example_relations.puml")))
+            .isEqualTo(readFile("src/test/resources/depth_example__aaa.bbb__expected_generate_output.puml"))
+        Truth.assertThat(readFile(File(destinationFolder, "aaa/bbb/ccc/example_relations.puml")))
+            .isEqualTo(readFile("src/test/resources/depth_example__aaa.bbb.ccc__expected_generate_output.puml"))
+        Truth.assertThat(readFile(File(destinationFolder, "aaa/bbb/ccc/depth_example/example_relations.puml")))
+            .isEqualTo(readFile("src/test/resources/depth_example__aaa.bbb.ccc.depth_example__expected_generate_output.puml"))
     }
 
+    private fun File.printDestinationStructure() {
+        println("Destination Folder content:")
+        var spaceCount = 0
+        this.walkTopDown()
+            .onEnter {
+                spaceCount++
+                true
+            }
+            .onLeave { spaceCount-- }
+            .forEach { println("${" ".repeat(spaceCount)}${it.name}") }
+    }
 
     private fun fillSourceFolder(usecase: String, target: File) {
         target.mkdirs()
@@ -122,14 +132,5 @@ class GenerateTaskTest {
 
     private fun readFile(file: File): String {
         return file.readText().replace("\r","")
-    }
-
-    private fun JsonElement.toKlassItem(): KlassItem {
-        val json = this.jsonObject
-        val filePackageString = json["package"]!!.jsonPrimitive.content
-        return klassItemFactory.createItem(
-            name = json["name"]!!.jsonPrimitive.content,
-            packageString = filePackageString
-        )
     }
 }

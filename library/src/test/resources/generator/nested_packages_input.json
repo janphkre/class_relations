@@ -45,6 +45,7 @@
   "packages": [
     { "name":  "depth1" },
     { "name":  "depth2" },
-    { "name":  "depth3" }
+    { "name":  "depth3" },
+    { "name":  "c" }
   ]
 }

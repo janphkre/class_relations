@@ -1,0 +1,28 @@
+{
+  "generatorSettings": {
+    "projectPackagePrefix": "org.example",
+    "selfColor": "#00FFFF",
+    "spaceCount": 4,
+    "generatedFileName": "example_relations.puml"
+  },
+  "files": [
+    {
+      "name": "",
+      "package": "org.example.a",
+      "methods": [],
+      "type": "",
+      "filePath": "",
+      "fileImports": [],
+      "parameters": [],
+      "inheritances": []
+    }
+  ],
+  "packages": [
+    { "name":  "depth1" },
+    { "name":  "depth2" },
+    { "name":  "depth3" },
+    { "name":  "depth4" },
+    { "name":  "depth5" },
+    { "name":  "depth6" }
+  ]
+}

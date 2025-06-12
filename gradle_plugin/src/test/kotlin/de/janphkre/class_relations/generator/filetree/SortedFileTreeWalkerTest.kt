@@ -57,7 +57,7 @@ internal class SortedFileTreeWalkerTest {
         )
 
         val result = ArrayList<WalkerItem>()
-        val walker = SortedFileTreeWalker(input) { result.add(WalkerItem(it.name, true))}
+        val walker = SortedFileTreeWalker(input) { result.add(WalkerItem(it.directory.name, true))}
         walker.forEach { result.add(WalkerItem(it.name, false)) }
         expect(result).toContainExactlyElementsOf(expectedResult)
     }

@@ -1,0 +1,9 @@
+@startuml
+!$pathToBase = "../../.."
+package "[[$pathToBase/../exampleModuleFolder/example_relations.puml aaa]]" as p\$_2 #ffffff {
+    package "bbb" #00FF00 {
+        package "[[$pathToBase/../exampleModuleFolder/aaa/bbb/ccc/example_relations.puml ccc]]" as p\$_3 #ffffff {
+        }
+    }
+}
+@enduml

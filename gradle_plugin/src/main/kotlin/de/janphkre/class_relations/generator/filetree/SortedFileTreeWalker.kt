@@ -14,7 +14,7 @@ import java.util.Stack
  * 6. onLeave for "root/b"
  * ...
  */
-class SortedFileTreeWalker(root: File, private val onLeave: (File) -> Unit): Iterator<File> {
+class SortedFileTreeWalker(root: File, private val onLeave: (Directory) -> Unit): Iterator<File> {
 
     private val remainingDirectories = Stack<Iterator<File>>()
     private var openDirectory: Directory? = null
@@ -33,9 +33,9 @@ class SortedFileTreeWalker(root: File, private val onLeave: (File) -> Unit): Ite
         }
         val directory = listFiles(remainingDirectories.peek().next())
         openDirectory = directory
-        remainingDirectories.push(directory.subDirectories)
-        if (!directory.files.hasNext()) {
-            onLeave(directory.directory)
+        remainingDirectories.push(directory.subDirectoriesIterator)
+        if (!directory.filesIterator.hasNext()) {
+            onLeave(directory)
             return computeNextDirectory()
         }
         return true
@@ -48,15 +48,15 @@ class SortedFileTreeWalker(root: File, private val onLeave: (File) -> Unit): Ite
         if(openDirectory == null) {
             return computeNextDirectory()
         }
-        if (openDirectory!!.files.hasNext() ) {
+        if (openDirectory!!.filesIterator.hasNext() ) {
             return true
         }
-        onLeave(openDirectory!!.directory)
+        onLeave(openDirectory!!)
         return computeNextDirectory()
     }
 
     override fun next(): File {
-        return openDirectory!!.files.next()
+        return openDirectory!!.filesIterator.next()
     }
 
     private fun listFiles(directory: File): Directory {
@@ -70,12 +70,15 @@ class SortedFileTreeWalker(root: File, private val onLeave: (File) -> Unit): Ite
                 contentDirectories.add(element)
             }
         }
-        return Directory(contentFiles.iterator(), directory, contentDirectories.iterator())
+        return Directory(contentFiles, directory, contentDirectories)
     }
 
-    private data class Directory(
-        val files: Iterator<File>,
+    data class Directory(
+        val files: List<File>,
         val directory: File,
-        val subDirectories: Iterator<File>
-    )
+        val subDirectories: List<File>
+    ) {
+        internal val filesIterator = files.iterator()
+        internal val subDirectoriesIterator = subDirectories.iterator()
+    }
 }

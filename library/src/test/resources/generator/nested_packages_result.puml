@@ -31,4 +31,5 @@ ExampleClassName1 -down-> ExampleClassName2
 ExampleClassName1 -down-> ExampleClassName3
 ExampleClassName1 -down-> ExampleClassName4
 ExampleClassName1 -down-> Something
+ExampleClassName1 -down-> ExampleClassName5
 @enduml
