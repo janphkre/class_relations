@@ -1,7 +1,6 @@
 package de.janphkre.class_relations.generator
 
 import de.janphkre.class_relations.generator.filetree.SortedFileTreeWalker
-import de.janphkre.class_relations.library.data.filter.KlassFilter
 import de.janphkre.class_relations.library.data.filter.KlassFilterFactory
 import de.janphkre.class_relations.library.data.item.KlassItemFactory
 import de.janphkre.class_relations.library.domain.ClassRelationsPumlGenerator

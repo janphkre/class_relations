@@ -1,7 +1,6 @@
 package de.janphkre.class_relations.library.domain
 
 import de.janphkre.class_relations.library.model.*
-import java.io.File
 import java.util.*
 
 internal class ClassRelationsPumlGeneratorImpl(
@@ -40,7 +39,7 @@ internal class ClassRelationsPumlGeneratorImpl(
         return StringBuilder(generatorSettings.initialCapacitySize).apply {
             appendContent("@startuml")
             createSelfPackageStructure(filePackage, rootGeneratedLink)
-            createImports(emptyList(), childPackages, rootGeneratedLink) //TODO: SPLIT CHILD PACKAGES OFF FROM HERE?
+            createImports(emptyList(), childPackages, rootGeneratedLink)
             for( i in 0 until openPackages.size) {
                 closePackage()
             }
@@ -188,7 +187,13 @@ internal class ClassRelationsPumlGeneratorImpl(
                 externalImports.add(input)
             }
         }
-        return KlassImport.Package("", listOf(KlassImport.Package(generatorSettings.projectPackagePrefix, groupProjectImportsInner(projectImports)))) to KlassImport.Package("", groupExternalImportsInner(externalImports))
+        return KlassImport.Package(
+            "",
+            listOf(KlassImport.Package(generatorSettings.projectPackagePrefix, groupProjectImportsInner(projectImports)))
+        ) to KlassImport.Package(
+            "",
+            groupExternalImportsInner(externalImports)
+        )
     }
 
     private fun groupProjectImportsInner(input: List<KlassItem>): List<KlassImport> {

@@ -39,8 +39,7 @@ class GlobKlassFilter(
 
         fun checkGlob(): Boolean {
             while(globIterator.hasNext()) {
-                val globElement = globIterator.next()
-                when(globElement) {
+                when(val globElement = globIterator.next()) {
                     is GlobFilterElement.Exact -> {
                         if (!targetIterator.hasNext()) {
                             return false

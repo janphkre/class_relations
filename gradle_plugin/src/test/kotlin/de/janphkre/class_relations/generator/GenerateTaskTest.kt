@@ -1,7 +1,6 @@
 package de.janphkre.class_relations.generator
 
 import com.google.common.truth.Truth
-import de.janphkre.class_relations.library.data.item.KlassItemFactory
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.Rule
 import org.junit.Test
@@ -12,8 +11,6 @@ class GenerateTaskTest {
 
     @get:Rule
     val testDirectory = TemporaryFolder()
-
-    private val klassItemFactory = KlassItemFactory.getInstance()
 
     @Test
     fun action_runsThroughFiles() {
