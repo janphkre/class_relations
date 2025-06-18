@@ -35,6 +35,7 @@ abstract class GenerateTask: DefaultTask() {
     private lateinit var destinationPathFromModule: String
     private lateinit var moduleDirectoryFile: File
     private lateinit var generatedFileName: String
+    private lateinit var packagePrefix: List<String>
 
     private fun File.toRelativeForwardSlashString(base: File): String {
         val relative = base.toPath().relativize(this.toPath())
@@ -70,6 +71,7 @@ abstract class GenerateTask: DefaultTask() {
         )
         itemFactory = KlassItemFactory.getInstance()
         generatedFileName = settings.generatedFileName
+        packagePrefix = settings.projectPackagePrefix.split('.')
     }
 
     private fun registerKlassFilters() {
@@ -85,7 +87,11 @@ abstract class GenerateTask: DefaultTask() {
 
     private fun generateDiagram(childPackages: List<String>, destinationDiagramPath: String) {
         val pumlDiagram = if (definitions.isEmpty()) {
-            generator.generateEmpty(destinationDiagramPath.split('/'), childPackages, destinationPathFromModule)
+            val diagramPackage = destinationDiagramPath.split('/')
+            if (packagePrefix.startsWith(diagramPackage)) {
+                return
+            }
+            generator.generateEmpty(diagramPackage, childPackages, destinationPathFromModule)
         } else {
             generator.generate(definitions, childPackages, destinationPathFromModule)
         }
@@ -96,5 +102,19 @@ abstract class GenerateTask: DefaultTask() {
         destinationFile.writeText(pumlDiagram)
         definitions.clear()
         itemFactory.clear()
+    }
+
+    private fun List<String>.startsWith(other: List<String>): Boolean {
+        if (other.size > this.size) {
+            return false
+        }
+        val otherIter = other.iterator()
+        val thisIter = this.iterator()
+        while (otherIter.hasNext()) {
+            if (otherIter.next() != thisIter.next()) {
+                return false
+            }
+        }
+        return true
     }
 }
