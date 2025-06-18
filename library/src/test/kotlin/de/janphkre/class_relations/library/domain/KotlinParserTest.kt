@@ -38,7 +38,8 @@ internal class KotlinParserTest {
     private fun verifyParser(id: String, filePath: String) {
         val parser = KotlinParser.getInstance()
         val result = parser.parse(readInput(id), id, filePath)
-        Truth.assertThat(result).isEqualTo(readOutput(id, filePath))
+        val expected = readOutput(id, filePath)
+        Truth.assertThat(result).isEqualTo(expected)
     }
 
     private fun readFile(file: String): String {
@@ -69,8 +70,16 @@ internal class KotlinParserTest {
     private fun JsonElement.toKlassItem(): KlassItem {
         val json = this.jsonObject
         val filePackageString = json["package"]!!.jsonPrimitive.content
-        return KlassItem(
-            name = json["name"]!!.jsonPrimitive.content,
+        val name = json["name"]!!.jsonPrimitive.content
+        if (filePackageString == "") {
+            return UnclearKlassItemImpl(
+                name = name,
+                filePackage = emptyList(),
+                filePackageString = ""
+            )
+        }
+        return KlassItemImpl(
+            name = name,
             filePackage = filePackageString.split("."),
             filePackageString = filePackageString
         )

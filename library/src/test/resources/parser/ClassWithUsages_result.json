@@ -18,6 +18,10 @@
     {
       "package": "io.other",
       "name": "UsageClassE"
+    },
+    {
+      "package": "io.other",
+      "name": "UsageClassF"
     }
   ],
   "parameters": [],
@@ -31,6 +35,14 @@
     {
       "package": "io.other",
       "name": "UsageClassE"
+    },
+    {
+      "package": "io.other",
+      "name": "UsageClassF"
+    },
+    {
+      "package": "",
+      "name": "Unit"
     }
   ]
 }

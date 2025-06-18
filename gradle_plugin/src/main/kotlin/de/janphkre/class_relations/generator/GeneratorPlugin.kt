@@ -11,9 +11,11 @@ class GeneratorPlugin : Plugin<Project> {
 
         target.tasks.register("generateClassRelationsPuml", GenerateTask::class.java) { task ->
             task.group = "documentation"
-            task.moduleDirectory.set(extension.moduleDirectory.convention(target.rootDir))
-            task.destination.set(extension.destination.convention(File(target.buildFile, "generated/puml_class_relations")))
-            task.source.set(extension.source.convention(File(target.rootDir, "src")))
+            task.moduleDirectory.set(extension.moduleDirectory.convention(target.projectDir))
+            task.destination.set(extension.destination.convention(
+                target.layout.buildDirectory.map { File(it.asFile, "generated/puml_class_relations") })
+            )
+            task.source.set(extension.source.convention(File(target.projectDir, "src")))
             task.filters.set(extension.filters.convention(emptyList()))
             val compositeSettings = extension.projectPackagePrefix.flatMap { prefix ->
                 extension.selfColor.flatMap { color ->

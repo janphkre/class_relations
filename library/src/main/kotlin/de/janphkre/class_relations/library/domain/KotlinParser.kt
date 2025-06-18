@@ -9,7 +9,9 @@ interface KotlinParser {
 
     companion object {
         fun getInstance(): KotlinParser {
-            return FilteringKotlinParser(KotlinParserImpl(KlassItemFactory.getInstance()))
+            return KotlinParserImpl(
+                    KlassItemFactory.getInstance()
+                )
         }
     }
 }

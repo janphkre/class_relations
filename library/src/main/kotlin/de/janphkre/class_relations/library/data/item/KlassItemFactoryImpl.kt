@@ -2,6 +2,8 @@ package de.janphkre.class_relations.library.data.item
 
 import de.janphkre.class_relations.library.data.filter.KlassFilter
 import de.janphkre.class_relations.library.model.KlassItem
+import de.janphkre.class_relations.library.model.KlassItemImpl
+import de.janphkre.class_relations.library.model.UnclearKlassItemImpl
 
 class KlassItemFactoryImpl: KlassItemFactory {
 
@@ -19,6 +21,17 @@ class KlassItemFactoryImpl: KlassItemFactory {
         )
     }
 
+    override fun createItem(name: String): KlassItem {
+        val klassItem = UnclearKlassItemImpl(
+            name = name,
+            filePackage = emptyList(),
+            filePackageString = "",
+            isDisabled = false
+        )
+        filterItem(klassItem)
+        return klassItem
+    }
+
     private fun createItem(
         name: String,
         filePackageList: List<String>,
@@ -34,7 +47,7 @@ class KlassItemFactoryImpl: KlassItemFactory {
             itemsInPackage = HashMap()
             itemsCache[filePackageString] = itemsInPackage
         }
-        val newResultItem = KlassItem(name, filePackageList, filePackageString)
+        val newResultItem = KlassItemImpl(name, filePackageList, filePackageString)
         itemsInPackage[name] = newResultItem
         filterItem(newResultItem)
         return newResultItem

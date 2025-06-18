@@ -47,9 +47,9 @@ internal class KotlinParserImpl(
                 filePath = filePath
             ),
             fileImports = fileImportItems,
-            parameters = klassDeclaration?.getParameters(fileImportItems, filePackage) ?: emptyList(), //TODO: SUPPORT ALIAS IMPORTS
-            inheritances = klassDeclaration?.getInheritances(fileImportItems, filePackage) ?: emptyList(), //TODO: SUPPORT ALIAS IMPORTS,
-            methodParameters = methods?.getMethodParameters(fileImportItems, filePackage) ?: emptyList()
+            parameters = klassDeclaration?.getParameters(fileImportItems) ?: emptyList(), //TODO: SUPPORT ALIAS IMPORTS
+            inheritances = klassDeclaration?.getInheritances(fileImportItems) ?: emptyList(), //TODO: SUPPORT ALIAS IMPORTS,
+            methodParameters = methods?.getMethodParameters(fileImportItems) ?: emptyList()
         )
     }
 
@@ -63,47 +63,66 @@ internal class KotlinParserImpl(
         return KlassType.values().firstOrNull { it.id == id }
     }
 
-    private fun KlassDeclaration.getParameters(fileImportItems: List<KlassItem>, currentFilePackage: List<String>): List<KlassItem> {
+    private fun KlassDeclaration.getParameters(fileImportItems: List<KlassItem>): List<KlassItem> {
         return parameter.flatMap { parameter -> parameter.parameter.flatMap { type -> type.type.map { it.identifier } } }
             .distinct()
             .map { parameter ->
-                fileImportItems.firstOrNull { it.name == parameter } ?: klassItemFactory.createItem(parameter, currentFilePackage)
+                fileImportItems.firstOrNull { it.name == parameter } ?: klassItemFactory.createItem(parameter)
             }
     }
 
-    private fun KlassDeclaration.getInheritances(fileImportItems: List<KlassItem>, currentFilePackage: List<String>): List<KlassItem> {
+    private fun KlassDeclaration.getInheritances(fileImportItems: List<KlassItem>): List<KlassItem> {
         return inheritance.map { it.type.identifier }
             .map { inheritance ->
-                fileImportItems.firstOrNull { it.name == inheritance } ?: klassItemFactory.createItem(inheritance, currentFilePackage)
+                fileImportItems.firstOrNull { it.name == inheritance } ?: klassItemFactory.createItem(inheritance)
             }
     }
 
-    private fun List<KlassDeclaration>.getMethodParameters(fileImportItems: List<KlassItem>, currentFilePackage: List<String>): List<KlassItem> {
+    @Suppress("UNCHECKED_CAST")
+    private fun List<KlassDeclaration>.getMethodParameters(fileImportItems: List<KlassItem>): List<KlassItem> {
         return this.flatMap { method ->
             val ast = (method.attachments.attachments[AstAttachmentRawAst] as? RawAst)?.ast as? DefaultAstNode
                 ?: return@flatMap emptyList<KlassItem>()
-            return@flatMap ast.children.flatMap{ methodPart ->
+            return@flatMap ast.children.flatMap { methodPart ->
                 when (methodPart.description) {
                     "functionValueParameters" -> {
-                        (methodPart as DefaultAstNode).children.mapNotNull { functionParameter ->
+                        (methodPart as DefaultAstNode).children.flatMap functionParameter@{ functionParameter ->
                             if (functionParameter.description != "functionValueParameter") {
-                                return@mapNotNull null
+                                return@functionParameter emptyList<KlassItem>()
                             }
-                            val className = ((((((((functionParameter as DefaultAstNode)
+                            val typeNode = (((functionParameter as DefaultAstNode)
                                 .children.first { it.description == "parameter" } as DefaultAstNode)
                                 .children.last { it.description == "type" } as DefaultAstNode)
-                                .children.first { it.description == "typeReference" } as DefaultAstNode)
-                                .children.firstOrNull { it.description == "userType" } as? DefaultAstNode)
-                                ?.children?.first { it.description == "simpleUserType" } as? DefaultAstNode)
-                                ?.children?.first { it.description == "simpleIdentifier" } as? DefaultAstNode)
-                                ?.children?.first() as? DefaultAstTerminal)?.text
-                            if (className == null) {
-                                return@mapNotNull null
+                            var children = typeNode.children
+                            var typeReferences = children.filter { it.description == "typeReference" } as List<DefaultAstNode>
+                            if (typeReferences.isEmpty()) {
+                                while (true) {
+                                    val nestedChildren = (children.filter {
+                                        it.description == "nullableType" ||
+                                                it.description == "parenthesizedType" ||
+                                                it.description == "functionType" ||
+                                                it.description == "type" ||
+                                                it.description == "functionTypeParameters"
+                                    } as List<DefaultAstNode>)
+                                        .flatMap { it.children }
+                                    children =
+                                        nestedChildren.plus(children.filter { it.description == "typeReference" })
+                                    if (nestedChildren.isEmpty()) {
+                                        typeReferences = children as List<DefaultAstNode>
+                                        break
+                                    }
+                                }
                             }
-                            return@mapNotNull fileImportItems.firstOrNull { it.name == className } ?: klassItemFactory.createItem(
-                                className,
-                                currentFilePackage
-                            )
+                            val classNames = typeReferences.map { reference ->
+                                ((((reference.children.first { it.description == "userType" } as DefaultAstNode)
+                                    .children.first { it.description == "simpleUserType" } as DefaultAstNode)
+                                    .children.first { it.description == "simpleIdentifier" } as DefaultAstNode)
+                                    .children.first() as DefaultAstTerminal).text
+                            }
+                            return@functionParameter classNames.map { className ->
+                                fileImportItems.firstOrNull { it.name == className }
+                                    ?: klassItemFactory.createItem(className)
+                            }
                         }
                     }
                     else -> {

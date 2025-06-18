@@ -10,6 +10,13 @@ interface KlassItemFactory {
         packageList: List<String>
     ): KlassItem
 
+    /**
+     * Creates a class item with no predetermined package.
+     */
+    fun createItem(
+        name: String
+    ): KlassItem
+
     fun createItem(
         name: String,
         packageString: String
