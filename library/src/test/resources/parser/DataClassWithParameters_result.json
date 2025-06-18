@@ -22,7 +22,7 @@
   ],
   "parameters": [
     {
-      "package": "com.example.a",
+      "package": "",
       "name": "ParameterClassA"
     },
     {

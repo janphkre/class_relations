@@ -13,7 +13,7 @@
   ],
   "methodParameters": [
     {
-      "package": "com.example.a",
+      "package": "",
       "name": "ParameterClassA"
     }
   ]

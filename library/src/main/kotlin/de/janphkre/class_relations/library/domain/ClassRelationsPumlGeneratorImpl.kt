@@ -275,7 +275,7 @@ internal class ClassRelationsPumlGeneratorImpl(
             KlassType.OBJECT -> "class"
             KlassType.INTERFACE -> "interface"
             KlassType.ENUM_CLASS -> "enum"
-            KlassType.UNKNOWN -> "diamond"
+            KlassType.UNKNOWN -> "circle"
         }
         appendContent("$plantUmlType \"[[\$pathToBase/${klassType.filePath} ${klassItem.name}]]\" as ${klassItem.name} {")
         klassType.methods.forEach { method ->

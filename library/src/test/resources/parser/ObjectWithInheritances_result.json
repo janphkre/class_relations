@@ -15,7 +15,7 @@
       "name": "SomeAbstractClass"
     },
     {
-      "package": "com.example.a",
+      "package": "",
       "name": "ExampleInterface"
     }
   ],
