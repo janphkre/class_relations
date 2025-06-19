@@ -38,6 +38,7 @@ internal class ClassRelationsPumlGeneratorImpl(
         childPackages: List<String>,
         sourcesLink: String
     ): String {
+        packageIndex = 0
         return StringBuilder(generatorSettings.initialCapacitySize).apply {
             appendContent("@startuml")
             createReferences(filePackage, sourcesLink)

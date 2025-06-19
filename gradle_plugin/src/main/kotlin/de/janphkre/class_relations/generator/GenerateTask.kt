@@ -1,6 +1,7 @@
 package de.janphkre.class_relations.generator
 
 import de.janphkre.class_relations.generator.filetree.SortedFileTreeWalker
+import de.janphkre.class_relations.library.data.filter.KlassDisabledFiltering
 import de.janphkre.class_relations.library.data.filter.KlassFilterFactory
 import de.janphkre.class_relations.library.data.item.KlassItemFactory
 import de.janphkre.class_relations.library.domain.ClassRelationsPumlGenerator
@@ -32,6 +33,7 @@ abstract class GenerateTask: DefaultTask() {
     private val definitions = ArrayList<KlassWithRelations>()
     private lateinit var generator: ClassRelationsPumlGenerator
     private lateinit var itemFactory: KlassItemFactory
+    private lateinit var disabledFiltering: KlassDisabledFiltering
     private lateinit var destinationPathFromSource: String
     private lateinit var sourceDirectoryFile: File
     private lateinit var generatedFileName: String
@@ -53,7 +55,6 @@ abstract class GenerateTask: DefaultTask() {
         val sourceDir = source.get()
         Sequence { SortedFileTreeWalker(sourceDir, onLeave = { dir ->
             val childPackages = dir.subDirectories.map { it.name }
-            //TODO FILTER OUT empty path?
             generateDiagram(
                 childPackages,
                 dir.directory.toRelativeForwardSlashString(sourceDir)
@@ -72,6 +73,7 @@ abstract class GenerateTask: DefaultTask() {
         generator = ClassRelationsPumlGenerator.getInstance(
             settings = settings
         )
+        disabledFiltering = KlassDisabledFiltering.getInstance()
         itemFactory = KlassItemFactory.getInstance()
         generatedFileName = settings.generatedFileName
         packagePrefix = settings.projectPackagePrefix.split('.')
@@ -89,16 +91,17 @@ abstract class GenerateTask: DefaultTask() {
     }
 
     private fun generateDiagram(childPackages: List<String>, destinationDiagramPath: String) {
-        val pumlDiagram = if (definitions.isEmpty()) {
+        val filteredKlassItems = disabledFiltering.filter(definitions)
+        val pumlDiagram = if (filteredKlassItems.isEmpty()) {
             val diagramPackage = destinationDiagramPath.split('/')
-            if (packagePrefix.startsWithButNotEqual(diagramPackage)) {
+            if (packagePrefix.startsWithButNotEqual(diagramPackage) || destinationDiagramPath.isBlank()) {
                 return
             }
             generator.generateEmpty(diagramPackage, childPackages, destinationPathFromSource)
         } else {
-            generator.generate(definitions, childPackages, destinationPathFromSource)
+            generator.generate(filteredKlassItems, childPackages, destinationPathFromSource)
         }
-
+        println("Generating diagram for $destinationDiagramPath")
         val destinationFile = File(destination.get(), "${destinationDiagramPath}/${generatedFileName}")
         destinationFile.parentFile.mkdirs()
         destinationFile.createNewFile()

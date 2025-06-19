@@ -20,10 +20,8 @@ interface ClassRelationsPumlGenerator {
 
     companion object {
         fun getInstance(settings: Settings): ClassRelationsPumlGenerator {
-            return FilteringClassRelationsPumlGeneratorImpl(
-                ClassRelationsPumlGeneratorImpl(
-                    settings
-                )
+            return ClassRelationsPumlGeneratorImpl(
+                settings
             )
         }
     }

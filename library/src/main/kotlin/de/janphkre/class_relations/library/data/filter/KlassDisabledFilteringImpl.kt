@@ -1,16 +1,12 @@
-package de.janphkre.class_relations.library.domain
+package de.janphkre.class_relations.library.data.filter
 
 import de.janphkre.class_relations.library.model.KlassItem
 import de.janphkre.class_relations.library.model.KlassWithRelations
 import de.janphkre.class_relations.library.model.UnclearKlassItem
-import java.io.Serializable
 
-class FilteringClassRelationsPumlGeneratorImpl(
-    private val delegate: ClassRelationsPumlGenerator
-): ClassRelationsPumlGenerator by delegate {
-
-    override fun generate(klasses: List<KlassWithRelations>, childPackages: List<String>, rootGeneratedLink: String): String {
-        val filteredKlasses = klasses.mapNotNull { klass ->
+class KlassDisabledFilteringImpl: KlassDisabledFiltering {
+    override fun filter(klasses: List<KlassWithRelations>): List<KlassWithRelations> {
+        return klasses.mapNotNull { klass ->
             if (klass.item.isDisabled) {
                 return@mapNotNull null
             }
@@ -21,7 +17,6 @@ class FilteringClassRelationsPumlGeneratorImpl(
                 inheritances = klass.inheritances.filterAndRectifyBy(klasses),
             )
         }
-        return delegate.generate(filteredKlasses, childPackages, rootGeneratedLink)
     }
 
     private fun List<KlassItem>.filterAndRectifyBy(currentKlasses: List<KlassWithRelations>): List<KlassItem> {

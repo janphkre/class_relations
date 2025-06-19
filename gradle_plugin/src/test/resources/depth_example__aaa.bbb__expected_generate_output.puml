@@ -1,9 +1,9 @@
 @startuml
 !$pathToCodeBase = "../../../sources"
 !$pathToDocsBase = "../../aaa"
-package "[[$pathToDocsBase/example_relations.puml aaa]]" as p\$_2 #ffffff {
+package "[[$pathToDocsBase/example_relations.puml aaa]]" as p\$_0 #ffffff {
     package "bbb" #00FF00 {
-        package "[[$pathToDocsBase/bbb/ccc/example_relations.puml ccc]]" as p\$_3 #ffffff {
+        package "[[$pathToDocsBase/bbb/ccc/example_relations.puml ccc]]" as p\$_1 #ffffff {
         }
     }
 }
