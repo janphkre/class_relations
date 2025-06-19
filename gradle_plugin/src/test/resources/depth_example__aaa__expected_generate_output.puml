@@ -1,7 +1,8 @@
 @startuml
-!$pathToBase = "../.."
+!$pathToCodeBase = "../../sources"
+!$pathToDocsBase = "../aaa"
 package "aaa" #00FF00 {
-    package "[[$pathToBase/../exampleModuleFolder/aaa/bbb/example_relations.puml bbb]]" as p\$_1 #ffffff {
+    package "[[$pathToDocsBase/bbb/example_relations.puml bbb]]" as p\$_1 #ffffff {
     }
 }
 @enduml

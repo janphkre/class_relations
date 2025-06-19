@@ -90,13 +90,17 @@ class GenerateTaskTest {
 
         destinationFolder.printDestinationStructure()
 
-        Truth.assertThat(readFile(File(destinationFolder, "aaa/example_relations.puml")))
+        var child = "aaa/example_relations.puml"
+        Truth.assertWithMessage(child).that(readFile(File(destinationFolder, child)))
             .isEqualTo(readFile("src/test/resources/depth_example__aaa__expected_generate_output.puml"))
-        Truth.assertThat(readFile(File(destinationFolder, "aaa/bbb/example_relations.puml")))
+        child = "aaa/bbb/example_relations.puml"
+        Truth.assertWithMessage(child).that(readFile(File(destinationFolder, child)))
             .isEqualTo(readFile("src/test/resources/depth_example__aaa.bbb__expected_generate_output.puml"))
-        Truth.assertThat(readFile(File(destinationFolder, "aaa/bbb/ccc/example_relations.puml")))
+        child = "aaa/bbb/ccc/example_relations.puml"
+        Truth.assertWithMessage(child).that(readFile(File(destinationFolder, child)))
             .isEqualTo(readFile("src/test/resources/depth_example__aaa.bbb.ccc__expected_generate_output.puml"))
-        Truth.assertThat(readFile(File(destinationFolder, "aaa/bbb/ccc/depth_example/example_relations.puml")))
+        child = "aaa/bbb/ccc/depth_example/example_relations.puml"
+        Truth.assertWithMessage(child).that(readFile(File(destinationFolder, child)))
             .isEqualTo(readFile("src/test/resources/depth_example__aaa.bbb.ccc.depth_example__expected_generate_output.puml"))
     }
 

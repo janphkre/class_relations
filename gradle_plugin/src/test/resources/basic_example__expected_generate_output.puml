@@ -1,21 +1,22 @@
 @startuml
-!$pathToBase = "../.."
+!$pathToCodeBase = "../../sources"
+!$pathToDocsBase = "../basic_example"
 package "basic_example" #00FF00 {
-    class "[[$pathToBase/../sources/basic_example/BasicClass.kt BasicClass]]" as BasicClass {
+    class "[[$pathToCodeBase/basic_example/BasicClass.kt BasicClass]]" as BasicClass {
     }
-    class "[[$pathToBase/../sources/basic_example/ClassWithDistinctDeps.kt ClassWithDistinctDeps]]" as ClassWithDistinctDeps {
+    class "[[$pathToCodeBase/basic_example/ClassWithDistinctDeps.kt ClassWithDistinctDeps]]" as ClassWithDistinctDeps {
     }
-    class "[[$pathToBase/../sources/basic_example/ClassWithMethods.kt ClassWithMethods]]" as ClassWithMethods {
+    class "[[$pathToCodeBase/basic_example/ClassWithMethods.kt ClassWithMethods]]" as ClassWithMethods {
         {method} methodA
         {method} methodB
         {method} methodC
     }
-    class "[[$pathToBase/../sources/basic_example/ClassWithUsages.kt ClassWithUsages]]" as ClassWithUsages {
+    class "[[$pathToCodeBase/basic_example/ClassWithUsages.kt ClassWithUsages]]" as ClassWithUsages {
         {method} methodA
         {method} methodB
         {method} methodC
     }
-    enum "[[$pathToBase/../sources/basic_example/EnumClass.kt EnumClass]]" as EnumClass {
+    enum "[[$pathToCodeBase/basic_example/EnumClass.kt EnumClass]]" as EnumClass {
     }
 }
 package "com.example" as p\$_0 #ffffff {

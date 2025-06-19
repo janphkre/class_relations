@@ -31,7 +31,7 @@ class ClassRelationsPumlGeneratorTest {
         val result = generator.generate(
             klasses = klasses,
             childPackages = packages,
-            rootGeneratedLink = "example/root/generated"
+            sourcesLink = "example/root/generated"
         )
         Truth.assertThat(result).isEqualTo(readOutput(id))
     }
@@ -43,7 +43,7 @@ class ClassRelationsPumlGeneratorTest {
         val result = generator.generateEmpty(
             filePackage = klasses.first().item.filePackage,
             childPackages = packages,
-            rootGeneratedLink = "example/root/generated"
+            sourcesLink = "example/root/generated"
         )
         Truth.assertThat(result).isEqualTo(readOutput(id))
     }

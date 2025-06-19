@@ -1,23 +1,24 @@
 @startuml
-!$pathToBase = "../../../../.."
-package "[[$pathToBase/example/root/generated/example_relations.puml org.example]]" as p\$_0 #ffffff {
+!$pathToCodeBase = "../../../example/root/generated"
+!$pathToDocsBase = "../../../org/example"
+package "[[$pathToDocsBase/example_relations.puml org.example]]" as p\$_0 #ffffff {
     package "a" #00FFFF {
-        class "[[$pathToBase/src/main/org/example/a/ExampleClassName1.kt ExampleClassName1]]" as ExampleClassName1 {
+        class "[[$pathToCodeBase/src/main/org/example/a/ExampleClassName1.kt ExampleClassName1]]" as ExampleClassName1 {
             {method} methodA
             {method} methodB
             {method} methodC
         }
-        package "[[$pathToBase/example/root/generated/org/example/a/c/example_relations.puml c]]" as p\$_1 #ffffff {
+        package "[[$pathToDocsBase/a/c/example_relations.puml c]]" as p\$_1 #ffffff {
             circle "ExampleClassName5"
         }
-        package "[[$pathToBase/example/root/generated/org/example/a/depth1/example_relations.puml depth1]]" as p\$_2 #ffffff {
+        package "[[$pathToDocsBase/a/depth1/example_relations.puml depth1]]" as p\$_2 #ffffff {
         }
-        package "[[$pathToBase/example/root/generated/org/example/a/depth2/example_relations.puml depth2]]" as p\$_3 #ffffff {
+        package "[[$pathToDocsBase/a/depth2/example_relations.puml depth2]]" as p\$_3 #ffffff {
         }
-        package "[[$pathToBase/example/root/generated/org/example/a/depth3/example_relations.puml depth3]]" as p\$_4 #ffffff {
+        package "[[$pathToDocsBase/a/depth3/example_relations.puml depth3]]" as p\$_4 #ffffff {
         }
     }
-    package "[[$pathToBase/example/root/generated/org/example/b/example_relations.puml b]]" as p\$_5 #ffffff {
+    package "[[$pathToDocsBase/b/example_relations.puml b]]" as p\$_5 #ffffff {
         circle "ExampleClassName2"
         circle "ExampleClassName3"
         circle "ExampleClassName4"

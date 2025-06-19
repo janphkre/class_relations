@@ -32,14 +32,16 @@ abstract class GenerateTask: DefaultTask() {
     private val definitions = ArrayList<KlassWithRelations>()
     private lateinit var generator: ClassRelationsPumlGenerator
     private lateinit var itemFactory: KlassItemFactory
-    private lateinit var destinationPathFromModule: String
-    private lateinit var moduleDirectoryFile: File
+    private lateinit var destinationPathFromSource: String
+    private lateinit var sourceDirectoryFile: File
     private lateinit var generatedFileName: String
     private lateinit var packagePrefix: List<String>
 
     private fun File.toRelativeForwardSlashString(base: File): String {
         val relative = base.toPath().relativize(this.toPath())
-        return relative.joinToString("/")
+        val result = relative.joinToString("/")
+        println("RelPath from ${base.absolutePath} to ${this.absolutePath} is $result")
+        return result
     }
 
     @TaskAction
@@ -51,6 +53,7 @@ abstract class GenerateTask: DefaultTask() {
         val sourceDir = source.get()
         Sequence { SortedFileTreeWalker(sourceDir, onLeave = { dir ->
             val childPackages = dir.subDirectories.map { it.name }
+            //TODO FILTER OUT empty path?
             generateDiagram(
                 childPackages,
                 dir.directory.toRelativeForwardSlashString(sourceDir)
@@ -64,8 +67,8 @@ abstract class GenerateTask: DefaultTask() {
 
     private fun initializeFields() {
         val settings = generatorSettings.get()
-        moduleDirectoryFile = moduleDirectory.get()
-        destinationPathFromModule = moduleDirectoryFile.toRelativeForwardSlashString(destination.get())
+        sourceDirectoryFile = source.get()
+        destinationPathFromSource = sourceDirectoryFile.toRelativeForwardSlashString(destination.get())
         generator = ClassRelationsPumlGenerator.getInstance(
             settings = settings
         )
@@ -81,19 +84,19 @@ abstract class GenerateTask: DefaultTask() {
     }
 
     private fun KotlinParser.readDefinition(file: File) {
-        val definition = parse(file.readText(), file.nameWithoutExtension, filePath = file.toRelativeForwardSlashString(moduleDirectoryFile))
+        val definition = parse(file.readText(), file.nameWithoutExtension, filePath = file.toRelativeForwardSlashString(sourceDirectoryFile))
         definitions.add(definition ?: return)
     }
 
     private fun generateDiagram(childPackages: List<String>, destinationDiagramPath: String) {
         val pumlDiagram = if (definitions.isEmpty()) {
             val diagramPackage = destinationDiagramPath.split('/')
-            if (packagePrefix.startsWith(diagramPackage)) {
+            if (packagePrefix.startsWithButNotEqual(diagramPackage)) {
                 return
             }
-            generator.generateEmpty(diagramPackage, childPackages, destinationPathFromModule)
+            generator.generateEmpty(diagramPackage, childPackages, destinationPathFromSource)
         } else {
-            generator.generate(definitions, childPackages, destinationPathFromModule)
+            generator.generate(definitions, childPackages, destinationPathFromSource)
         }
 
         val destinationFile = File(destination.get(), "${destinationDiagramPath}/${generatedFileName}")
@@ -104,8 +107,8 @@ abstract class GenerateTask: DefaultTask() {
         itemFactory.clear()
     }
 
-    private fun List<String>.startsWith(other: List<String>): Boolean {
-        if (other.size > this.size) {
+    private fun List<String>.startsWithButNotEqual(other: List<String>): Boolean {
+        if (other.size >= this.size) {
             return false
         }
         val otherIter = other.iterator()

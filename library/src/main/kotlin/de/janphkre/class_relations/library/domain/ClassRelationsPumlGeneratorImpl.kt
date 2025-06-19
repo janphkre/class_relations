@@ -11,14 +11,16 @@ internal class ClassRelationsPumlGeneratorImpl(
     private val openPackages = Stack<String>()
     private var packageIndex = 0
 
-    override fun generate(klasses: List<KlassWithRelations>, childPackages: List<String>, rootGeneratedLink: String): String {
+    override fun generate(klasses: List<KlassWithRelations>, childPackages: List<String>, sourcesLink: String): String {
         packageIndex = 0
         return StringBuilder(generatorSettings.initialCapacitySize * klasses.size).apply {
             appendContent("@startuml")
             //STRUCTURE
-            createSelfPackageStructure(klasses.first().item.filePackage, rootGeneratedLink)
+            val anyKlassPackage = klasses.first().item.filePackage
+            createReferences(anyKlassPackage, sourcesLink)
+            createSelfPackageStructure(anyKlassPackage)
             createClasses(klasses)
-            createImports(klasses, childPackages, rootGeneratedLink)
+            createImports(klasses, childPackages)
             appendLine()
             if (openPackages.isNotEmpty()) {
                 println(this.toString())
@@ -34,12 +36,13 @@ internal class ClassRelationsPumlGeneratorImpl(
     override fun generateEmpty(
         filePackage: List<String>,
         childPackages: List<String>,
-        rootGeneratedLink: String
+        sourcesLink: String
     ): String {
         return StringBuilder(generatorSettings.initialCapacitySize).apply {
             appendContent("@startuml")
-            createSelfPackageStructure(filePackage, rootGeneratedLink)
-            createImports(emptyList(), childPackages, rootGeneratedLink)
+            createReferences(filePackage, sourcesLink)
+            createSelfPackageStructure(filePackage)
+            createImports(emptyList(), childPackages)
             for( i in 0 until openPackages.size) {
                 closePackage()
             }
@@ -47,9 +50,14 @@ internal class ClassRelationsPumlGeneratorImpl(
         }.toString()
     }
 
-    private fun StringBuilder.createSelfPackageStructure(filePackage: List<String>, rootGeneratedLink: String) {
-        val pathDepth = filePackage.size + rootGeneratedLink.count { it == '/' }
-        appendContent("!\$pathToBase = \"${"..".repeat(pathDepth, '/')}\"")
+    private fun StringBuilder.createReferences(filePackage: List<String>,sourcesLink: String) {
+        val pathDepth = filePackage.size
+        val filePathReverse = "..".repeat(pathDepth, '/')
+        appendContent("!\$pathToCodeBase = \"${filePathReverse}/${sourcesLink}\"")
+        appendContent("!\$pathToDocsBase = \"${filePathReverse}/${generatorSettings.projectPackagePrefix.replace('.', '/')}\"")
+    }
+
+    private fun StringBuilder.createSelfPackageStructure(filePackage: List<String>) {
         if (!filePackage.hasProjectPrefix()) {
             beginSelfPackage(filePackage.joinToString("."))
             return
@@ -58,12 +66,12 @@ internal class ClassRelationsPumlGeneratorImpl(
             beginSelfPackage(filePackage.joinToString("."))
             return
         }
-        beginPackage(generatorSettings.projectPackagePrefix, rootGeneratedLink)
+        beginPackage(generatorSettings.projectPackagePrefix)
         val packages = filePackage.drop(projectPrefix.size)
-        var packageLink = rootGeneratedLink
+        var packageLink = ""
         for (i in 0 until packages.size - 1) {
             packageLink += "/${packages[i]}"
-            beginPackage(packages[i], packageLink)
+            beginPackage(packages[i])
         }
         beginSelfPackage(packages.last())
     }
@@ -97,26 +105,20 @@ internal class ClassRelationsPumlGeneratorImpl(
         }
     }
 
-    private fun StringBuilder.createImports(klasses: List<KlassWithRelations>, childPackages: List<String>, rootGeneratedLink: String) {
+    private fun StringBuilder.createImports(klasses: List<KlassWithRelations>, childPackages: List<String>) {
         val (projectImports, externalImports) = groupAllImports(klasses.flatMap { it.fileImports })
         val currentImports = projectImports.getCurrentImports(childPackages)
         //At this point, the openPackages stack matches the currentImports list
         // Create imported classes in open package tree:
         var lastOpenPackage = openPackages.lastOrNull()
         for (i in currentImports.size - 1 downTo 0) {
-            val projectRootGeneratedLink = "$rootGeneratedLink/${projectPrefix.joinToString("/")}"
-            val currentPackageRootGeneratedLink = if (openPackages.size <= 1) {
-                projectRootGeneratedLink
-            } else {
-                "$projectRootGeneratedLink/${openPackages.drop(1).joinToString("/")}"
-            }
-            createImportedClassesInPackage(currentImports[i], lastOpenPackage, currentPackageRootGeneratedLink)
+            createImportedClassesInPackage(currentImports[i], lastOpenPackage)
             lastOpenPackage = openPackages.last()
             closePackage()
         }
 
         //Remaining imports:
-        createImportedClassesInPackage(externalImports, lastOpenPackage, null)
+        createImportedClassesInPackage(externalImports, lastOpenPackage)
     }
 
     private fun KlassImport.getCurrentImports(childPackages: List<String>): List<KlassImport.Package> {
@@ -228,32 +230,25 @@ internal class ClassRelationsPumlGeneratorImpl(
 
     private fun StringBuilder.createImportedClassesInPackage(
         imports: KlassImport.Package,
-        skipPreviousKey: String?,
-        rootGeneratedLink: String?
+        skipPreviousKey: String?
     ) {
         for (element in imports.elements) {
             if (element.name == skipPreviousKey) {
                 // Skip already visited key
                 continue
             }
-            createImportedElement(element, rootGeneratedLink)
+            createImportedElement(element)
         }
     }
 
     private fun StringBuilder.createImportedElement(
-        element: KlassImport,
-        rootGeneratedLink: String?
+        element: KlassImport
     ) {
         when(element) {
             is KlassImport.Package -> {
-                val packageTarget = if (rootGeneratedLink == null) {
-                    null
-                } else {
-                    "${rootGeneratedLink}/${element.name}"
-                }
-                beginPackage(element.name, packageTarget)
+                beginPackage(element.name)
                 for (nestedElement in element.elements) {
-                    createImportedElement(nestedElement, rootGeneratedLink)
+                    createImportedElement(nestedElement)
                 }
                 closePackage()
             }
@@ -277,16 +272,23 @@ internal class ClassRelationsPumlGeneratorImpl(
             KlassType.ENUM_CLASS -> "enum"
             KlassType.UNKNOWN -> "circle"
         }
-        appendContent("$plantUmlType \"[[\$pathToBase/${klassType.filePath} ${klassItem.name}]]\" as ${klassItem.name} {")
+        appendContent("$plantUmlType \"[[\$pathToCodeBase/${klassType.filePath} ${klassItem.name}]]\" as ${klassItem.name} {")
         klassType.methods.forEach { method ->
             appendContent("${" ".repeat(generatorSettings.spaceCount)}{method} $method")
         }
         appendContent("}")
     }
 
-    private fun StringBuilder.beginPackage(name: String, linkTarget: String?) {
-        if (linkTarget != null) {
-            appendContent("package \"[[\$pathToBase/$linkTarget/${generatorSettings.generatedFileName} $name]]\" as p\\\$_${packageIndex++} #ffffff {")
+    private fun StringBuilder.beginPackage(name: String) {
+        if (openPackages.firstOrNull() == generatorSettings.projectPackagePrefix) {
+            val linkTarget = if (openPackages.size > 1) {
+                "${openPackages.drop(1).joinToString("/")}/$name"
+            } else {
+                name
+            }
+            appendContent("package \"[[\$pathToDocsBase/$linkTarget/${generatorSettings.generatedFileName} $name]]\" as p\\\$_${packageIndex++} #ffffff {")
+        } else if (name == generatorSettings.projectPackagePrefix) {
+            appendContent("package \"[[\$pathToDocsBase/${generatorSettings.generatedFileName} $name]]\" as p\\\$_${packageIndex++} #ffffff {")
         } else {
             appendContent("package \"$name\" as p\\\$_${packageIndex++} #ffffff {")
         }
