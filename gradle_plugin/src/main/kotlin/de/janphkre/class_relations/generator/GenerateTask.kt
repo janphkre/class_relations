@@ -42,7 +42,6 @@ abstract class GenerateTask: DefaultTask() {
     private fun File.toRelativeForwardSlashString(base: File): String {
         val relative = base.toPath().relativize(this.toPath())
         val result = relative.joinToString("/")
-        println("RelPath from ${base.absolutePath} to ${this.absolutePath} is $result")
         return result
     }
 
@@ -101,7 +100,6 @@ abstract class GenerateTask: DefaultTask() {
         } else {
             generator.generate(filteredKlassItems, childPackages, destinationPathFromSource)
         }
-        println("Generating diagram for $destinationDiagramPath")
         val destinationFile = File(destination.get(), "${destinationDiagramPath}/${generatedFileName}")
         destinationFile.parentFile.mkdirs()
         destinationFile.createNewFile()
