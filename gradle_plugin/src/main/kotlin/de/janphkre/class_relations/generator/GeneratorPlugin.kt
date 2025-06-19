@@ -26,7 +26,6 @@ class GeneratorPlugin : Plugin<Project> {
 
         target.tasks.register("generateClassRelationsPuml", GenerateTask::class.java) { task ->
             task.group = "documentation"
-            task.moduleDirectory.set(extension.moduleDirectory.convention(target.projectDir))
             task.destination.set(extension.destination.convention(
                 target.layout.buildDirectory.map { File(it.asFile, "generated/puml_class_relations") })
             )

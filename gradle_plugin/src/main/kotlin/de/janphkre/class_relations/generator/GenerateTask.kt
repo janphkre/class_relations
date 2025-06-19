@@ -33,9 +33,6 @@ abstract class GenerateTask: DefaultTask() {
     @get:OutputDirectory
     abstract val destination: Property<File>
 
-    @get:Internal
-    abstract val moduleDirectory: Property<File>
-
     @get:InputDirectory
     abstract val source: Property<File>
 

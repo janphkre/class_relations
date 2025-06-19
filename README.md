@@ -18,11 +18,29 @@ pluginManagement {
         maven { url "https://jitpack.io"  }
     }
 }
-...
+
+
 plugins {
     id("de.janphkre.class_relations") version "${currentlyReleasedVersion}"
 }
+
+
+pumlGenerate {
+    destination = new File(project.buildDir, "generated/puml_class_relations")
+    source = new File(project.projectDir, "src")
+    projectPackagePrefix = "readme.example"
+    selfColor = "#00FF00"
+    spaceCount = 4
+    generatedFilename = "class_relations.puml"
+    filters = [
+            "*",
+            "**.*Module"
+    ]
+}
 ```
+
+The task `generateClassRelationsPuml` can be executed to generate the diagrams.
+
 ## License
 
 This project is licensed under the Apache License 2.0, see [here](LICENSE).
