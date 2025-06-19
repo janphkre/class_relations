@@ -23,7 +23,9 @@ internal class KotlinParserImpl(
 ): KotlinParser {
 
     override fun parse(fileContent: String, presentableName: String, filePath: String): KlassWithRelations? {
-        val kotlinFileSummary = KotlinGrammarAntlrKotlinParser.parseKotlinFile(AstSource.String(description = presentableName, content = fileContent)).summary(false)
+        val kotlinFileSummary = KotlinGrammarAntlrKotlinParser.parseKotlinFile(
+            AstSource.String(description = presentableName, content = fileContent)
+        ).summary(false)
         if (kotlinFileSummary is AstFailure) {
             kotlinFileSummary.errors.forEach(::println)
             return null
@@ -34,7 +36,17 @@ internal class KotlinParserImpl(
         val importList: DefaultAstNode? = kotlinFileSummary.success.find { it is DefaultAstNode } as? DefaultAstNode
 
         val filePackage = packageHeader?.identifier?.map { it.identifier } ?: emptyList()
-        val fileImportItems = importList?.children?.map { import -> (import as Import).identifier.map { it.identifier } }?.distinct()?.map { klassItemFactory.createItem(it.last(), it.dropLast(1)) } ?: emptyList()
+        val fileImportItems = importList?.children?.map { import ->
+            import as Import
+            import.alias?.identifier to import.identifier.map { it.identifier }
+        }?.distinctBy { (_, identifier) -> identifier }?.map { (alias, identifier) ->
+            val name = identifier.last()
+            klassItemFactory.createItem(
+                name = name,
+                codeIdentifier = alias,
+                packageList = identifier.dropLast(1)
+            )
+        } ?: emptyList()
         val methods = (klassDeclaration?.expressions?.find { it.description == "classBody" } as? DefaultAstNode)?.children?.filterIsInstance<KlassDeclaration>()
         return KlassWithRelations(
             item = klassItemFactory.createItem(
@@ -47,8 +59,8 @@ internal class KotlinParserImpl(
                 filePath = filePath
             ),
             fileImports = fileImportItems,
-            parameters = klassDeclaration?.getParameters(fileImportItems) ?: emptyList(), //TODO: SUPPORT ALIAS IMPORTS
-            inheritances = klassDeclaration?.getInheritances(fileImportItems) ?: emptyList(), //TODO: SUPPORT ALIAS IMPORTS,
+            parameters = klassDeclaration?.getParameters(fileImportItems) ?: emptyList(),
+            inheritances = klassDeclaration?.getInheritances(fileImportItems) ?: emptyList(),
             methodParameters = methods?.getMethodParameters(fileImportItems) ?: emptyList()
         )
     }
@@ -67,14 +79,14 @@ internal class KotlinParserImpl(
         return parameter.flatMap { parameter -> parameter.parameter.flatMap { type -> type.type.map { it.identifier } } }
             .distinct()
             .map { parameter ->
-                fileImportItems.firstOrNull { it.name == parameter } ?: klassItemFactory.createItem(parameter)
+                fileImportItems.firstOrNull { it.codeIdentifier == parameter } ?: klassItemFactory.createItem(parameter)
             }
     }
 
     private fun KlassDeclaration.getInheritances(fileImportItems: List<KlassItem>): List<KlassItem> {
         return inheritance.map { it.type.identifier }
             .map { inheritance ->
-                fileImportItems.firstOrNull { it.name == inheritance } ?: klassItemFactory.createItem(inheritance)
+                fileImportItems.firstOrNull { it.codeIdentifier == inheritance } ?: klassItemFactory.createItem(inheritance)
             }
     }
 
@@ -120,7 +132,7 @@ internal class KotlinParserImpl(
                                     .children.first() as DefaultAstTerminal).text
                             }
                             return@functionParameter classNames.map { className ->
-                                fileImportItems.firstOrNull { it.name == className }
+                                fileImportItems.firstOrNull { it.codeIdentifier == className }
                                     ?: klassItemFactory.createItem(className)
                             }
                         }

@@ -90,10 +90,10 @@ class ClassRelationsPumlGeneratorTest {
 
     private fun JsonElement.toKlassItem(): KlassItem {
         val json = this.jsonObject
-        val filePackageString = json["package"]!!.jsonPrimitive.content
+        val filePackageList = json["package"]!!.jsonPrimitive.content.split(".")
         return klassItemFactory.createItem(
             name = json["name"]!!.jsonPrimitive.content,
-            packageString = filePackageString
+            packageList = filePackageList
         )
     }
 

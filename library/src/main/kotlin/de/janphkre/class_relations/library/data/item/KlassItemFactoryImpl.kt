@@ -1,6 +1,7 @@
 package de.janphkre.class_relations.library.data.item
 
 import de.janphkre.class_relations.library.data.filter.KlassFilter
+import de.janphkre.class_relations.library.model.AliasKlassItemImpl
 import de.janphkre.class_relations.library.model.KlassItem
 import de.janphkre.class_relations.library.model.KlassItemImpl
 import de.janphkre.class_relations.library.model.UnclearKlassItemImpl
@@ -12,12 +13,20 @@ class KlassItemFactoryImpl: KlassItemFactory {
 
     override fun createItem(
         name: String,
+        codeIdentifier: String?,
         packageList: List<String>
     ): KlassItem {
-        return createItem(
+        val item = createItem(
             name,
             packageList,
             packageList.joinToString(".")
+        )
+        if (codeIdentifier == null) {
+            return item
+        }
+        return AliasKlassItemImpl(
+            item,
+            codeIdentifier
         )
     }
 
@@ -47,29 +56,14 @@ class KlassItemFactoryImpl: KlassItemFactory {
             itemsInPackage = HashMap()
             itemsCache[filePackageString] = itemsInPackage
         }
-        val newResultItem = KlassItemImpl(name, filePackageList, filePackageString)
+        val newResultItem = KlassItemImpl(
+            name = name,
+            filePackage = filePackageList,
+            filePackageString = filePackageString
+        )
         itemsInPackage[name] = newResultItem
         filterItem(newResultItem)
         return newResultItem
-    }
-
-    override fun createItem(
-        name: String,
-        packageString: String
-    ): KlassItem {
-        return if (packageString.isEmpty()) {
-            createItem(
-                name,
-                emptyList(),
-                ""
-            )
-        } else {
-            createItem(
-                name,
-                packageString.split("."),
-                packageString
-            )
-        }
     }
 
     private fun filterItem(item: KlassItem) {

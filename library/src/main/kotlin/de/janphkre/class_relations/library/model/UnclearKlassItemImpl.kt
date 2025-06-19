@@ -6,7 +6,16 @@ data class UnclearKlassItemImpl(
     override val filePackageString: String,
     override var isDisabled: Boolean = false
 ) : UnclearKlassItem {
+
+    override val codeIdentifier: String
+        get() = name
+
     override fun copy(filePackage: List<String>): KlassItem {
-        return UnclearKlassItemImpl(name, filePackage, filePackageString, isDisabled)
+        return UnclearKlassItemImpl(
+            name = name,
+            filePackage = filePackage,
+            filePackageString = filePackageString,
+            isDisabled = isDisabled
+        )
     }
 }

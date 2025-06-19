@@ -35,6 +35,9 @@ internal class KotlinParserTest {
     @Test
     fun testClassWithUsages() = verifyParser("ClassWithUsages", "example/file/path9")
 
+    @Test
+    fun testClassWithAliasDeps() = verifyParser("ClassWithAliasDeps", "example/file/path10")
+
     private fun verifyParser(id: String, filePath: String) {
         val parser = KotlinParser.getInstance()
         val result = parser.parse(readInput(id), id, filePath)
@@ -71,18 +74,27 @@ internal class KotlinParserTest {
         val json = this.jsonObject
         val filePackageString = json["package"]!!.jsonPrimitive.content
         val name = json["name"]!!.jsonPrimitive.content
-        if (filePackageString == "") {
-            return UnclearKlassItemImpl(
+        val alias = json["alias"]?.jsonPrimitive?.content
+        val item = if (filePackageString == "") {
+            UnclearKlassItemImpl(
                 name = name,
                 filePackage = emptyList(),
                 filePackageString = ""
             )
+        } else {
+            KlassItemImpl(
+                name = name,
+                filePackage = filePackageString.split("."),
+                filePackageString = filePackageString
+            )
         }
-        return KlassItemImpl(
-            name = name,
-            filePackage = filePackageString.split("."),
-            filePackageString = filePackageString
-        )
+        if (alias != null) {
+            return AliasKlassItemImpl(
+                delegate = item,
+                codeIdentifier = alias
+            )
+        }
+        return item
     }
 
     private fun readInput(file: String): String {

@@ -6,7 +6,16 @@ data class KlassItemImpl(
     override val filePackageString: String,
     override var isDisabled: Boolean = false
 ): KlassItem {
+
+    override val codeIdentifier: String
+        get() = name
+
     override fun copy(filePackage: List<String>): KlassItem {
-        return KlassItemImpl(name, filePackage, filePackageString, isDisabled)
+        return KlassItemImpl(
+            name = name,
+            filePackage = filePackage,
+            filePackageString = filePackageString,
+            isDisabled = isDisabled
+        )
     }
 }

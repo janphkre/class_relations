@@ -1,0 +1,37 @@
+{
+  "name": "ClassWithAliasDeps",
+  "package": "com.example.a",
+  "type": "class",
+  "fileImports": [
+    {
+      "package": "com.example.b",
+      "name": "ParameterClassA"
+    },
+    {
+      "package": "com.example.b",
+      "name": "ParameterClassB"
+    },
+    {
+      "package": "com.example.c",
+      "name": "ParameterClassB",
+      "alias": "ParameterClassC"
+    }
+  ],
+  "parameters": [
+    {
+      "package": "com.example.b",
+      "name": "ParameterClassA"
+    },
+    {
+      "package": "com.example.b",
+      "name": "ParameterClassB"
+    },
+    {
+      "package": "com.example.c",
+      "name": "ParameterClassB",
+      "alias": "ParameterClassC"
+    }
+  ],
+  "inheritances": [],
+  "methods": []
+}

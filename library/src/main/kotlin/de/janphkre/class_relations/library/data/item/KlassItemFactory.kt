@@ -7,6 +7,7 @@ interface KlassItemFactory {
 
     fun createItem(
         name: String,
+        codeIdentifier: String? = null,
         packageList: List<String>
     ): KlassItem
 
@@ -15,11 +16,6 @@ interface KlassItemFactory {
      */
     fun createItem(
         name: String
-    ): KlassItem
-
-    fun createItem(
-        name: String,
-        packageString: String
     ): KlassItem
 
     fun clear()

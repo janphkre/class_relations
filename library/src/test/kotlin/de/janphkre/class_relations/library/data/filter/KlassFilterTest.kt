@@ -3,6 +3,7 @@ package de.janphkre.class_relations.library.data.filter
 import com.google.common.truth.Truth
 import de.janphkre.class_relations.library.data.item.KlassItemFactoryImpl
 import de.janphkre.class_relations.library.model.KlassFilterItem
+import de.janphkre.class_relations.library.model.KlassItemImpl
 import org.junit.Test
 
 class KlassFilterTest {
@@ -11,8 +12,11 @@ class KlassFilterTest {
     fun exactKlassFilter_matchesKlassItem() {
         val klassName = "ExampleKlassName"
         val klassPackage = "aaa.bbb.ccc"
-        val klassItemFactory = KlassItemFactoryImpl()
-        val klassItem = klassItemFactory.createItem(klassName, klassPackage)
+        val klassItem = KlassItemImpl(
+            name = klassName,
+            filePackage = klassPackage.split("."),
+            filePackageString = klassPackage
+        )
         val klassFilter = ExactKlassFilter(
             listOf(
                 KlassFilterItem(klassName, klassPackage)
@@ -28,8 +32,11 @@ class KlassFilterTest {
         val klassName = "ExampleKlassName"
         val klassPackage = "aaa.bbb.ccc"
         val filterPackage = "aaa.bbb.ddd"
-        val klassItemFactory = KlassItemFactoryImpl()
-        val klassItem = klassItemFactory.createItem(klassName, klassPackage)
+        val klassItem = KlassItemImpl(
+            name = klassName,
+            filePackage = klassPackage.split("."),
+            filePackageString = klassPackage
+        )
         val klassFilter = ExactKlassFilter(
             listOf(
                 KlassFilterItem(klassName, filterPackage)
@@ -61,8 +68,11 @@ class KlassFilterTest {
         val klassName = "ExampleKlassName"
         val klassPackage = "aaa.bbb.ccc"
         val filterPackage = "bbb.*.ExampleKlassName"
-        val klassItemFactory = KlassItemFactoryImpl()
-        val klassItem = klassItemFactory.createItem(klassName, klassPackage)
+        val klassItem = KlassItemImpl(
+            name = klassName,
+            filePackage = klassPackage.split("."),
+            filePackageString = klassPackage
+        )
         val klassFilter = GlobKlassFilter(
             setOf(
                 filterPackage
@@ -145,9 +155,25 @@ class KlassFilterTest {
         globFilterMatches(klassName, klassPackage, globFilter)
     }
 
+    @Test
+    fun globFilterMultiplePathWildcardMatches_MatchSinglePackageKlassItem() {
+        val klassName = "ExampleKlassName"
+        val klassPackage = "aaa"
+        val globFilter = "**.**.**"
+        globFilterMatches(klassName, klassPackage, globFilter)
+    }
+
     private fun globFilterMatches(klassName: String, klassPackage: String, globFilter: String) {
-        val klassItemFactory = KlassItemFactoryImpl()
-        val klassItem = klassItemFactory.createItem(klassName, klassPackage)
+        val filePackageList = if(klassPackage.isBlank()) {
+            emptyList()
+        } else {
+            klassPackage.split(".")
+        }
+        val klassItem = KlassItemImpl(
+            name = klassName,
+            filePackage = filePackageList,
+            filePackageString = klassPackage
+        )
         val klassFilter = GlobKlassFilter(
             setOf(
                 globFilter
