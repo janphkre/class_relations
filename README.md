@@ -1,8 +1,8 @@
-# class_structure
+# class_relations
 
-[![](https://jitpack.io/v/janphkre/class_structure.svg)](https://jitpack.io/#janphkre/class_structure)
+[![](https://jitpack.io/v/janphkre/class_relations.svg)](https://jitpack.io/#janphkre/class_relations)
 
-Class_structure aims to provide a generator for class relations on a package level.
+Class_relations aims to provide a generator for class relations on a package level.
 
 A simple example can be found in the tests:
 
@@ -10,18 +10,24 @@ A simple example can be found in the tests:
 
 ## Usage
 
-Like any gradle plugin, class_structure is also defined as a plugin:
+Like any gradle plugin, class_relations is also defined as a plugin:
 
 ```groovy
 pluginManagement {
     repositories {
         maven { url "https://jitpack.io"  }
     }
+    resolutionStrategy {
+        eachPlugin {
+            if (requested.id.id == "de.janphkre.class_relations") {
+                useModule("de.janphkre.class_relations:gradle-plugin:${classRelationsVersion}")
+            }
+        }
+    }
 }
 
-
 plugins {
-    id("de.janphkre.class_relations") version "${currentlyReleasedVersion}"
+    id("de.janphkre.class_relations")
 }
 
 

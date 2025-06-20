@@ -2,10 +2,20 @@ plugins {
     id("java")
     id("org.jetbrains.kotlin.jvm") version "2.1.0"
     id("java-gradle-plugin")
+    id("maven-publish")
 }
 
-group = "de.janphkre"
-version = "1.0-SNAPSHOT"
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = "de.janphkre.class_relations"
+            artifactId = "gradle-plugin"
+            version = "1.0.0"
+
+            from(components["java"])
+        }
+    }
+}
 
 repositories {
     mavenCentral()
