@@ -7,12 +7,18 @@ plugins {
 
 publishing {
     publications {
-        create<MavenPublication>("maven") {
-            groupId = "de.janphkre.class_relations"
-            artifactId = "gradle-plugin"
+        create<MavenPublication>("plugin") {
+            groupId = "com.github.janphkre.class_relations"
+            artifactId = "gradle_plugin"
             version = "1.0.0"
 
             from(components["java"])
+
+            pom {
+                name.set("class_relations Gradle Plugin")
+                description.set("A gradle plugin to generate puml files out of kotlin source code")
+                url.set("https://github.com/janphkre/class_relations")
+            }
         }
     }
 }

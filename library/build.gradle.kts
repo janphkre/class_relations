@@ -1,10 +1,30 @@
 plugins {
     id("java")
     id("org.jetbrains.kotlin.jvm") version "2.1.0"
+    id("java-gradle-plugin")
+    id("maven-publish")
 }
 
-group = "de.janphkre"
-version = "1.0-SNAPSHOT"
+publishing {
+    publications {
+        create<MavenPublication>("library") {
+            groupId = "com.github.janphkre.class_relations"
+            artifactId = "library"
+            version = "1.0.0"
+
+            from(components["java"])
+
+            pom {
+                name.set("class_relations Library")
+                description.set("A library to generate puml out of kotlin sources")
+                url.set("https://github.com/janphkre/class_relations")
+            }
+        }
+    }
+}
+
+group = "com.github.janphkre.class_relations"
+version = "1.0.0"
 
 repositories {
     mavenCentral()
