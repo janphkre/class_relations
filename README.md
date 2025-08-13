@@ -15,19 +15,26 @@ Like any gradle plugin, class_relations is also defined as a plugin:
 ```groovy
 pluginManagement {
     repositories {
-        maven { url "https://jitpack.io"  }
+        maven {
+            url = uri("https://jitpack.io")
+            content {
+                includeGroupAndSubgroups("com.github")
+            }
+        }
     }
     resolutionStrategy {
         eachPlugin {
-            if (requested.id.id == "de.janphkre.class_relations") {
-                useModule("de.janphkre.class_relations:gradle-plugin:${classRelationsVersion}")
+            requested.apply {
+                if ("$id".startsWith("com.github.")) {
+                    useModule("$id:gradle_plugin:$version")
+                }
             }
         }
     }
 }
 
 plugins {
-    id("de.janphkre.class_relations")
+    id("com.github.janphkre.class_relations") version "$libs.versions.classRelationsPlugin"
 }
 
 
@@ -37,7 +44,7 @@ pumlGenerate {
     projectPackagePrefix = "readme.example"
     selfColor = "#00FF00"
     spaceCount = 4
-    generatedFilename = "class_relations.puml"
+    generatedFileName = "class_relations.puml"
     filters = [
             "*",
             "**.*Module"
