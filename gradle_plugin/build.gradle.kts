@@ -23,6 +23,9 @@ publishing {
     }
 }
 
+group = "com.github.janphkre.class_relations"
+version = "1.0.0"
+
 repositories {
     mavenCentral()
     maven { url = uri("https://jitpack.io") }
@@ -40,7 +43,7 @@ dependencies {
 gradlePlugin {
     plugins {
         create("classRelationsGenerator") {
-            id = "de.janphkre.class_relations"
+            id = "com.github.janphkre.class_relations"
             implementationClass = "de.janphkre.class_relations.generator.GeneratorPlugin"
         }
     }
