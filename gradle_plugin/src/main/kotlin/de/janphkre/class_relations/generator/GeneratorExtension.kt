@@ -58,7 +58,7 @@ interface GeneratorExtension {
      * Set the source folder of the project of which puml files shall be created.
      * Defaults to "src".
      */
-    val source: Property<File>
+    val sources: ListProperty<File>
 
     /**
      * Define a set of filters that can be used to exclude files or relations

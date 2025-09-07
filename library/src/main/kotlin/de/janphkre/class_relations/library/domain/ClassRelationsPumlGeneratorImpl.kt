@@ -26,7 +26,7 @@ internal class ClassRelationsPumlGeneratorImpl(
     private val openPackages = Stack<String>()
     private var packageIndex = 0
 
-    override fun generate(klasses: List<KlassWithRelations>, childPackages: List<String>, sourcesLink: String): String {
+    override fun generate(klasses: List<KlassWithRelations>, childPackages: Collection<String>, sourcesLink: String): String {
         packageIndex = 0
         return StringBuilder(generatorSettings.initialCapacitySize * klasses.size).apply {
             appendContent("@startuml")
@@ -50,7 +50,7 @@ internal class ClassRelationsPumlGeneratorImpl(
 
     override fun generateEmpty(
         filePackage: List<String>,
-        childPackages: List<String>,
+        childPackages: Collection<String>,
         sourcesLink: String
     ): String {
         packageIndex = 0
@@ -66,7 +66,7 @@ internal class ClassRelationsPumlGeneratorImpl(
         }.toString()
     }
 
-    private fun StringBuilder.createReferences(filePackage: List<String>,sourcesLink: String) {
+    private fun StringBuilder.createReferences(filePackage: List<String>, sourcesLink: String) {
         val pathDepth = filePackage.size
         val filePathReverse = "..".repeat(pathDepth, '/')
         appendContent("!\$pathToCodeBase = \"${filePathReverse}/${sourcesLink}\"")
@@ -121,7 +121,7 @@ internal class ClassRelationsPumlGeneratorImpl(
         }
     }
 
-    private fun StringBuilder.createImports(klasses: List<KlassWithRelations>, childPackages: List<String>) {
+    private fun StringBuilder.createImports(klasses: List<KlassWithRelations>, childPackages: Collection<String>) {
         val (projectImports, externalImports) = groupAllImports(klasses.flatMap { it.fileImports })
         val currentImports = projectImports.getCurrentImports(childPackages)
         //At this point, the openPackages stack matches the currentImports list
@@ -137,7 +137,7 @@ internal class ClassRelationsPumlGeneratorImpl(
         createImportedClassesInPackage(externalImports, lastOpenPackage)
     }
 
-    private fun KlassImport.getCurrentImports(childPackages: List<String>): List<KlassImport.Package> {
+    private fun KlassImport.getCurrentImports(childPackages: Collection<String>): List<KlassImport.Package> {
         val currentImports = mutableListOf<KlassImport.Package>()
         var previousImports = this
         for (openPackage in openPackages) {

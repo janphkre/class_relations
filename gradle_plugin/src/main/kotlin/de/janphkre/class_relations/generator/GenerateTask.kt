@@ -15,7 +15,8 @@
  */
 package de.janphkre.class_relations.generator
 
-import de.janphkre.class_relations.generator.filetree.SortedFileTreeWalker
+import de.janphkre.class_relations.generator.filetree.FileInRoot
+import de.janphkre.class_relations.generator.filetree.MultiRootFileTreeWalker
 import de.janphkre.class_relations.library.data.filter.KlassDisabledFiltering
 import de.janphkre.class_relations.library.data.filter.KlassFilterFactory
 import de.janphkre.class_relations.library.data.item.KlassItemFactory
@@ -34,7 +35,7 @@ abstract class GenerateTask: DefaultTask() {
     abstract val destination: Property<File>
 
     @get:InputDirectory
-    abstract val source: Property<File>
+    abstract val sources: ListProperty<File>
 
     @get:Input
     abstract val generatorSettings: Property<ClassRelationsPumlGenerator.Settings>
@@ -47,7 +48,6 @@ abstract class GenerateTask: DefaultTask() {
     private lateinit var itemFactory: KlassItemFactory
     private lateinit var disabledFiltering: KlassDisabledFiltering
     private lateinit var destinationPathFromSource: String
-    private lateinit var sourceDirectoryFile: File
     private lateinit var generatedFileName: String
     private lateinit var packagePrefix: List<String>
 
@@ -63,24 +63,24 @@ abstract class GenerateTask: DefaultTask() {
         registerKlassFilters()
 
         val parser = KotlinParser.getInstance()
-        val sourceDir = source.get()
-        Sequence { SortedFileTreeWalker(sourceDir, onLeave = { dir ->
-            val childPackages = dir.subDirectories.map { it.name }
+        val sourceDirs = sources.get()
+        Sequence { MultiRootFileTreeWalker(sourceDirs, onLeave = { directory ->
+            val childPackages = directory.subDirectories.keys
+            val aDirectory = directory.directories.first()
             generateDiagram(
                 childPackages,
-                dir.directory.toRelativeForwardSlashString(sourceDir)
+                aDirectory.file.toRelativeForwardSlashString(aDirectory.root)
             )
         }) }
-            .filter { it.extension == "kt" }
-            .forEach { path ->
-                parser.readDefinition(path)
+            .filter { it.file.extension == "kt" }
+            .forEach { file ->
+                parser.readDefinition(file)
             }
     }
 
     private fun initializeFields() {
         val settings = generatorSettings.get()
-        sourceDirectoryFile = source.get()
-        destinationPathFromSource = sourceDirectoryFile.toRelativeForwardSlashString(destination.get())
+        destinationPathFromSource = sourceDirectoryFile.toRelativeForwardSlashString(destination.get()) //TODO: CONVERT PATHING TO DYNAMIC ROOT!
         generator = ClassRelationsPumlGenerator.getInstance(
             settings = settings
         )
@@ -96,12 +96,16 @@ abstract class GenerateTask: DefaultTask() {
         itemFactory.applyFilters(klassFilters)
     }
 
-    private fun KotlinParser.readDefinition(file: File) {
-        val definition = parse(file.readText(), file.nameWithoutExtension, filePath = file.toRelativeForwardSlashString(sourceDirectoryFile))
+    private fun KotlinParser.readDefinition(file: FileInRoot) {
+        val definition = parse(
+            file.file.readText(),
+            file.file.nameWithoutExtension,
+            filePath = file.file.toRelativeForwardSlashString(file.root)
+        )
         definitions.add(definition ?: return)
     }
 
-    private fun generateDiagram(childPackages: List<String>, destinationDiagramPath: String) {
+    private fun generateDiagram(childPackages: Collection<String>, destinationDiagramPath: String) {
         val filteredKlassItems = disabledFiltering.filter(definitions)
         val pumlDiagram = if (filteredKlassItems.isEmpty()) {
             val diagramPackage = destinationDiagramPath.split('/')
