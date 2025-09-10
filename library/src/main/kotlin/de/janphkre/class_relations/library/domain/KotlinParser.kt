@@ -17,10 +17,16 @@ package de.janphkre.class_relations.library.domain
 
 import de.janphkre.class_relations.library.data.item.KlassItemFactory
 import de.janphkre.class_relations.library.model.KlassWithRelations
+import java.io.File
 
 interface KotlinParser {
 
-    fun parse(fileContent: String, presentableName: String, filePath: String): KlassWithRelations?
+    fun parse(
+        fileContent: String,
+        presentableName: String,
+        filePathInRoot: String,
+        rootName: String
+    ): KlassWithRelations?
 
     companion object {
         fun getInstance(): KotlinParser {

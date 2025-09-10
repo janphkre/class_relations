@@ -26,13 +26,13 @@ internal class ClassRelationsPumlGeneratorImpl(
     private val openPackages = Stack<String>()
     private var packageIndex = 0
 
-    override fun generate(klasses: List<KlassWithRelations>, childPackages: Collection<String>, sourcesLink: String): String {
+    override fun generate(klasses: List<KlassWithRelations>, childPackages: Collection<String>, sourcesLinks: Map<String, String>): String {
         packageIndex = 0
         return StringBuilder(generatorSettings.initialCapacitySize * klasses.size).apply {
             appendContent("@startuml")
             //STRUCTURE
             val anyKlassPackage = klasses.first().item.filePackage
-            createReferences(anyKlassPackage, sourcesLink)
+            createReferences(anyKlassPackage, sourcesLinks)
             createSelfPackageStructure(anyKlassPackage)
             createClasses(klasses)
             createImports(klasses, childPackages)
@@ -56,7 +56,7 @@ internal class ClassRelationsPumlGeneratorImpl(
         packageIndex = 0
         return StringBuilder(generatorSettings.initialCapacitySize).apply {
             appendContent("@startuml")
-            createReferences(filePackage, sourcesLink)
+            createReferences(filePackage, emptyMap())
             createSelfPackageStructure(filePackage)
             createImports(emptyList(), childPackages)
             for( i in 0 until openPackages.size) {
@@ -66,20 +66,22 @@ internal class ClassRelationsPumlGeneratorImpl(
         }.toString()
     }
 
-    private fun StringBuilder.createReferences(filePackage: List<String>, sourcesLink: String) {
+    private fun StringBuilder.createReferences(filePackage: List<String>, sourcesLinks: Map<String, String>) {
         val pathDepth = filePackage.size
-        val filePathReverse = "..".repeat(pathDepth, '/')
-        appendContent("!\$pathToCodeBase = \"${filePathReverse}/${sourcesLink}\"")
-        appendContent("!\$pathToDocsBase = \"${filePathReverse}/${generatorSettings.projectPackagePrefix.replace('.', '/')}\"")
+        val filePathReverse = "..".repeat(pathDepth, PATH_DELIMITER)
+        for ((codeBaseName, link) in sourcesLinks) {
+            appendContent("!\$pathTo${codeBaseName} = \"${filePathReverse}${PATH_DELIMITER}${link}\"")
+        }
+        appendContent("!\$pathToDocsBase = \"${filePathReverse}${PATH_DELIMITER}${generatorSettings.projectPackagePrefix.replace(PACKAGE_DELIMITER, PATH_DELIMITER)}\"")
     }
 
     private fun StringBuilder.createSelfPackageStructure(filePackage: List<String>) {
         if (!filePackage.hasProjectPrefix()) {
-            beginSelfPackage(filePackage.joinToString("."))
+            beginSelfPackage(filePackage.joinToString(PACKAGE_SEPARATOR))
             return
         }
         if (projectPrefix.size == filePackage.size) {
-            beginSelfPackage(filePackage.joinToString("."))
+            beginSelfPackage(filePackage.joinToString(PACKAGE_SEPARATOR))
             return
         }
         beginPackage(generatorSettings.projectPackagePrefix)
@@ -288,7 +290,7 @@ internal class ClassRelationsPumlGeneratorImpl(
             KlassType.ENUM_CLASS -> "enum"
             KlassType.UNKNOWN -> "circle"
         }
-        appendContent("$plantUmlType \"[[\$pathToCodeBase/${klassType.filePath} ${klassItem.name}]]\" as ${klassItem.name} {")
+        appendContent("$plantUmlType \"[[\$pathTo${klassType.codeBaseName}${PATH_DELIMITER}${klassType.filePath} ${klassItem.name}]]\" as ${klassItem.name} {")
         klassType.methods.forEach { method ->
             appendContent("${" ".repeat(generatorSettings.spaceCount)}{method} $method")
         }
@@ -302,9 +304,9 @@ internal class ClassRelationsPumlGeneratorImpl(
             } else {
                 name
             }
-            appendContent("package \"[[\$pathToDocsBase/$linkTarget/${generatorSettings.generatedFileName} $name]]\" as p\\\$_${packageIndex++} #ffffff {")
+            appendContent("package \"[[\$pathToDocsBase${PATH_DELIMITER}${linkTarget}${PATH_DELIMITER}${generatorSettings.generatedFileName} $name]]\" as p\\\$_${packageIndex++} #ffffff {")
         } else if (name == generatorSettings.projectPackagePrefix) {
-            appendContent("package \"[[\$pathToDocsBase/${generatorSettings.generatedFileName} $name]]\" as p\\\$_${packageIndex++} #ffffff {")
+            appendContent("package \"[[\$pathToDocsBase${PATH_DELIMITER}${generatorSettings.generatedFileName} $name]]\" as p\\\$_${packageIndex++} #ffffff {")
         } else {
             appendContent("package \"$name\" as p\\\$_${packageIndex++} #ffffff {")
         }
@@ -339,5 +341,11 @@ internal class ClassRelationsPumlGeneratorImpl(
     private fun StringBuilder.appendContent(string: String) {
         append(" ".repeat(openPackages.size * generatorSettings.spaceCount))
         appendLine(string)
+    }
+
+    private companion object {
+        private const val PACKAGE_SEPARATOR = "."
+        private const val PACKAGE_DELIMITER = '.'
+        private const val PATH_DELIMITER = '/'
     }
 }

@@ -37,7 +37,12 @@ internal class KotlinParserImpl(
     private val klassItemFactory: KlassItemFactory
 ): KotlinParser {
 
-    override fun parse(fileContent: String, presentableName: String, filePath: String): KlassWithRelations? {
+    override fun parse(
+        fileContent: String,
+        presentableName: String,
+        filePathInRoot: String,
+        rootName: String
+    ): KlassWithRelations? {
         val kotlinFileSummary = KotlinGrammarAntlrKotlinParser.parseKotlinFile(
             AstSource.String(description = presentableName, content = fileContent)
         ).summary(false)
@@ -71,7 +76,8 @@ internal class KotlinParserImpl(
             type = KlassTypeData(
                 type = klassDeclaration?.getType() ?: KlassType.UNKNOWN,
                 methods = methods?.mapNotNull { it.identifier?.identifier } ?: emptyList(),
-                filePath = filePath
+                filePath = filePathInRoot,
+                codeBaseName = rootName
             ),
             fileImports = fileImportItems,
             parameters = klassDeclaration?.getParameters(fileImportItems) ?: emptyList(),

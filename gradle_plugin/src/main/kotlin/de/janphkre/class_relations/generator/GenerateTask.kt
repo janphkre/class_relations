@@ -28,6 +28,7 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import java.io.File
+import java.util.Locale
 
 abstract class GenerateTask: DefaultTask() {
 
@@ -47,13 +48,12 @@ abstract class GenerateTask: DefaultTask() {
     private lateinit var generator: ClassRelationsPumlGenerator
     private lateinit var itemFactory: KlassItemFactory
     private lateinit var disabledFiltering: KlassDisabledFiltering
-    private lateinit var destinationPathFromSource: String
     private lateinit var generatedFileName: String
     private lateinit var packagePrefix: List<String>
 
     private fun File.toRelativeForwardSlashString(base: File): String {
         val relative = base.toPath().relativize(this.toPath())
-        val result = relative.joinToString("/")
+        val result = relative.joinToString(PATH_SEPARATOR)
         return result
     }
 
@@ -64,30 +64,43 @@ abstract class GenerateTask: DefaultTask() {
 
         val parser = KotlinParser.getInstance()
         val sourceDirs = sources.get()
+        val destinationDir = destination.get()
+        val sourceAssociations = sourceDirs.associateWith { dir ->
+            val sourcePath = dir.toRelativeForwardSlashString(destinationDir)
+            val name = sourcePath.split(PATH_DELIMITER).joinToString { it.capitalized() }
+            (name to sourcePath)
+        }
+        val sourceNames = sourceAssociations.mapValues { it.value.first }
+        val sourcePathsFromDestination = sourceAssociations.values.associate { it.first to it.second }
         Sequence { MultiRootFileTreeWalker(sourceDirs, onLeave = { directory ->
             val childPackages = directory.subDirectories.keys
             val aDirectory = directory.directories.first()
             generateDiagram(
                 childPackages,
-                aDirectory.file.toRelativeForwardSlashString(aDirectory.root)
+                destinationDiagramFilePath = aDirectory.file
+                    .toRelativeForwardSlashString(aDirectory.root),
+                sourcePathsFromDestination
             )
         }) }
-            .filter { it.file.extension == "kt" }
+            .filter { it.file.extension == KOTLIN_FILE_TYPE }
             .forEach { file ->
-                parser.readDefinition(file)
+                parser.readDefinition(file, sourceNames)
             }
+    }
+
+    private fun String.capitalized(): String {
+        return replaceFirstChar { it.titlecase(Locale.getDefault()) }
     }
 
     private fun initializeFields() {
         val settings = generatorSettings.get()
-        destinationPathFromSource = sourceDirectoryFile.toRelativeForwardSlashString(destination.get()) //TODO: CONVERT PATHING TO DYNAMIC ROOT!
         generator = ClassRelationsPumlGenerator.getInstance(
             settings = settings
         )
         disabledFiltering = KlassDisabledFiltering.getInstance()
         itemFactory = KlassItemFactory.getInstance()
         generatedFileName = settings.generatedFileName
-        packagePrefix = settings.projectPackagePrefix.split('.')
+        packagePrefix = settings.projectPackagePrefix.split(PACKAGE_DELIMITER)
     }
 
     private fun registerKlassFilters() {
@@ -96,27 +109,32 @@ abstract class GenerateTask: DefaultTask() {
         itemFactory.applyFilters(klassFilters)
     }
 
-    private fun KotlinParser.readDefinition(file: FileInRoot) {
+    private fun KotlinParser.readDefinition(file: FileInRoot, sourceNames: Map<File, String>) {
         val definition = parse(
-            file.file.readText(),
-            file.file.nameWithoutExtension,
-            filePath = file.file.toRelativeForwardSlashString(file.root)
-        )
-        definitions.add(definition ?: return)
+            fileContent = file.file.readText(),
+            presentableName = file.file.nameWithoutExtension,
+            filePathInRoot = file.file.toRelativeForwardSlashString(file.root),
+            rootName = sourceNames[file.root]!!
+        ) ?: return
+        definitions.add(definition)
     }
 
-    private fun generateDiagram(childPackages: Collection<String>, destinationDiagramPath: String) {
+    private fun generateDiagram(
+        childPackages: Collection<String>,
+        destinationDiagramFilePath: String,
+        sourcePathsFromDestination: Map<String, String>
+    ) {
         val filteredKlassItems = disabledFiltering.filter(definitions)
         val pumlDiagram = if (filteredKlassItems.isEmpty()) {
-            val diagramPackage = destinationDiagramPath.split('/')
-            if (packagePrefix.startsWithButNotEqual(diagramPackage) || destinationDiagramPath.isBlank()) {
+            val diagramPackage = destinationDiagramFilePath.split(PATH_DELIMITER)
+            if (packagePrefix.startsWithButNotEqual(diagramPackage) || destinationDiagramFilePath.isBlank()) {
                 return
             }
-            generator.generateEmpty(diagramPackage, childPackages, destinationPathFromSource)
+            generator.generateEmpty(diagramPackage, childPackages)
         } else {
-            generator.generate(filteredKlassItems, childPackages, destinationPathFromSource)
+            generator.generate(filteredKlassItems, childPackages, sourcePathsFromDestination)
         }
-        val destinationFile = File(destination.get(), "${destinationDiagramPath}/${generatedFileName}")
+        val destinationFile = File(destination.get(), "${destinationDiagramFilePath}/${generatedFileName}")
         destinationFile.parentFile.mkdirs()
         destinationFile.createNewFile()
         destinationFile.writeText(pumlDiagram)
@@ -136,5 +154,12 @@ abstract class GenerateTask: DefaultTask() {
             }
         }
         return true
+    }
+
+    private companion object {
+        private const val PACKAGE_DELIMITER = '.'
+        private const val PATH_DELIMITER = '/'
+        private const val KOTLIN_FILE_TYPE = "kt"
+        private const val PATH_SEPARATOR = "/"
     }
 }

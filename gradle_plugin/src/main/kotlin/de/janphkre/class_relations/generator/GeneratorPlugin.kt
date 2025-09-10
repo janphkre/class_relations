@@ -22,15 +22,15 @@ import java.io.File
 
 class GeneratorPlugin : Plugin<Project> {
     override fun apply(target: Project) {
-        val extension = target.extensions.create("pumlGenerate", GeneratorExtension::class.java)
+        val extension = target.extensions.create(PLUGIN_NAME, GeneratorExtension::class.java)
 
-        target.tasks.register("generateClassRelationsPuml", GenerateTask::class.java) { task ->
-            task.group = "documentation"
+        target.tasks.register(TASK_NAME, GenerateTask::class.java) { task ->
+            task.group = TASK_GROUP
             task.destination.set(extension.destination.convention(
-                target.layout.buildDirectory.map { File(it.asFile, "generated/puml_class_relations") })
+                target.layout.buildDirectory.map { File(it.asFile, DEFAULT_DESTINATION) })
             )
             task.sources.set(extension.sources.convention(
-                listOf(File(target.projectDir, "src/main/kotlin")))
+                listOf(File(target.projectDir, DEFAULT_SOURCE)))
             )
             task.filters.set(extension.filters.convention(emptyList()))
             val compositeSettings = extension.projectPackagePrefix.flatMap { prefix ->
@@ -50,5 +50,13 @@ class GeneratorPlugin : Plugin<Project> {
             }
             task.generatorSettings.set(compositeSettings)
         }
+    }
+
+    private companion object {
+        private const val PLUGIN_NAME = "pumlGenerate"
+        private const val TASK_NAME = "generateClassRelationsPuml"
+        private const val TASK_GROUP = "documentation"
+        private const val DEFAULT_DESTINATION = "generated/puml_class_relations"
+        private const val DEFAULT_SOURCE = "src/main/kotlin"
     }
 }
