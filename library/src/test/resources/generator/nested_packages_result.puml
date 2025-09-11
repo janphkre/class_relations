@@ -9,7 +9,7 @@ package "[[$pathToDocsBase/example_relations.puml org.example]]" as p\$_0 #fffff
             {method} methodC
         }
         package "[[$pathToDocsBase/a/c/example_relations.puml c]]" as p\$_1 #ffffff {
-            circle "ExampleClassName5"
+            interface "ExampleClassName5"
         }
         package "[[$pathToDocsBase/a/depth1/example_relations.puml depth1]]" as p\$_2 #ffffff {
         }
@@ -19,13 +19,13 @@ package "[[$pathToDocsBase/example_relations.puml org.example]]" as p\$_0 #fffff
         }
     }
     package "[[$pathToDocsBase/b/example_relations.puml b]]" as p\$_5 #ffffff {
-        circle "ExampleClassName2"
-        circle "ExampleClassName3"
-        circle "ExampleClassName4"
+        interface "ExampleClassName2"
+        interface "ExampleClassName3"
+        interface "ExampleClassName4"
     }
 }
 package "io.different" as p\$_6 #ffffff {
-    circle "Something"
+    interface "Something"
 }
 
 ExampleClassName1 -down-> ExampleClassName2

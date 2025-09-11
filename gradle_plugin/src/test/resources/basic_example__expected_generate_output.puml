@@ -21,18 +21,18 @@ package "basic_example" #00FF00 {
 }
 package "com.example" as p\$_0 #ffffff {
     package "b" as p\$_1 #ffffff {
-        circle "ParameterClassB"
-        circle "UsageClassB"
-        circle "UsageClassC"
+        interface "ParameterClassB"
+        interface "UsageClassB"
+        interface "UsageClassC"
     }
     package "c" as p\$_2 #ffffff {
-        circle "ParameterClassD"
+        interface "ParameterClassD"
     }
 }
 package "io.other" as p\$_3 #ffffff {
-    circle "ParameterClassE"
-    circle "UsageClassE"
-    circle "UsageClassF"
+    interface "ParameterClassE"
+    interface "UsageClassE"
+    interface "UsageClassF"
 }
 
 ClassWithDistinctDeps .up.|> ParameterClassB

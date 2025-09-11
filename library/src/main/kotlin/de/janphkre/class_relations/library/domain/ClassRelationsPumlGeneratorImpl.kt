@@ -277,7 +277,7 @@ internal class ClassRelationsPumlGeneratorImpl(
     }
 
     private fun StringBuilder.createImportedClass(name: String) {
-        appendContent("circle \"${name}\"")
+        appendContent("interface \"${name}\"")
     }
 
     private fun StringBuilder.createClass(klassItem: KlassItem, klassType: KlassTypeData) {
@@ -288,7 +288,7 @@ internal class ClassRelationsPumlGeneratorImpl(
             KlassType.OBJECT -> "class"
             KlassType.INTERFACE -> "interface"
             KlassType.ENUM_CLASS -> "enum"
-            KlassType.UNKNOWN -> "circle"
+            KlassType.UNKNOWN -> "interface"
         }
         appendContent("$plantUmlType \"[[\$pathTo${klassType.codeBaseName}${PATH_DELIMITER}${klassType.filePath} ${klassItem.name}]]\" as ${klassItem.name} {")
         klassType.methods.forEach { method ->

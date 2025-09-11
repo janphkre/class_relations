@@ -93,7 +93,7 @@ internal class KotlinParserImpl(
         } else {
             keyword
         }
-        return KlassType.values().firstOrNull { it.id == id }
+        return KlassType.entries.firstOrNull { it.id == id }
     }
 
     private fun KlassDeclaration.getParameters(fileImportItems: List<KlassItem>): List<KlassItem> {
