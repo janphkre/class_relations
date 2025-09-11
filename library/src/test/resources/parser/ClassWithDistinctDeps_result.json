@@ -2,6 +2,7 @@
   "name": "ClassWithDistinctDeps",
   "package": "com.example.a",
   "type": "class",
+  "codeBaseName": "SrcMainBaseDistinct",
   "fileImports": [
     {
       "package": "com.example.b",

@@ -46,10 +46,11 @@ class ClassRelationsPumlGeneratorTest {
         val result = generator.generate(
             klasses = klasses,
             childPackages = packages,
-            sourcesLink = "example/root/generated"
+            sourcesLinks = mapOf("ExampleRootGenerated" to "example/root/generated")
         )
         Truth.assertThat(result).isEqualTo(readOutput(id))
     }
+
     private fun verifyGeneratorEmpty(id: String) {
         val (generatorSettings, klasses, packages) = readInput(id)
         val generator = ClassRelationsPumlGenerator.getInstance(
@@ -57,8 +58,7 @@ class ClassRelationsPumlGeneratorTest {
         )
         val result = generator.generateEmpty(
             filePackage = klasses.first().item.filePackage,
-            childPackages = packages,
-            sourcesLink = "example/root/generated"
+            childPackages = packages
         )
         Truth.assertThat(result).isEqualTo(readOutput(id))
     }
@@ -88,7 +88,8 @@ class ClassRelationsPumlGeneratorTest {
                 type = KlassTypeData(
                     methods = element["methods"]!!.jsonArray.map { it.jsonPrimitive.content },
                     type = KlassType.entries.firstOrNull { it.id == elementType } ?: throw IllegalArgumentException("Type \'$elementType\' not supported"),
-                    filePath = element["filePath"]!!.jsonPrimitive.content
+                    filePath = element["filePath"]!!.jsonPrimitive.content,
+                    codeBaseName = "ExampleRootGenerated"
                 ),
                 fileImports = element["fileImports"]!!.jsonArray.map { it.toKlassItem()},
                 parameters = element["parameters"]!!.jsonArray.map { it.toKlassItem()},

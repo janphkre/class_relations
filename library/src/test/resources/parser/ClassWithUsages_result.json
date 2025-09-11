@@ -2,6 +2,7 @@
   "name": "ClassWithUsages",
   "package": "com.example.a",
   "type": "class",
+  "codeBaseName": "SrcMainBaseUsages",
   "fileImports": [
     {
       "package": "com.example.b",

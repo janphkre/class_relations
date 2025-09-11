@@ -2,6 +2,7 @@
   "name": "EnumClass",
   "package": "com.example.a",
   "type": "enum class",
+  "codeBaseName": "SrcMainBaseEnum",
   "fileImports": [],
   "parameters": [],
   "inheritances": [],

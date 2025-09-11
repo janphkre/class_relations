@@ -24,38 +24,52 @@ import kotlin.test.Test
 internal class KotlinParserTest {
 
     @Test
-    fun testBasicClass() = verifyParser("BasicClass", "example/file/path")
+    fun testBasicClass() = verifyParser("BasicClass", "example/file/path", "SrcMainBase")
 
     @Test
-    fun testClassWithMethods() = verifyParser("ClassWithMethods", "example/file/path2")
+    fun testClassWithMethods() = verifyParser("ClassWithMethods", "example/file/path2", "SrcMainBaseMethods")
 
     @Test
-    fun testDataClassWithParameters() = verifyParser("DataClassWithParameters", "example/file/path3")
+    fun testDataClassWithParameters() = verifyParser("DataClassWithParameters", "example/file/path3", "SrcMainBaseParameters")
 
     @Test
-    fun testInterfaceWithMethods() = verifyParser("InterfaceWithMethods", "example/file/path4")
+    fun testInterfaceWithMethods() = verifyParser("InterfaceWithMethods", "example/file/path4", "SrcMainBaseInterfaceMethods")
 
     @Test
-    fun testObjectWithInheritances() = verifyParser("ObjectWithInheritances", "example/file/path5")
+    fun testObjectWithInheritances() = verifyParser("ObjectWithInheritances", "example/file/path5", "SrcMainBaseObject")
 
     @Test
-    fun testAbstractClass() = verifyParser("AbstractClass", "example/file/path6")
+    fun testAbstractClass() = verifyParser("AbstractClass", "example/file/path6", "SrcMainBaseAbstract")
 
     @Test
-    fun testEnumClass() = verifyParser("EnumClass", "example/file/path7")
+    fun testEnumClass() = verifyParser("EnumClass", "example/file/path7", "SrcMainBaseEnum")
 
     @Test
-    fun testClassWithDistinctDependencies() = verifyParser("ClassWithDistinctDeps", "example/file/path8")
+    fun testClassWithDistinctDependencies() = verifyParser("ClassWithDistinctDeps", "example/file/path8", "SrcMainBaseDistinct")
 
     @Test
-    fun testClassWithUsages() = verifyParser("ClassWithUsages", "example/file/path9")
+    fun testClassWithUsages() = verifyParser("ClassWithUsages", "example/file/path9", "SrcMainBaseUsages")
 
     @Test
-    fun testClassWithAliasDeps() = verifyParser("ClassWithAliasDeps", "example/file/path10")
+    fun testClassWithAliasDeps() = verifyParser("ClassWithAliasDeps", "example/file/path10", "SrcMainBaseAlias")
 
-    private fun verifyParser(id: String, filePath: String) {
+    @Test
+    fun testMultipleClassesHaveSameInstance() {
+        val idFirst = "UsageClassB"
+        val filePathFirst = "example/file/path11"
+        val idSecond = "ClassWithUsages"
+        val filePathSecond = "example/file/path12"
+        val rootPath = "MultipleClassesRootPath"
         val parser = KotlinParser.getInstance()
-        val result = parser.parse(readInput(id), id, filePath)
+        val resultFirst = parser.parse(readInput(idFirst), idFirst, filePathFirst, rootPath)!!
+        val resultSecond = parser.parse(readInput(idSecond), idSecond, filePathSecond, rootPath)!!
+        val resultImportFromSecond = resultSecond.fileImports.first { it.name == idFirst}
+        Truth.assertThat(resultFirst.item).isSameInstanceAs(resultImportFromSecond)
+    }
+
+    private fun verifyParser(id: String, filePath: String, rootPath: String) {
+        val parser = KotlinParser.getInstance()
+        val result = parser.parse(readInput(id), id, filePath, rootPath)
         val expected = readOutput(id, filePath)
         Truth.assertThat(result).isEqualTo(expected)
     }
@@ -76,7 +90,8 @@ internal class KotlinParserTest {
             type = KlassTypeData(
                 type = KlassType.entries.firstOrNull { it.id == elementType } ?: throw IllegalArgumentException("Type \'$elementType\' not supported"),
                 methods = jsonObject["methods"]!!.jsonArray.map { it.jsonPrimitive.content },
-                filePath = filePath
+                filePath = filePath,
+                codeBaseName = jsonObject["codeBaseName"]!!.jsonPrimitive.content
             ),
             fileImports = jsonObject["fileImports"]!!.jsonArray.map { it.toKlassItem() },
             parameters = jsonObject["parameters"]!!.jsonArray.map { it.toKlassItem() },
@@ -120,5 +135,4 @@ internal class KotlinParserTest {
         private const val INPUT_POSTFIX = ".kt"
         private const val OUTPUT_POSTFIX = "_result.json"
     }
-//TODO: VERIFY SAME INSTANCE IS CREATED IN KOTLIN PARSER FOR ALL KLASS ITEMS
 }

@@ -2,6 +2,7 @@
   "name": "DataClassWithParameters",
   "package": "com.example.a",
   "type": "data class",
+  "codeBaseName": "SrcMainBaseParameters",
   "fileImports": [
     {
       "package": "com.example.b",

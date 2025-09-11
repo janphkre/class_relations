@@ -2,6 +2,7 @@
   "name": "AbstractClass",
   "package": "com.example.a",
   "type": "abstract class",
+  "codeBaseName": "SrcMainBaseAbstract",
   "fileImports": [],
   "parameters": [],
   "inheritances": [],

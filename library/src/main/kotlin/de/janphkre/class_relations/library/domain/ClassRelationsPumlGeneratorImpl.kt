@@ -50,8 +50,7 @@ internal class ClassRelationsPumlGeneratorImpl(
 
     override fun generateEmpty(
         filePackage: List<String>,
-        childPackages: Collection<String>,
-        sourcesLink: String
+        childPackages: Collection<String>
     ): String {
         packageIndex = 0
         return StringBuilder(generatorSettings.initialCapacitySize).apply {

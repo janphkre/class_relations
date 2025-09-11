@@ -2,6 +2,7 @@
   "name": "ObjectWithInheritances",
   "package": "com.example.a",
   "type": "object",
+  "codeBaseName": "SrcMainBaseObject",
   "fileImports": [
     {
       "package": "io.other",

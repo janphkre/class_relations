@@ -2,6 +2,7 @@
   "name": "ClassWithAliasDeps",
   "package": "com.example.a",
   "type": "class",
+  "codeBaseName": "SrcMainBaseAlias",
   "fileImports": [
     {
       "package": "com.example.b",

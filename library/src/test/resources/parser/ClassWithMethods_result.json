@@ -2,6 +2,7 @@
   "name": "ClassWithMethods",
   "package": "com.example.a",
   "type": "class",
+  "codeBaseName": "SrcMainBaseMethods",
   "fileImports": [],
   "parameters": [],
   "inheritances": [],

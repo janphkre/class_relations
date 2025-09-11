@@ -2,6 +2,7 @@
   "name": "InterfaceWithMethods",
   "package": "com.example.a",
   "type": "interface",
+  "codeBaseName": "SrcMainBaseInterfaceMethods",
   "fileImports": [],
   "parameters": [],
   "inheritances": [],

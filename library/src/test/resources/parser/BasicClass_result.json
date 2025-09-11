@@ -2,6 +2,7 @@
   "name": "BasicClass",
   "package": "com.example.a",
   "type": "class",
+  "codeBaseName": "SrcMainBase",
   "fileImports": [],
   "parameters": [],
   "inheritances": [],
