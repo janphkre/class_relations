@@ -1,7 +1,7 @@
 @startuml
 !$pathToDocsBase = "../aaa"
-package "aaa" #00FF00 {
-    package "[[$pathToDocsBase/bbb/example_relations.puml bbb]]" as p\$_0 #ffffff {
+package "aaa" as p\$_0 #00FF00 {
+    package "[[$pathToDocsBase/bbb/example_relations.puml bbb]]" as p\$_1 #ffffff {
     }
 }
 @enduml

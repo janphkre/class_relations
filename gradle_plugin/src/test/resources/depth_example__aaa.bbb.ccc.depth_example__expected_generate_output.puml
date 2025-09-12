@@ -4,7 +4,7 @@
 package "[[$pathToDocsBase/example_relations.puml aaa]]" as p\$_0 #ffffff {
     package "[[$pathToDocsBase/bbb/example_relations.puml bbb]]" as p\$_1 #ffffff {
         package "[[$pathToDocsBase/bbb/ccc/example_relations.puml ccc]]" as p\$_2 #ffffff {
-            package "depth_example" #00FF00 {
+            package "depth_example" as p\$_3 #00FF00 {
                 class "[[$pathToSources/aaa/bbb/ccc/depth_example/BasicClass.kt BasicClass]]" as BasicClass {
                 }
             }

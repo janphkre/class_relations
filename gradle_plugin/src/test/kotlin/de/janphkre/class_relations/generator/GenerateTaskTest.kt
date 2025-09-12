@@ -28,7 +28,7 @@ class GenerateTaskTest {
     val testDirectory = TemporaryFolder()
 
     @Test
-    fun action_runsThroughFiles() {
+    fun actionOnBase_runsThroughFiles() {
         val destinationFolder = testDirectory.newFolder("destination")
         val sourceFolder = testDirectory.newFolder("sources")
         fillSourceFolder(usecase = "basic_example", target = sourceFolder)
@@ -69,7 +69,7 @@ class GenerateTaskTest {
 
 
     @Test
-    fun action_createsEmptyDiagramsForStructure() {
+    fun actionOnDepth_createsEmptyDiagramsForStructure() {
         val destinationFolder = testDirectory.newFolder("destination")
         val sourceFolder = testDirectory.newFolder("sources")
         val sourceDepthFolder = File(sourceFolder, "aaa/bbb/ccc")
@@ -115,8 +115,56 @@ class GenerateTaskTest {
             .isEqualTo(readFile("src/test/resources/depth_example__aaa.bbb.ccc.depth_example__expected_generate_output.puml"))
     }
 
+
     @Test
-    fun multipleRoots_CreatesSingleDiagram() {
+    fun actionOnDepth_skipsProjectPackagePrefix() {
+        val destinationFolder = testDirectory.newFolder("destination")
+        val sourceFolder = testDirectory.newFolder("sources")
+        val sourceDepthFolder = File(sourceFolder, "aaa/bbb/ccc")
+        fillSourceFolder(usecase = "depth_example", target = sourceDepthFolder)
+
+        val buildFile = testDirectory.newFile("build.gradle")
+
+        buildFile.writeText("""
+            plugins {
+                id 'com.github.janphkre.class_relations'
+            }
+            
+            pumlGenerate {
+                projectPackagePrefix = "aaa.bbb.ccc"
+                selfColor = "#00FF00"
+                spaceCount = 4
+                generatedFileName = "example_relations.puml"
+                destination = new File("${destinationFolder.absolutePath.replace('\\','/')}")
+                sources = [new File("${sourceFolder.absolutePath.replace('\\','/')}")]
+            }
+        """.trimIndent())
+
+        val result = GradleRunner.create()
+            .withProjectDir(testDirectory.root)
+            .withPluginClasspath()
+            .withArguments("generateClassRelationsPuml")
+            .forwardOutput()
+            .build()
+
+        destinationFolder.printDestinationStructure()
+
+        var child = "example_relations.puml"
+        Truth.assertWithMessage(child).that(File(destinationFolder, child).exists()).isFalse()
+        child = "aaa/example_relations.puml"
+        Truth.assertWithMessage(child).that(File(destinationFolder, child).exists()).isFalse()
+        child = "aaa/bbb/example_relations.puml"
+        Truth.assertWithMessage(child).that(File(destinationFolder, child).exists()).isFalse()
+        child = "aaa/bbb/ccc/example_relations.puml"
+        Truth.assertWithMessage(child).that(readFile(File(destinationFolder, child)))
+            .isEqualTo(readFile("src/test/resources/depth_example_with_prefix__aaa.bbb.ccc__expected_generate_output.puml"))
+        child = "aaa/bbb/ccc/depth_example/example_relations.puml"
+        Truth.assertWithMessage(child).that(readFile(File(destinationFolder, child)))
+            .isEqualTo(readFile("src/test/resources/depth_example_with_prefix__aaa.bbb.ccc.depth_example__expected_generate_output.puml"))
+    }
+
+    @Test
+    fun actionOnMultipleRoots_CreatesSingleDiagram() {
         val destinationFolder = testDirectory.newFolder("destination")
         val sourceFolder1 = testDirectory.newFolder("sources1")
         val sourceFolder2 = testDirectory.newFolder("sources2")

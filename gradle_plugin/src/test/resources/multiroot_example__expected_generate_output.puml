@@ -2,7 +2,7 @@
 !$pathToSources1 = "../../sources1"
 !$pathToSources2 = "../../sources2"
 !$pathToDocsBase = "../multiroot_example"
-package "multiroot_example" #00FF00 {
+package "multiroot_example" as p\$_0 #00FF00 {
     class "[[$pathToSources1/multiroot_example/BasicClass1.kt BasicClass1]]" as BasicClass1 {
     }
     class "[[$pathToSources2/multiroot_example/BasicClass2.kt BasicClass2]]" as BasicClass2 {

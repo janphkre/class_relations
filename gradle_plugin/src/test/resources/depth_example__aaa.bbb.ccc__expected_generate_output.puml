@@ -2,8 +2,8 @@
 !$pathToDocsBase = "../../../aaa"
 package "[[$pathToDocsBase/example_relations.puml aaa]]" as p\$_0 #ffffff {
     package "[[$pathToDocsBase/bbb/example_relations.puml bbb]]" as p\$_1 #ffffff {
-        package "ccc" #00FF00 {
-            package "[[$pathToDocsBase/bbb/ccc/depth_example/example_relations.puml depth_example]]" as p\$_2 #ffffff {
+        package "ccc" as p\$_2 #00FF00 {
+            package "[[$pathToDocsBase/bbb/ccc/depth_example/example_relations.puml depth_example]]" as p\$_3 #ffffff {
             }
         }
     }

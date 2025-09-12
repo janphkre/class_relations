@@ -1,7 +1,7 @@
 @startuml
 !$pathToSources = "../../sources"
 !$pathToDocsBase = "../basic_example"
-package "basic_example" #00FF00 {
+package "basic_example" as p\$_0 #00FF00 {
     class "[[$pathToSources/basic_example/BasicClass.kt BasicClass]]" as BasicClass {
     }
     class "[[$pathToSources/basic_example/ClassWithDistinctDeps.kt ClassWithDistinctDeps]]" as ClassWithDistinctDeps {
@@ -19,17 +19,17 @@ package "basic_example" #00FF00 {
     enum "[[$pathToSources/basic_example/EnumClass.kt EnumClass]]" as EnumClass {
     }
 }
-package "com.example" as p\$_0 #ffffff {
-    package "b" as p\$_1 #ffffff {
+package "com.example" as p\$_1 #ffffff {
+    package "b" as p\$_2 #ffffff {
         interface "ParameterClassB"
         interface "UsageClassB"
         interface "UsageClassC"
     }
-    package "c" as p\$_2 #ffffff {
+    package "c" as p\$_3 #ffffff {
         interface "ParameterClassD"
     }
 }
-package "io.other" as p\$_3 #ffffff {
+package "io.other" as p\$_4 #ffffff {
     interface "ParameterClassE"
     interface "UsageClassE"
     interface "UsageClassF"

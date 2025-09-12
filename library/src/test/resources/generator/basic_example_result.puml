@@ -2,7 +2,7 @@
 !$pathToExampleRootGenerated = "../../../example/root/generated"
 !$pathToDocsBase = "../../../org/example"
 package "[[$pathToDocsBase/example_relations.puml org.example]]" as p\$_0 #ffffff {
-    package "a" #00FFFF {
+    package "a" as p\$_1 #00FFFF {
         class "[[$pathToExampleRootGenerated/src/main/org/example/a/ExampleClassName1.kt ExampleClassName1]]" as ExampleClassName1 {
             {method} methodA
             {method} methodB
@@ -29,13 +29,13 @@ package "[[$pathToDocsBase/example_relations.puml org.example]]" as p\$_0 #fffff
             {method} methodI
         }
     }
-    package "[[$pathToDocsBase/b/example_relations.puml b]]" as p\$_1 #ffffff {
+    package "[[$pathToDocsBase/b/example_relations.puml b]]" as p\$_2 #ffffff {
         interface "ExampleClassName2"
         interface "ExampleClassName3"
         interface "ExampleClassName4"
     }
 }
-package "io.different" as p\$_2 #ffffff {
+package "io.different" as p\$_3 #ffffff {
     interface "Something"
 }
 

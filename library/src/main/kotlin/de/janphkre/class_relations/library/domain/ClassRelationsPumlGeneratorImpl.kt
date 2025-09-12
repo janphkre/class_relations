@@ -313,7 +313,7 @@ internal class ClassRelationsPumlGeneratorImpl(
     }
 
     private fun StringBuilder.beginSelfPackage(name: String) {
-        appendContent("package \"$name\" ${generatorSettings.selfColor} {")
+        appendContent("package \"$name\" as p\\\$_${packageIndex++} ${generatorSettings.selfColor} {")
         openPackages.push(name)
     }
 
