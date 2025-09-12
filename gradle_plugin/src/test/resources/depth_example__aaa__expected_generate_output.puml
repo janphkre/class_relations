@@ -1,5 +1,4 @@
 @startuml
-!$pathToCodeBase = "../../sources"
 !$pathToDocsBase = "../aaa"
 package "aaa" #00FF00 {
     package "[[$pathToDocsBase/bbb/example_relations.puml bbb]]" as p\$_0 #ffffff {

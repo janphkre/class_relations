@@ -29,9 +29,13 @@ class GeneratorPlugin : Plugin<Project> {
             task.destination.set(extension.destination.convention(
                 target.layout.buildDirectory.map { File(it.asFile, DEFAULT_DESTINATION) })
             )
-            task.sources.set(extension.sources.convention(
-                listOf(File(target.projectDir, DEFAULT_SOURCE)))
+            val inputSources = extension.sources.convention(
+                listOf(File(target.projectDir, DEFAULT_SOURCE))
             )
+            task.sources.set(inputSources)
+            for (input in inputSources.get()) {
+                task.inputs.dir(input)
+            }
             task.filters.set(extension.filters.convention(emptyList()))
             val compositeSettings = extension.projectPackagePrefix.flatMap { prefix ->
                 extension.selfColor.flatMap { color ->

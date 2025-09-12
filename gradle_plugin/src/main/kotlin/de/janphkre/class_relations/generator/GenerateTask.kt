@@ -35,7 +35,7 @@ abstract class GenerateTask: DefaultTask() {
     @get:OutputDirectory
     abstract val destination: Property<File>
 
-    @get:InputDirectory
+    @get:Input
     abstract val sources: ListProperty<File>
 
     @get:Input
@@ -67,9 +67,13 @@ abstract class GenerateTask: DefaultTask() {
         val destinationDir = destination.get()
         val sourceAssociations = sourceDirs.associateWith { dir ->
             val sourcePath = dir.toRelativeForwardSlashString(destinationDir)
-            val name = sourcePath.split(PATH_DELIMITER).joinToString { it.capitalized() }
+            val name = sourcePath
+                .split(PATH_DELIMITER)
+                .filterNot { it == ".." }
+                .joinToString("") { it.capitalized() }
             (name to sourcePath)
         }
+        println("Associations:\n${sourceAssociations.entries.joinToString("\n"){"\"${it.key}\"=\"${it.value.first}\";\"${it.value.second}\""}}")
         val sourceNames = sourceAssociations.mapValues { it.value.first }
         val sourcePathsFromDestination = sourceAssociations.values.associate { it.first to it.second }
         Sequence { MultiRootFileTreeWalker(sourceDirs, onLeave = { directory ->

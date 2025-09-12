@@ -29,7 +29,6 @@ class GenerateTaskTest {
 
     @Test
     fun action_runsThroughFiles() {
-        val moduleFolder = testDirectory.newFolder("exampleModuleFolder")
         val destinationFolder = testDirectory.newFolder("destination")
         val sourceFolder = testDirectory.newFolder("sources")
         fillSourceFolder("basic_example", sourceFolder)
@@ -38,7 +37,7 @@ class GenerateTaskTest {
 
         buildFile.writeText("""
             plugins {
-                id 'de.janphkre.class_relations'
+                id 'com.github.janphkre.class_relations'
             }
             
             pumlGenerate {
@@ -47,8 +46,7 @@ class GenerateTaskTest {
                 spaceCount = 4
                 generatedFileName = "example_relations.puml"
                 destination = new File("${destinationFolder.absolutePath.replace('\\','/')}")
-                moduleDirectory = new File("${moduleFolder.absolutePath.replace('\\','/')}")
-                source = new File("${sourceFolder.absolutePath.replace('\\','/')}")
+                sources = [new File("${sourceFolder.absolutePath.replace('\\','/')}")]
                 filters = [
                     "io.other.UsageClassD",
                     "com.example.b.ParameterClassC"
@@ -82,7 +80,7 @@ class GenerateTaskTest {
 
         buildFile.writeText("""
             plugins {
-                id 'de.janphkre.class_relations'
+                id 'com.github.janphkre.class_relations'
             }
             
             pumlGenerate {
@@ -91,8 +89,7 @@ class GenerateTaskTest {
                 spaceCount = 4
                 generatedFileName = "example_relations.puml"
                 destination = new File("${destinationFolder.absolutePath.replace('\\','/')}")
-                moduleDirectory = new File("${moduleFolder.absolutePath.replace('\\','/')}")
-                source = new File("${sourceFolder.absolutePath.replace('\\','/')}")
+                sources = [new File("${sourceFolder.absolutePath.replace('\\','/')}")]
             }
         """.trimIndent())
 
