@@ -24,11 +24,6 @@ import kotlin.test.Test
 
 internal class SortedFileTreeWalkerTest {
 
-    private data class WalkerItem(
-        val fileName: String,
-        val fromOnLeave: Boolean
-    )
-
     @Test
     fun sortedFileTreeWalkerIteratesFilesAsExpected() {
         val input = mockDir(
@@ -76,6 +71,11 @@ internal class SortedFileTreeWalkerTest {
         walker.forEach { result.add(WalkerItem(it.name, false)) }
         expect(result).toContainExactlyElementsOf(expectedResult)
     }
+
+    private data class WalkerItem(
+        val fileName: String,
+        val fromOnLeave: Boolean
+    )
 
     private fun mockDir(name: String, vararg entries: File): File {
         return mockk<File> {

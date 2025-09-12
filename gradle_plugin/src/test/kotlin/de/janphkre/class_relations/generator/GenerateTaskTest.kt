@@ -31,7 +31,7 @@ class GenerateTaskTest {
     fun action_runsThroughFiles() {
         val destinationFolder = testDirectory.newFolder("destination")
         val sourceFolder = testDirectory.newFolder("sources")
-        fillSourceFolder("basic_example", sourceFolder)
+        fillSourceFolder(usecase = "basic_example", target = sourceFolder)
 
         val buildFile = testDirectory.newFile("build.gradle")
 
@@ -70,11 +70,10 @@ class GenerateTaskTest {
 
     @Test
     fun action_createsEmptyDiagramsForStructure() {
-        val moduleFolder = testDirectory.newFolder("exampleModuleFolder")
         val destinationFolder = testDirectory.newFolder("destination")
         val sourceFolder = testDirectory.newFolder("sources")
         val sourceDepthFolder = File(sourceFolder, "aaa/bbb/ccc")
-        fillSourceFolder("depth_example", sourceDepthFolder)
+        fillSourceFolder(usecase = "depth_example", target = sourceDepthFolder)
 
         val buildFile = testDirectory.newFile("build.gradle")
 
@@ -116,6 +115,48 @@ class GenerateTaskTest {
             .isEqualTo(readFile("src/test/resources/depth_example__aaa.bbb.ccc.depth_example__expected_generate_output.puml"))
     }
 
+    @Test
+    fun multipleRoots_CreatesSingleDiagram() {
+        val destinationFolder = testDirectory.newFolder("destination")
+        val sourceFolder1 = testDirectory.newFolder("sources1")
+        val sourceFolder2 = testDirectory.newFolder("sources2")
+        fillSourceFolder("multiroot_example1", "multiroot_example", sourceFolder1)
+        fillSourceFolder("multiroot_example2", "multiroot_example", sourceFolder2)
+
+        val buildFile = testDirectory.newFile("build.gradle")
+
+        buildFile.writeText("""
+            plugins {
+                id 'com.github.janphkre.class_relations'
+            }
+            
+            pumlGenerate {
+                projectPackagePrefix = "multiroot_example"
+                selfColor = "#00FF00"
+                spaceCount = 4
+                generatedFileName = "example_relations.puml"
+                destination = new File("${destinationFolder.absolutePath.replace('\\','/')}")
+                sources = [
+                    new File("${sourceFolder1.absolutePath.replace('\\','/')}"),
+                    new File("${sourceFolder2.absolutePath.replace('\\','/')}"),
+                ]
+                filters = []
+            }
+        """.trimIndent())
+
+        val result = GradleRunner.create()
+            .withProjectDir(testDirectory.root)
+            .withPluginClasspath()
+            .withArguments("generateClassRelationsPuml")
+            .forwardOutput()
+            .build()
+
+        destinationFolder.printDestinationStructure()
+
+        Truth.assertThat(readFile(File(destinationFolder, "multiroot_example/example_relations.puml")))
+            .isEqualTo(readFile("src/test/resources/multiroot_example__expected_generate_output.puml"))
+    }
+
     private fun File.printDestinationStructure() {
         println("Destination Folder content:")
         var spaceCount = 0
@@ -128,9 +169,9 @@ class GenerateTaskTest {
             .forEach { println("${" ".repeat(spaceCount)}${it.name}") }
     }
 
-    private fun fillSourceFolder(usecase: String, target: File) {
+    private fun fillSourceFolder(usecase: String, sourceDirName: String = usecase, target: File) {
         target.mkdirs()
-        val usecaseFile = File(target,usecase)
+        val usecaseFile = File(target, sourceDirName)
         usecaseFile.mkdir()
         val sourceFiles = File("src/test/resources/$usecase").listFiles()
         sourceFiles!!.forEach { source ->

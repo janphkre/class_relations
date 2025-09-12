@@ -106,16 +106,16 @@ class MultiRootFileTreeWalker(roots: Collection<File>, private val onLeave: (Ope
         return this.flatMap { it.subDirectories }.groupBy { it.file.name }
     }
 
-    data class Directory(
+    private data class Directory(
         val files: List<FileInRoot>,
         val directory: FileInRoot,
         val subDirectories: List<FileInRoot>
     ) {
-        internal val filesIterator
+        val filesIterator
             get() = files.iterator()
     }
 
-    class GroupedDirectoriesFilesIterator(
+    private class GroupedDirectoriesFilesIterator(
         directories: List<Directory>
     ) : Iterator<FileInRoot> {
 
@@ -133,7 +133,11 @@ class MultiRootFileTreeWalker(roots: Collection<File>, private val onLeave: (Ope
         }
 
         override fun hasNext(): Boolean {
-            return innerIterator?.hasNext() ?: computeNextInner()
+            val innerIteratorNext = innerIterator?.hasNext()
+            if (innerIteratorNext != true) {
+                return computeNextInner()
+            }
+            return true
         }
 
         override fun next(): FileInRoot {

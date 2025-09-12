@@ -73,7 +73,6 @@ abstract class GenerateTask: DefaultTask() {
                 .joinToString("") { it.capitalized() }
             (name to sourcePath)
         }
-        println("Associations:\n${sourceAssociations.entries.joinToString("\n"){"\"${it.key}\"=\"${it.value.first}\";\"${it.value.second}\""}}")
         val sourceNames = sourceAssociations.mapValues { it.value.first }
         val sourcePathsFromDestination = sourceAssociations.values.associate { it.first to it.second }
         Sequence { MultiRootFileTreeWalker(sourceDirs, onLeave = { directory ->

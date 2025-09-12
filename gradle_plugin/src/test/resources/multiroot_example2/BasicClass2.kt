@@ -1,0 +1,3 @@
+package multiroot_example
+
+internal class BasicClass2
