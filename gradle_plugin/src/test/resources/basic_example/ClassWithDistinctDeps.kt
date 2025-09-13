@@ -5,7 +5,7 @@ import com.example.b.ParameterClassB
 import com.example.b.ParameterClassC
 import com.example.c.ParameterClassD
 import com.example.c.ParameterClassD
-import io.other.ParameterClassE
+import com.other.ParameterClassE
 
 class ClassWithDistinctDeps(
     private val parameterA1: ParameterClassA,

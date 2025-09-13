@@ -205,6 +205,50 @@ class GenerateTaskTest {
             .isEqualTo(readFile("src/test/resources/multiroot_example__expected_generate_output.puml"))
     }
 
+    @Test
+    fun actionOnBase_CreatesLinksInDiagram() {
+        val destinationFolder = testDirectory.newFolder("destination")
+        val sourceFolder = testDirectory.newFolder("sources")
+        val externalFolder = testDirectory.newFolder("external_com_example")
+        fillSourceFolder(usecase = "basic_example", target = sourceFolder)
+        val externalFile = File(externalFolder, "example_relations.puml")
+
+        val buildFile = testDirectory.newFile("build.gradle")
+        buildFile.writeText("""
+            plugins {
+                id 'com.github.janphkre.class_relations'
+            }
+            
+            pumlGenerate {
+                projectPackagePrefix = "basic_example"
+                selfColor = "#00FF00"
+                spaceCount = 4
+                generatedFileName = "example_relations.puml"
+                destination = new File("${destinationFolder.absolutePath.replace('\\','/')}")
+                sources = [new File("${sourceFolder.absolutePath.replace('\\','/')}")]
+                filters = [
+                    "io.other.UsageClassD",
+                    "com.example.b.ParameterClassC"
+                ]
+                externalLinks = [
+                    new kotlin.Pair("com.example", new File("${externalFile.absolutePath.replace('\\','/')}"))
+                ]
+            }
+        """.trimIndent())
+
+        val result = GradleRunner.create()
+            .withProjectDir(testDirectory.root)
+            .withPluginClasspath()
+            .withArguments("generateClassRelationsPuml")
+            .forwardOutput()
+            .build()
+
+        destinationFolder.printDestinationStructure()
+
+        Truth.assertThat(readFile(File(destinationFolder, "basic_example/example_relations.puml")))
+            .isEqualTo(readFile("src/test/resources/link_example__expected_generate_output.puml"))
+    }
+
     private fun File.printDestinationStructure() {
         println("Destination Folder content:")
         var spaceCount = 0

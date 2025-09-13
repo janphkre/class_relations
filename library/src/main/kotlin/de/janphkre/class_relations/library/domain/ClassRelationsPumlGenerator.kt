@@ -30,14 +30,23 @@ interface ClassRelationsPumlGenerator {
 
     // All klasses must belong to the same package / folder!
     // SourcesLinks needs capitalized keys
-    fun generate(klasses: List<KlassWithRelations>, childPackages: Collection<String>, sourcesLinks: Map<String, String>): String
+    fun generate(
+        klasses: List<KlassWithRelations>,
+        childPackages: Collection<String>,
+    ): String
 
     fun generateEmpty(filePackage: List<String>, childPackages: Collection<String>): String
 
     companion object {
-        fun getInstance(settings: Settings): ClassRelationsPumlGenerator {
+        fun getInstance(
+            settings: Settings,
+            sourcesLinks: Map<String, String>,
+            externalLinks: Map<String, String>,
+        ): ClassRelationsPumlGenerator {
             return ClassRelationsPumlGeneratorImpl(
-                settings
+                settings,
+                sourcesLinks,
+                externalLinks
             )
         }
     }

@@ -67,4 +67,10 @@ interface GeneratorExtension {
      * "*" and "**" are accepted as in a glob.
      */
     val filters: ListProperty<String>
+
+    /**
+     * Define a set of explicit links that are marked in the diagrams upon matching the defined key.
+     * This can be links to external packages or external classes (imports).
+     */
+    val externalLinks: ListProperty<Pair<String, File>>
 }

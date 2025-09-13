@@ -50,9 +50,9 @@ class GeneratorPlugin : Plugin<Project> {
                         }
                     }
                 }
-
             }
             task.generatorSettings.set(compositeSettings)
+            task.externalLinks.set(extension.externalLinks.convention(emptyList()))
         }
     }
 

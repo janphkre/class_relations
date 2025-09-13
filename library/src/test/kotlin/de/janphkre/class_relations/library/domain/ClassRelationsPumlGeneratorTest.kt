@@ -41,12 +41,13 @@ class ClassRelationsPumlGeneratorTest {
     private fun verifyGenerator(id: String) {
         val (generatorSettings, klasses, packages) = readInput(id)
         val generator = ClassRelationsPumlGenerator.getInstance(
-            generatorSettings
+            generatorSettings,
+            mapOf("ExampleRootGenerated" to "example/root/generated"),
+            emptyMap()
         )
         val result = generator.generate(
             klasses = klasses,
             childPackages = packages,
-            sourcesLinks = mapOf("ExampleRootGenerated" to "example/root/generated")
         )
         Truth.assertThat(result).isEqualTo(readOutput(id))
     }
@@ -54,7 +55,9 @@ class ClassRelationsPumlGeneratorTest {
     private fun verifyGeneratorEmpty(id: String) {
         val (generatorSettings, klasses, packages) = readInput(id)
         val generator = ClassRelationsPumlGenerator.getInstance(
-            generatorSettings
+            generatorSettings,
+            emptyMap(),
+            emptyMap()
         )
         val result = generator.generateEmpty(
             filePackage = klasses.first().item.filePackage,

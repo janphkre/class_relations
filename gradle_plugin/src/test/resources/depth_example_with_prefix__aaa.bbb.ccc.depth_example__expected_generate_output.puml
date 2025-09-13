@@ -1,9 +1,10 @@
 @startuml
-!$pathToSources = "../../../../../sources"
-!$pathToDocsBase = "../../../../aaa/bbb/ccc"
+!$pathToRoot = "../../../.."
+!$pathToSourceSources = "$pathToRoot/../sources"
+!$pathToDocsBase = "$pathToRoot/aaa/bbb/ccc"
 package "[[$pathToDocsBase/example_relations.puml aaa.bbb.ccc]]" as p\$_0 #ffffff {
     package "depth_example" as p\$_1 #00FF00 {
-        class "[[$pathToSources/aaa/bbb/ccc/depth_example/BasicClass.kt BasicClass]]" as BasicClass {
+        class "[[$pathToSourceSources/aaa/bbb/ccc/depth_example/BasicClass.kt BasicClass]]" as BasicClass {
         }
     }
 }

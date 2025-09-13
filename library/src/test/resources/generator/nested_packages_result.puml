@@ -1,9 +1,10 @@
 @startuml
-!$pathToExampleRootGenerated = "../../../example/root/generated"
-!$pathToDocsBase = "../../../org/example"
+!$pathToRoot = "../../.."
+!$pathToSourceExampleRootGenerated = "$pathToRoot/example/root/generated"
+!$pathToDocsBase = "$pathToRoot/org/example"
 package "[[$pathToDocsBase/example_relations.puml org.example]]" as p\$_0 #ffffff {
     package "a" as p\$_1 #00FFFF {
-        class "[[$pathToExampleRootGenerated/src/main/org/example/a/ExampleClassName1.kt ExampleClassName1]]" as ExampleClassName1 {
+        class "[[$pathToSourceExampleRootGenerated/src/main/org/example/a/ExampleClassName1.kt ExampleClassName1]]" as ExampleClassName1 {
             {method} methodA
             {method} methodB
             {method} methodC

@@ -1,31 +1,32 @@
 @startuml
-!$pathToExampleRootGenerated = "../../../example/root/generated"
-!$pathToDocsBase = "../../../org/example"
+!$pathToRoot = "../../.."
+!$pathToSourceExampleRootGenerated = "$pathToRoot/example/root/generated"
+!$pathToDocsBase = "$pathToRoot/org/example"
 package "[[$pathToDocsBase/example_relations.puml org.example]]" as p\$_0 #ffffff {
     package "a" as p\$_1 #00FFFF {
-        class "[[$pathToExampleRootGenerated/src/main/org/example/a/ExampleClassName1.kt ExampleClassName1]]" as ExampleClassName1 {
+        class "[[$pathToSourceExampleRootGenerated/src/main/org/example/a/ExampleClassName1.kt ExampleClassName1]]" as ExampleClassName1 {
             {method} methodA
             {method} methodB
             {method} methodC
         }
-        class "[[$pathToExampleRootGenerated/src/main/org/example/a/ExampleClassName5.kt ExampleClassName5]]" as ExampleClassName5 {
+        class "[[$pathToSourceExampleRootGenerated/src/main/org/example/a/ExampleClassName5.kt ExampleClassName5]]" as ExampleClassName5 {
             {method} methodD
             {method} methodE
             {method} methodF
         }
-        enum "[[$pathToExampleRootGenerated/src/main/org/example/a/ExampleEnumClassName6.kt ExampleEnumClassName6]]" as ExampleEnumClassName6 {
+        enum "[[$pathToSourceExampleRootGenerated/src/main/org/example/a/ExampleEnumClassName6.kt ExampleEnumClassName6]]" as ExampleEnumClassName6 {
             {method} methodG
         }
-        entity "[[$pathToExampleRootGenerated/src/main/org/example/a/ExampleDataClassName7.kt ExampleDataClassName7]]" as ExampleDataClassName7 {
+        entity "[[$pathToSourceExampleRootGenerated/src/main/org/example/a/ExampleDataClassName7.kt ExampleDataClassName7]]" as ExampleDataClassName7 {
         }
-        interface "[[$pathToExampleRootGenerated/src/main/org/example/a/ExampleInterface.kt ExampleInterface]]" as ExampleInterface {
+        interface "[[$pathToSourceExampleRootGenerated/src/main/org/example/a/ExampleInterface.kt ExampleInterface]]" as ExampleInterface {
             {method} methodB
         }
-        abstract class "[[$pathToExampleRootGenerated/src/main/org/example/a/ExampleAbstractClassName8.kt ExampleAbstractClassName8]]" as ExampleAbstractClassName8 {
+        abstract class "[[$pathToSourceExampleRootGenerated/src/main/org/example/a/ExampleAbstractClassName8.kt ExampleAbstractClassName8]]" as ExampleAbstractClassName8 {
             {method} methodH
             {method} methodC
         }
-        class "[[$pathToExampleRootGenerated/src/main/org/example/a/ExampleObject.kt ExampleObject]]" as ExampleObject {
+        class "[[$pathToSourceExampleRootGenerated/src/main/org/example/a/ExampleObject.kt ExampleObject]]" as ExampleObject {
             {method} methodI
         }
     }

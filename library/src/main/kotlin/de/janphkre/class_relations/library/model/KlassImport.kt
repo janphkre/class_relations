@@ -20,6 +20,7 @@ sealed interface KlassImport {
 
     data class Package(
         override val name: String,
+        val qualifiedName: String,
         val elements: List<KlassImport>
     ) : KlassImport {
         override fun hashCode(): Int {
