@@ -24,7 +24,15 @@ import java.io.File
  */
 interface GeneratorExtension {
     /**
-     * The project package prefix as in the base package where the project / module is defined in.
+     * The project base prefix as in the base package where the project is defined in.
+     * Should be a subset of the module prefix.
+     * Most of the time this may be part of the library id potentially shared across multiple modules.
+     * Optional, picks the projectPackagePrefix as a default value.
+     */
+    val projectBasePrefix: Property<String>
+
+    /**
+     * The full project package prefix as in the base package where the project / module is defined in.
      * Most of the time this may be the library id.
      */
     val projectPackagePrefix: Property<String>

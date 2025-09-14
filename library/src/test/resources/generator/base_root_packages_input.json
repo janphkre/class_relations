@@ -1,7 +1,7 @@
 {
   "generatorSettings": {
     "projectBasePrefix": "org.example",
-    "projectPackagePrefix": "org.example",
+    "projectPackagePrefix": "org.example.project",
     "selfColor": "#00FFFF",
     "spaceCount": 4,
     "generatedFileName": "example_relations.puml"
@@ -9,17 +9,17 @@
   "files": [
     {
       "name": "ExampleClassName1",
-      "package": "org.example.a",
+      "package": "org.example.project",
       "methods": [
         "methodA",
         "methodB",
         "methodC"
       ],
       "type": "class",
-      "filePath": "src/main/org/example/a/ExampleClassName1.kt",
+      "filePath": "src/main/org/example/project/ExampleClassName1.kt",
       "fileImports": [
         {
-          "package": "org.example.b",
+          "package": "org.example.project",
           "name": "ExampleClassName2"
         },
         {
@@ -35,7 +35,7 @@
           "name": "Something"
         },
         {
-          "package": "org.example.a.c",
+          "package": "org.example.project.c",
           "name": "ExampleClassName5"
         }
       ],

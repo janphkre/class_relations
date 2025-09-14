@@ -38,6 +38,9 @@ class ClassRelationsPumlGeneratorTest {
     @Test
     fun testEmptyPackagesExample() = verifyGeneratorEmpty("empty_packages")
 
+    @Test
+    fun testBaseRootPackagesExample() = verifyGenerator("base_root_packages")
+
     private fun verifyGenerator(id: String) {
         val (generatorSettings, klasses, packages) = readInput(id)
         val generator = ClassRelationsPumlGenerator.getInstance(
@@ -78,6 +81,7 @@ class ClassRelationsPumlGeneratorTest {
         val json = Json.parseToJsonElement(readFile("$file$INPUT_POSTFIX")).jsonObject
         val jsonSettings = json["generatorSettings"]!!.jsonObject
         val settings = ClassRelationsPumlGenerator.Settings(
+            projectBasePrefix = jsonSettings["projectBasePrefix"]!!.jsonPrimitive.content,
             projectPackagePrefix = jsonSettings["projectPackagePrefix"]!!.jsonPrimitive.content,
             selfColor = jsonSettings["selfColor"]!!.jsonPrimitive.content,
             spaceCount = jsonSettings["spaceCount"]!!.jsonPrimitive.int,

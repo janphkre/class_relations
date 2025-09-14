@@ -1,0 +1,37 @@
+@startuml
+!$pathToRoot = "../../.."
+!$pathToSourceExampleRootGenerated = "$pathToRoot/example/root/generated"
+!$pathToDocsBase = "$pathToRoot/org/example/project"
+package "org.example" as p\$_0 #ffffff {
+    package "project" as p\$_1 #00FFFF {
+        class "[[$pathToSourceExampleRootGenerated/src/main/org/example/project/ExampleClassName1.kt ExampleClassName1]]" as ExampleClassName1 {
+            {method} methodA
+            {method} methodB
+            {method} methodC
+        }
+        interface "ExampleClassName2"
+        package "[[$pathToDocsBase/c/example_relations.puml c]]" as p\$_2 #ffffff {
+            interface "ExampleClassName5"
+        }
+        package "[[$pathToDocsBase/depth1/example_relations.puml depth1]]" as p\$_3 #ffffff {
+        }
+        package "[[$pathToDocsBase/depth2/example_relations.puml depth2]]" as p\$_4 #ffffff {
+        }
+        package "[[$pathToDocsBase/depth3/example_relations.puml depth3]]" as p\$_5 #ffffff {
+        }
+    }
+    package "b" as p\$_6 #ffffff {
+        interface "ExampleClassName3"
+        interface "ExampleClassName4"
+    }
+}
+package "io.different" as p\$_7 #ffffff {
+    interface "Something"
+}
+
+ExampleClassName1 -down-> ExampleClassName2
+ExampleClassName1 -down-> ExampleClassName3
+ExampleClassName1 -down-> ExampleClassName4
+ExampleClassName1 -down-> Something
+ExampleClassName1 -down-> ExampleClassName5
+@enduml

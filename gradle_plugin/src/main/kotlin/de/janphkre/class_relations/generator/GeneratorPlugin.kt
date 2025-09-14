@@ -37,20 +37,25 @@ class GeneratorPlugin : Plugin<Project> {
                 task.inputs.dir(input)
             }
             task.filters.set(extension.filters.convention(emptyList()))
-            val compositeSettings = extension.projectPackagePrefix.flatMap { prefix ->
-                extension.selfColor.flatMap { color ->
-                    extension.generatedFileName.flatMap { fileName ->
-                        extension.spaceCount.map { spaceCount ->
-                            ClassRelationsPumlGenerator.Settings(
-                                projectPackagePrefix = prefix,
-                                selfColor = color,
-                                spaceCount = spaceCount,
-                                generatedFileName = fileName
-                            )
+            val compositeSettings = extension.projectBasePrefix
+                .convention(extension.projectPackagePrefix)
+                .flatMap { basePrefix ->
+                    extension.projectPackagePrefix.flatMap { packagePrefix ->
+                        extension.selfColor.flatMap { color ->
+                            extension.generatedFileName.flatMap { fileName ->
+                                extension.spaceCount.map { spaceCount ->
+                                    ClassRelationsPumlGenerator.Settings(
+                                        projectBasePrefix = basePrefix,
+                                        projectPackagePrefix = packagePrefix,
+                                        selfColor = color,
+                                        spaceCount = spaceCount,
+                                        generatedFileName = fileName
+                                    )
+                                }
+                            }
                         }
                     }
                 }
-            }
             task.generatorSettings.set(compositeSettings)
             task.externalLinks.set(extension.externalLinks.convention(emptyList()))
         }

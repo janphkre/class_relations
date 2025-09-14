@@ -21,6 +21,7 @@ import java.io.Serializable
 interface ClassRelationsPumlGenerator {
 
     data class Settings(
+        val projectBasePrefix: String,
         val projectPackagePrefix: String,
         val selfColor: String,
         val spaceCount: Int,

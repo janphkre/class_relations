@@ -24,7 +24,8 @@ internal class ClassRelationsPumlGeneratorImpl(
     private val externalLinks: Map<String, String>,
 ) : ClassRelationsPumlGenerator {
 
-    private val projectPrefix = generatorSettings.projectPackagePrefix.split('.')
+    private val projectBasePrefix = generatorSettings.projectBasePrefix.split('.')
+    private val projectRemainderPrefix = generatorSettings.projectPackagePrefix.split('.').drop(projectBasePrefix.size)
     private val openPackages = Stack<String>()
     private var packageIndex = 0
 
@@ -85,13 +86,13 @@ internal class ClassRelationsPumlGeneratorImpl(
             beginSelfPackage(filePackage.joinToString(PACKAGE_SEPARATOR))
             return
         }
-        if (projectPrefix.size == filePackage.size) {
+        if (projectBasePrefix.size == filePackage.size) {
             beginSelfPackage(filePackage.joinToString(PACKAGE_SEPARATOR))
             return
         }
-        var qualifiedName = generatorSettings.projectPackagePrefix
-        beginPackage(generatorSettings.projectPackagePrefix, qualifiedName)
-        val packages = filePackage.drop(projectPrefix.size)
+        var qualifiedName = generatorSettings.projectBasePrefix
+        beginPackage(generatorSettings.projectBasePrefix, qualifiedName)
+        val packages = filePackage.drop(projectBasePrefix.size)
         var packageLink = ""
         for (i in 0 until packages.size - 1) {
             packageLink += "/${packages[i]}"
@@ -118,10 +119,10 @@ internal class ClassRelationsPumlGeneratorImpl(
     }
 
     private fun List<String>.hasProjectPrefix(): Boolean {
-        if (size < projectPrefix.size) {
+        if (size < projectBasePrefix.size) {
             return false
         }
-        return projectPrefix.withIndex().all { (index, item) -> this[index] == item }
+        return projectBasePrefix.withIndex().all { (index, item) -> this[index] == item }
     }
 
     private fun StringBuilder.createClasses(klasses: List<KlassWithRelations>) {
@@ -148,11 +149,16 @@ internal class ClassRelationsPumlGeneratorImpl(
 
     private fun KlassImport.getCurrentImports(childPackages: Collection<String>): List<KlassImport.Package> {
         val currentImports = collectCurrentImportListFromOpenPackages()
-
-        var childPackageImports: List<KlassImport> = childPackages.map { KlassImport.Package(it, "", emptyList()) }
+        var qualifiedName = openPackages.joinToString(PACKAGE_SEPARATOR)
+        var childPackageImports: List<KlassImport> = childPackages.map {
+            KlassImport.Package(
+                name = it,
+                qualifiedName = "${qualifiedName}${PACKAGE_SEPARATOR}${it}",
+                elements = emptyList()
+            )
+        }
         val additionalImports = mutableListOf<KlassImport.Package>()
         if(openPackages.size > currentImports.size) {
-            var qualifiedName = openPackages.joinToString(PACKAGE_SEPARATOR)
             for (i in openPackages.size - 1 downTo currentImports.size) {
                 val packageImport = KlassImport.Package(
                     openPackages[i],
@@ -223,7 +229,7 @@ internal class ClassRelationsPumlGeneratorImpl(
         val externalImports = ArrayList<KlassItem>(imports.size)
         imports.forEach { input ->
             if (input.filePackage.hasProjectPrefix()) {
-                projectImports.add(input.copy(filePackage = input.filePackage.drop(projectPrefix.size)))
+                projectImports.add(input.copy(filePackage = input.filePackage.drop(projectBasePrefix.size)))
             } else {
                 externalImports.add(input)
             }
@@ -232,11 +238,11 @@ internal class ClassRelationsPumlGeneratorImpl(
             "",
             "",
             listOf(KlassImport.Package(
-                name = generatorSettings.projectPackagePrefix,
-                qualifiedName = generatorSettings.projectPackagePrefix,
+                name = generatorSettings.projectBasePrefix,
+                qualifiedName = generatorSettings.projectBasePrefix,
                 elements = groupProjectImportsInner(
                     projectImports,
-                    generatorSettings.projectPackagePrefix
+                    generatorSettings.projectBasePrefix
                 )
             ))
         ) to KlassImport.Package(
@@ -369,15 +375,18 @@ internal class ClassRelationsPumlGeneratorImpl(
     }
 
     private fun StringBuilder.beginPackage(name: String, qualifiedName: String) {
-        val packageName = if (openPackages.firstOrNull() == generatorSettings.projectPackagePrefix) {
-            val linkTarget = if (openPackages.size > 1) {
-                "${openPackages.drop(1).joinToString("/")}/$name"
+        val packageName = if (qualifiedName.startsWith(generatorSettings.projectPackagePrefix)) {
+            if (qualifiedName == generatorSettings.projectPackagePrefix) {
+                "[[\$pathToDocsBase${PATH_DELIMITER}${generatorSettings.generatedFileName} $name]]"
             } else {
-                name
+                val prefixSize = 1 + projectRemainderPrefix.size
+                val linkTarget = if (openPackages.size > prefixSize) {
+                    "${openPackages.drop(prefixSize).joinToString("$PATH_DELIMITER")}${PATH_DELIMITER}$name"
+                } else {
+                    name
+                }
+                "[[\$pathToDocsBase${PATH_DELIMITER}${linkTarget}${PATH_DELIMITER}${generatorSettings.generatedFileName} $name]]"
             }
-            "[[\$pathToDocsBase${PATH_DELIMITER}${linkTarget}${PATH_DELIMITER}${generatorSettings.generatedFileName} $name]]"
-        } else if (name == generatorSettings.projectPackagePrefix) {
-            "[[\$pathToDocsBase${PATH_DELIMITER}${generatorSettings.generatedFileName} $name]]"
         } else {
             val externalLink = externalLinks[qualifiedName]
             if (externalLink != null) {
