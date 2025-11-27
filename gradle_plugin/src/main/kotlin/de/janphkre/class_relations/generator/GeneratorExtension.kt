@@ -57,10 +57,11 @@ interface GeneratorExtension {
     val generatedFileName: Property<String>
 
     /**
-     * Set the destination folder in which the puml file structure shall be created.
-     * Defaults to "build/generated/puml_class_relations".
+     * Set the destination folder path in the build folder
+     * in which the puml file structure shall be created.
+     * Defaults to "generated/puml_class_relations".
      */
-    val destination: Property<File>
+    val destination: Property<String>
 
     /**
      * Set the source folder of the project of which puml files shall be created.

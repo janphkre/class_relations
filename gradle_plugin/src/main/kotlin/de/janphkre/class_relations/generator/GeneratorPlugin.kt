@@ -18,16 +18,28 @@ package de.janphkre.class_relations.generator
 import de.janphkre.class_relations.library.domain.ClassRelationsPumlGenerator
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import java.io.File
 
 class GeneratorPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         val extension = target.extensions.create(PLUGIN_NAME, GeneratorExtension::class.java)
+        apply(target, extension, extension.externalLinks.convention(emptyList()))
+    }
 
+    internal fun apply(
+        target: Project,
+        extension: GeneratorExtension,
+        groupingLinks: Provider<List<Pair<String, File>>>,
+    ) {
         target.tasks.register(TASK_NAME, GenerateTask::class.java) { task ->
             task.group = TASK_GROUP
-            task.destination.set(extension.destination.convention(
-                target.layout.buildDirectory.map { File(it.asFile, DEFAULT_DESTINATION) })
+            task.destination.set(
+                target.layout.buildDirectory.map {
+                    File(it.asFile, extension.destination.convention(DEFAULT_DESTINATION).get())
+                }
             )
             val inputSources = extension.sources.convention(
                 listOf(File(target.projectDir, DEFAULT_SOURCE))
@@ -57,15 +69,15 @@ class GeneratorPlugin : Plugin<Project> {
                     }
                 }
             task.generatorSettings.set(compositeSettings)
-            task.externalLinks.set(extension.externalLinks.convention(emptyList()))
+            task.externalLinks.set(groupingLinks)
         }
     }
 
-    private companion object {
-        private const val PLUGIN_NAME = "pumlGenerate"
-        private const val TASK_NAME = "generateClassRelationsPuml"
-        private const val TASK_GROUP = "documentation"
-        private const val DEFAULT_DESTINATION = "generated/puml_class_relations"
-        private const val DEFAULT_SOURCE = "src/main/kotlin"
+    internal companion object {
+        internal const val PLUGIN_NAME = "pumlGenerate"
+        internal const val TASK_NAME = "generateClassRelationsPuml"
+        internal const val TASK_GROUP = "documentation"
+        internal const val DEFAULT_DESTINATION = "generated/puml_class_relations"
+        internal const val DEFAULT_SOURCE = "src/main/kotlin"
     }
 }
