@@ -160,12 +160,12 @@ class GlobKlassFilter(
         }
     }
 
-    override fun filterItem(item: KlassItem) {
-        globFilters.forEach { filter ->
-            if (GlobFilterSearch(filter, item.filePackage.plus(item.name)).checkGlob()) { //TODO: FIND A BETTER WAY FOR THIS
-                item.isDisabled = true
-                return@forEach
-            }
+    override fun filterItem(item: KlassItem) { //TODO: FIND A BETTER WAY FOR THIS
+        val isGlobMatch = globFilters.any { filter ->
+            GlobFilterSearch(filter, item.filePackage.plus(item.name)).checkGlob()
+        }
+        if (isGlobMatch) {
+            item.isDisabled = true
         }
     }
 
