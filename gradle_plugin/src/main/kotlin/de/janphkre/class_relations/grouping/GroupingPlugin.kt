@@ -21,6 +21,7 @@ import de.janphkre.class_relations.generator.GeneratorExtension
 import de.janphkre.class_relations.generator.GeneratorPlugin
 import de.janphkre.class_relations.generator.GeneratorPlugin.Companion.DEFAULT_DESTINATION
 import de.janphkre.class_relations.generator.GeneratorPlugin.Companion.PLUGIN_NAME
+import de.janphkre.class_relations.generator.GeneratorPlugin.Companion.TASK_GROUP
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
@@ -40,12 +41,16 @@ class GroupingPlugin: Plugin<Project> {
             }
             subProject.getPackageOfProject() to destination
         }
-        target.subprojects.map { subProject ->
+        val subTasks = target.subprojects.map { subProject ->
             val generatorPlugin = GeneratorPlugin()
             val list: Provider<List<Pair<String, File>>> = extension.externalLinks.map { base ->
                 childrenPaths.map { (path, file) -> path.get() to file.get() }.plus(base)
             }
             generatorPlugin.apply(subProject, extension, list)
+        }
+        target.tasks.register(GeneratorPlugin.TASK_NAME) { task ->
+            task.group = TASK_GROUP
+            task.setDependsOn(subTasks)
         }
     }
 

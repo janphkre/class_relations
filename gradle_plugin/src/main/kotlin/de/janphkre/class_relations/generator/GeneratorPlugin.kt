@@ -18,9 +18,11 @@ package de.janphkre.class_relations.generator
 import de.janphkre.class_relations.library.domain.ClassRelationsPumlGenerator
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.TaskProvider
 import java.io.File
 
 class GeneratorPlugin : Plugin<Project> {
@@ -33,8 +35,8 @@ class GeneratorPlugin : Plugin<Project> {
         target: Project,
         extension: GeneratorExtension,
         groupingLinks: Provider<List<Pair<String, File>>>,
-    ) {
-        target.tasks.register(TASK_NAME, GenerateTask::class.java) { task ->
+    ): TaskProvider<*> {
+        return target.tasks.register(TASK_NAME, GenerateTask::class.java) { task ->
             task.group = TASK_GROUP
             task.destination.set(
                 target.layout.buildDirectory.map {
