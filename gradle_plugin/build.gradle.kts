@@ -10,7 +10,7 @@ publishing {
         create<MavenPublication>("plugin") {
             groupId = "com.github.janphkre.class_relations"
             artifactId = "gradle_plugin"
-            version = "1.0.0"
+            version = "1.1.1"
 
             from(components["java"])
 
@@ -24,7 +24,7 @@ publishing {
 }
 
 group = "com.github.janphkre.class_relations"
-version = "1.1.0"
+version = "1.1.1"
 
 repositories {
     mavenCentral()
