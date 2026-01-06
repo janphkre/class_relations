@@ -39,19 +39,17 @@ class GeneratorPlugin : Plugin<Project> {
         return target.tasks.register(TASK_NAME, GenerateTask::class.java) { task ->
             task.group = TASK_GROUP
             task.destination.set(
-                target.layout.buildDirectory.map {
-                    File(it.asFile, extension.destination.convention(DEFAULT_DESTINATION).get())
-                }
+                File(target.layout.projectDirectory.asFile, extension.destination.convention(DEFAULT_DESTINATION).get())
             )
             val inputSources = extension.sources.convention(
-                listOf(File(target.projectDir, DEFAULT_SOURCE))
-            )
+                listOf(DEFAULT_SOURCE)
+            ).map { sources -> sources.map { File(target.projectDir, it) } }
             task.sources.set(inputSources)
             for (input in inputSources.get()) {
                 task.inputs.dir(input)
             }
             task.filters.set(extension.filters.convention(emptyList()))
-            val compositeSettings = extension.projectBasePrefix
+            val compositeSettings = extension.projectBasePrefix //TODO: FIX IN GROUPING PLUGIN, NO VALUE IS EMITTED?!
                 .convention(extension.projectPackagePrefix)
                 .flatMap { basePrefix ->
                     extension.projectPackagePrefix.flatMap { packagePrefix ->

@@ -75,7 +75,7 @@ internal class KotlinParserTest {
     }
 
     private fun readFile(file: String): String {
-        return File("src/test/resources/parser/$file").readText().replace("\r","")
+        return File("src/test/resources/generator/parser/$file").readText().replace("\r","")
     }
 
     private fun readOutput(file: String, filePath: String): KlassWithRelations? {

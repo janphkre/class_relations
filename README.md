@@ -39,8 +39,8 @@ plugins {
 
 
 pumlGenerate {
-    destination = new File(project.buildDir, "generated/puml_class_relations")
-    source = new File(project.projectDir, "src")
+    destination = "build/generated/puml_class_relations"
+    sources = ["src"]
     projectPackagePrefix = "readme.example"
     selfColor = "#00FF00"
     spaceCount = 4
@@ -86,8 +86,8 @@ plugins {
 
 
 pumlGenerate {
-    destination = new File(project.buildDir, "generated/puml_class_relations")
-    source = new File(project.projectDir, "src")
+    destination = "build/generated/puml_class_relations"
+    sources = ["src"]
     projectPackagePrefix = "readme.example"
     selfColor = "#00FF00"
     spaceCount = 4

@@ -45,8 +45,8 @@ class GenerateTaskTest {
                 selfColor = "#00FF00"
                 spaceCount = 4
                 generatedFileName = "example_relations.puml"
-                destination = new File("${destinationFolder.absolutePath.replace('\\','/')}")
-                sources = [new File("${sourceFolder.absolutePath.replace('\\','/')}")]
+                destination = "destination"
+                sources = ["sources"]
                 filters = [
                     "io.other.UsageClassD",
                     "com.example.b.ParameterClassC"
@@ -64,7 +64,7 @@ class GenerateTaskTest {
         destinationFolder.printDestinationStructure()
 
         Truth.assertThat(readFile(File(destinationFolder, "basic_example/example_relations.puml")))
-            .isEqualTo(readFile("src/test/resources/basic_example__expected_generate_output.puml"))
+            .isEqualTo(readFile("src/test/resources/generator/basic_example__expected_generate_output.puml"))
     }
 
 
@@ -87,8 +87,8 @@ class GenerateTaskTest {
                 selfColor = "#00FF00"
                 spaceCount = 4
                 generatedFileName = "example_relations.puml"
-                destination = new File("${destinationFolder.absolutePath.replace('\\','/')}")
-                sources = [new File("${sourceFolder.absolutePath.replace('\\','/')}")]
+                destination = "destination"
+                sources = ["sources"]
             }
         """.trimIndent())
 
@@ -103,16 +103,16 @@ class GenerateTaskTest {
 
         var child = "aaa/example_relations.puml"
         Truth.assertWithMessage(child).that(readFile(File(destinationFolder, child)))
-            .isEqualTo(readFile("src/test/resources/depth_example__aaa__expected_generate_output.puml"))
+            .isEqualTo(readFile("src/test/resources/generator/depth_example__aaa__expected_generate_output.puml"))
         child = "aaa/bbb/example_relations.puml"
         Truth.assertWithMessage(child).that(readFile(File(destinationFolder, child)))
-            .isEqualTo(readFile("src/test/resources/depth_example__aaa.bbb__expected_generate_output.puml"))
+            .isEqualTo(readFile("src/test/resources/generator/depth_example__aaa.bbb__expected_generate_output.puml"))
         child = "aaa/bbb/ccc/example_relations.puml"
         Truth.assertWithMessage(child).that(readFile(File(destinationFolder, child)))
-            .isEqualTo(readFile("src/test/resources/depth_example__aaa.bbb.ccc__expected_generate_output.puml"))
+            .isEqualTo(readFile("src/test/resources/generator/depth_example__aaa.bbb.ccc__expected_generate_output.puml"))
         child = "aaa/bbb/ccc/depth_example/example_relations.puml"
         Truth.assertWithMessage(child).that(readFile(File(destinationFolder, child)))
-            .isEqualTo(readFile("src/test/resources/depth_example__aaa.bbb.ccc.depth_example__expected_generate_output.puml"))
+            .isEqualTo(readFile("src/test/resources/generator/depth_example__aaa.bbb.ccc.depth_example__expected_generate_output.puml"))
     }
 
 
@@ -135,8 +135,8 @@ class GenerateTaskTest {
                 selfColor = "#00FF00"
                 spaceCount = 4
                 generatedFileName = "example_relations.puml"
-                destination = new File("${destinationFolder.absolutePath.replace('\\','/')}")
-                sources = [new File("${sourceFolder.absolutePath.replace('\\','/')}")]
+                destination = "destination"
+                sources = ["sources"]
             }
         """.trimIndent())
 
@@ -157,10 +157,10 @@ class GenerateTaskTest {
         Truth.assertWithMessage(child).that(File(destinationFolder, child).exists()).isFalse()
         child = "aaa/bbb/ccc/example_relations.puml"
         Truth.assertWithMessage(child).that(readFile(File(destinationFolder, child)))
-            .isEqualTo(readFile("src/test/resources/depth_example_with_prefix__aaa.bbb.ccc__expected_generate_output.puml"))
+            .isEqualTo(readFile("src/test/resources/generator/depth_example_with_prefix__aaa.bbb.ccc__expected_generate_output.puml"))
         child = "aaa/bbb/ccc/depth_example/example_relations.puml"
         Truth.assertWithMessage(child).that(readFile(File(destinationFolder, child)))
-            .isEqualTo(readFile("src/test/resources/depth_example_with_prefix__aaa.bbb.ccc.depth_example__expected_generate_output.puml"))
+            .isEqualTo(readFile("src/test/resources/generator/depth_example_with_prefix__aaa.bbb.ccc.depth_example__expected_generate_output.puml"))
     }
 
     @Test
@@ -183,10 +183,10 @@ class GenerateTaskTest {
                 selfColor = "#00FF00"
                 spaceCount = 4
                 generatedFileName = "example_relations.puml"
-                destination = new File("${destinationFolder.absolutePath.replace('\\','/')}")
+                destination = "destination"
                 sources = [
-                    new File("${sourceFolder1.absolutePath.replace('\\','/')}"),
-                    new File("${sourceFolder2.absolutePath.replace('\\','/')}"),
+                    "sources1",
+                    "sources2",
                 ]
                 filters = []
             }
@@ -195,14 +195,15 @@ class GenerateTaskTest {
         val result = GradleRunner.create()
             .withProjectDir(testDirectory.root)
             .withPluginClasspath()
-            .withArguments("generateClassRelationsPuml")
+            .withArguments("generateClassRelationsPuml", "--stacktrace")
             .forwardOutput()
+            .withDebug(true)
             .build()
 
         destinationFolder.printDestinationStructure()
 
         Truth.assertThat(readFile(File(destinationFolder, "multiroot_example/example_relations.puml")))
-            .isEqualTo(readFile("src/test/resources/multiroot_example__expected_generate_output.puml"))
+            .isEqualTo(readFile("src/test/resources/generator/multiroot_example__expected_generate_output.puml"))
     }
 
     @Test
@@ -224,14 +225,14 @@ class GenerateTaskTest {
                 selfColor = "#00FF00"
                 spaceCount = 4
                 generatedFileName = "example_relations.puml"
-                destination = new File("${destinationFolder.absolutePath.replace('\\','/')}")
-                sources = [new File("${sourceFolder.absolutePath.replace('\\','/')}")]
+                destination = "destination"
+                sources = ["sources"]
                 filters = [
                     "io.other.UsageClassD",
                     "com.example.b.ParameterClassC"
                 ]
                 externalLinks = [
-                    new kotlin.Pair("com.example", new File("${externalFile.absolutePath.replace('\\','/')}"))
+                    new kotlin.Pair("com.example", new File(projectDir, "external_com_example/example_relations.puml"))
                 ]
             }
         """.trimIndent())
@@ -246,7 +247,7 @@ class GenerateTaskTest {
         destinationFolder.printDestinationStructure()
 
         Truth.assertThat(readFile(File(destinationFolder, "basic_example/example_relations.puml")))
-            .isEqualTo(readFile("src/test/resources/link_example__expected_generate_output.puml"))
+            .isEqualTo(readFile("src/test/resources/generator/link_example__expected_generate_output.puml"))
     }
 
     private fun File.printDestinationStructure() {
@@ -265,7 +266,7 @@ class GenerateTaskTest {
         target.mkdirs()
         val usecaseFile = File(target, sourceDirName)
         usecaseFile.mkdir()
-        val sourceFiles = File("src/test/resources/$usecase").listFiles()
+        val sourceFiles = File("src/test/resources/generator/$usecase").listFiles()
         sourceFiles!!.forEach { source ->
             val content = source.readText().replace("\r","")
             File(usecaseFile, source.name).writeText(content)
