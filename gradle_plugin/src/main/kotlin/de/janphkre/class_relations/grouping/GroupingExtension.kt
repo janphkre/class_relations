@@ -13,30 +13,22 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package de.janphkre.class_relations.generator
+package de.janphkre.class_relations.grouping
 
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.provider.Provider
 import java.io.File
 
 /**
  * Configurable options for the [GeneratorPlugin].
  */
-interface GeneratorExtension {
+interface GroupingExtension {
     /**
      * The project base prefix as in the base package where the project is defined in.
      * Should be a subset of the module prefix.
      * Most of the time this may be part of the library id potentially shared across multiple modules.
-     * Optional, picks the projectPackagePrefix as a default value.
      */
     val projectBasePrefix: Property<String>
-
-    /**
-     * The full project package prefix as in the base package where the project / module is defined in.
-     * Most of the time this may be the library id.
-     */
-    val projectPackagePrefix: Property<String>
 
     /**
      * Set the color of the currently displayed package.

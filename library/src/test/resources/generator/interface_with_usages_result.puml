@@ -1,0 +1,24 @@
+@startuml
+!$pathToRoot = "../../.."
+!$pathToSourceExampleRootGenerated = "$pathToRoot/example/root/generated"
+!$pathToDocsBase = "$pathToRoot/com/example"
+package "[[$pathToDocsBase/example_relations.puml com.example]]" as p\$_0 #ffffff {
+    package "a" as p\$_1 #00FFFF {
+        interface "[[$pathToSourceExampleRootGenerated/src/main/com/example/a/InterfaceWithUsages.kt InterfaceWithUsages]]" as InterfaceWithUsages {
+            {method} methodA
+            {method} methodB
+            {method} methodC
+            {method} methodD
+        }
+    }
+}
+package "com.other" as p\$_2 #ffffff {
+    interface "ParameterClassA"
+}
+package "io.other" as p\$_3 #ffffff {
+    interface "ParameterClassB"
+}
+
+InterfaceWithUsages .up.|> ParameterClassB
+InterfaceWithUsages -down-> ParameterClassA
+@enduml

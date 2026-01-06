@@ -1,0 +1,34 @@
+@startuml
+!$pathToRoot = "../.."
+!$pathToSourceSources = "$pathToRoot/../sources"
+!$pathToDocsBase = "$pathToRoot/multi_module_example/submodule_a"
+package "multi_module_example" as p\$_0 #ffffff {
+    package "submodule_a" as p\$_1 #00FF00 {
+        class "[[$pathToSourceSources/multi_module_example/submodule_a/ClassWithDistinctDeps.kt ClassWithDistinctDeps]]" as ClassWithDistinctDeps {
+        }
+        class "[[$pathToSourceSources/multi_module_example/submodule_a/ClassWithUsages.kt ClassWithUsages]]" as ClassWithUsages {
+            {method} methodA
+            {method} methodB
+            {method} methodC
+        }
+    }
+    package "[[$pathToRoot/../../submodule_b/destination/multi_module_example/submodule_b/example_multi.puml submodule_b]]" as p\$_2 #ffffff {
+        interface "ParameterClassA"
+        interface "UsageClassC"
+    }
+}
+package "com.other" as p\$_3 #ffffff {
+    interface "ParameterClassE"
+}
+package "io.other" as p\$_4 #ffffff {
+    interface "UsageClassE"
+    interface "UsageClassF"
+}
+
+ClassWithDistinctDeps o-down- ParameterClassA
+ClassWithDistinctDeps o-down- ParameterClassE
+ClassWithUsages -down-> UsageClassC
+ClassWithUsages -down-> UsageClassE
+ClassWithUsages -down-> UsageClassF
+ClassWithUsages -down-> Unit
+@enduml

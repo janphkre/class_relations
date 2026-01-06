@@ -18,9 +18,6 @@ package de.janphkre.class_relations.generator
 import de.janphkre.class_relations.library.domain.ClassRelationsPumlGenerator
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.Task
-import org.gradle.api.provider.ListProperty
-import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskProvider
 import java.io.File
@@ -28,12 +25,13 @@ import java.io.File
 class GeneratorPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         val extension = target.extensions.create(PLUGIN_NAME, GeneratorExtension::class.java)
-        apply(target, extension, extension.externalLinks.convention(emptyList()))
+        apply(target, extension, extension.projectPackagePrefix, extension.externalLinks.convention(emptyList()))
     }
 
     internal fun apply(
         target: Project,
         extension: GeneratorExtension,
+        projectPackagePrefix: Provider<String>,
         groupingLinks: Provider<List<Pair<String, File>>>,
     ): TaskProvider<*> {
         return target.tasks.register(TASK_NAME, GenerateTask::class.java) { task ->
@@ -50,9 +48,9 @@ class GeneratorPlugin : Plugin<Project> {
             }
             task.filters.set(extension.filters.convention(emptyList()))
             val compositeSettings = extension.projectBasePrefix //TODO: FIX IN GROUPING PLUGIN, NO VALUE IS EMITTED?!
-                .convention(extension.projectPackagePrefix)
+                .convention(projectPackagePrefix)
                 .flatMap { basePrefix ->
-                    extension.projectPackagePrefix.flatMap { packagePrefix ->
+                    projectPackagePrefix.flatMap { packagePrefix ->
                         extension.selfColor.flatMap { color ->
                             extension.generatedFileName.flatMap { fileName ->
                                 extension.spaceCount.map { spaceCount ->

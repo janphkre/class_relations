@@ -41,6 +41,9 @@ class ClassRelationsPumlGeneratorTest {
     @Test
     fun testBaseRootPackagesExample() = verifyGenerator("base_root_packages")
 
+    @Test
+    fun testInterfaceWithUsages() = verifyGenerator("interface_with_usages")
+
     private fun verifyGenerator(id: String) {
         val (generatorSettings, klasses, packages) = readInput(id)
         val generator = ClassRelationsPumlGenerator.getInstance(
@@ -70,7 +73,7 @@ class ClassRelationsPumlGeneratorTest {
     }
 
     private fun readFile(file: String): String {
-        return File("src/test/resources/generator/generator/$file").readText().replace("\r","")
+        return File("src/test/resources/generator/$file").readText().replace("\r","")
     }
 
     private fun readOutput(file: String): String {
