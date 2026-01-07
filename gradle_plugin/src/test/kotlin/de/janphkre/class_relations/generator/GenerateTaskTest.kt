@@ -226,7 +226,7 @@ class GenerateTaskTest {
                 spaceCount = 4
                 generatedFileName = "example_relations.puml"
                 destination = "destination"
-                sources = ["sources"]
+                sources = ["sources", "doesNotExist"]
                 filters = [
                     "io.other.UsageClassD",
                     "com.example.b.ParameterClassC"

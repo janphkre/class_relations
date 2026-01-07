@@ -41,13 +41,14 @@ class GeneratorPlugin : Plugin<Project> {
             )
             val inputSources = extension.sources.convention(
                 listOf(DEFAULT_SOURCE)
-            ).map { sources -> sources.map { File(target.projectDir, it) } }
+            ).map { sources -> sources.map { File(target.projectDir, it) }.filter { file -> file.exists() } }
+
             task.sources.set(inputSources)
             for (input in inputSources.get()) {
                 task.inputs.dir(input)
             }
             task.filters.set(extension.filters.convention(emptyList()))
-            val compositeSettings = extension.projectBasePrefix //TODO: FIX IN GROUPING PLUGIN, NO VALUE IS EMITTED?!
+            val compositeSettings = extension.projectBasePrefix
                 .convention(projectPackagePrefix)
                 .flatMap { basePrefix ->
                     projectPackagePrefix.flatMap { packagePrefix ->
