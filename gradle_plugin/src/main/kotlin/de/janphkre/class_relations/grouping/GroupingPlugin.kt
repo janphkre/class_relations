@@ -60,7 +60,7 @@ class GroupingPlugin: Plugin<Project> {
                 filters = extension.filters,
                 externalLinks = extension.externalLinks,
             )
-            generatorPlugin.apply(subProject, generatorExtension, childPackage, list)//TODO: CHANGE PROJECT PACKAGE PREFIX!
+            generatorPlugin.apply(subProject, generatorExtension, childPackage, list)
         }
         target.tasks.register(GeneratorPlugin.TASK_NAME) { task ->
             task.group = TASK_GROUP
@@ -79,6 +79,7 @@ class GroupingPlugin: Plugin<Project> {
             if (libComponents != null) {
                 return@provider libComponents.namespace
             }
+            println("Could not find project package, returning project name")
             extension.projectBasePrefix.orNull?.let { "${it}.${project.name}"} ?: project.name
         }
     }

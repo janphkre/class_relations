@@ -1,0 +1,3 @@
+package multi_module_example.android.example.submodule_library.subpackage
+
+interface ParameterClassB
