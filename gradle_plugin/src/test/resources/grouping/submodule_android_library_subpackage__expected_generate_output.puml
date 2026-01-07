@@ -8,9 +8,16 @@ package "multi_module_example.android.example" as p\$_0 #ffffff {
             interface "[[$pathToSourceSrcMainJava/multi_module_example/android/example/submodule_library/subpackage/ParameterClassB.kt ParameterClassB]]" as ParameterClassB {
             }
             interface "[[$pathToSourceSrcMainJava/multi_module_example/android/example/submodule_library/subpackage/UsageClassE.kt UsageClassE]]" as UsageClassE {
+                {method} methodC
             }
+        }
+        package "[[$pathToDocsBase/adjacent/example_multi.puml adjacent]]" as p\$_3 #ffffff {
+            interface "ParameterClassC"
+            interface "UsageClassG"
         }
     }
 }
 
+ParameterClassB .up.|> ParameterClassC
+UsageClassE -down-> UsageClassG
 @enduml

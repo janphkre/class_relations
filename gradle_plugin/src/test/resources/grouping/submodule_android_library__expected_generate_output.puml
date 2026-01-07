@@ -13,9 +13,11 @@ package "multi_module_example.android.example" as p\$_0 #ffffff {
             interface "ParameterClassB"
             interface "UsageClassE"
         }
+        package "[[$pathToDocsBase/adjacent/example_multi.puml adjacent]]" as p\$_3 #ffffff {
+        }
     }
 }
-package "com.other" as p\$_3 #ffffff {
+package "com.other" as p\$_4 #ffffff {
     interface "ParameterClassE"
 }
 

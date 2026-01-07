@@ -1,3 +1,5 @@
 package multi_module_example.android.example.submodule_library.subpackage
 
-interface ParameterClassB
+import multi_module_example.android.example.submodule_library.adjacent.ParameterClassC
+
+interface ParameterClassB: ParameterClassC

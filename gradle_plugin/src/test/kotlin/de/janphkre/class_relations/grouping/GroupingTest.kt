@@ -73,6 +73,7 @@ class GroupingTest {
         fillSourceFolder(usecase = "submodule_android_app", sourceDirName = "src/main/java/multi_module_example/android/example/submodule_app", target = submoduleAFolder)
         fillSourceFolder(usecase = "submodule_android_library", sourceDirName = "src/main/java/multi_module_example/android/example/submodule_library", target = submoduleBFolder)
         fillSourceFolder(usecase = "submodule_android_library_subpackage", sourceDirName = "src/main/java/multi_module_example/android/example/submodule_library/subpackage", target = submoduleBFolder)
+        fillSourceFolder(usecase = "submodule_android_library_subpackage_adjacent", sourceDirName = "src/main/java/multi_module_example/android/example/submodule_library/adjacent", target = submoduleBFolder)
 
         val buildFile = testDirectory.newFile("build.gradle")
         buildFile.writeText("""
@@ -144,6 +145,9 @@ class GroupingTest {
 
         Truth.assertThat(readFile(File(destinationFolderB, "generated/class_relations/multi_module_example/android/example/submodule_library/subpackage/example_multi.puml")))
             .isEqualTo(readFile("src/test/resources/grouping/submodule_android_library_subpackage__expected_generate_output.puml"))
+
+        Truth.assertThat(readFile(File(destinationFolderB, "generated/class_relations/multi_module_example/android/example/submodule_library/adjacent/example_multi.puml")))
+            .isEqualTo(readFile("src/test/resources/grouping/submodule_android_library_subpackage_adjacent__expected_generate_output.puml"))
     }
 
     private fun File.printDestinationStructure() {
