@@ -1,6 +1,6 @@
 @startuml
 !$pathToRoot = "../../.."
-!$pathToDocsBase = "$pathToRoot/aaa"
+!$pathToDocsBase = "../../../aaa"
 package "[[$pathToDocsBase/example_relations.puml aaa]]" as p\$_0 #ffffff {
     package "[[$pathToDocsBase/bbb/example_relations.puml bbb]]" as p\$_1 #ffffff {
         package "ccc" as p\$_2 #00FF00 {

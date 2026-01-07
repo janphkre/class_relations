@@ -1,8 +1,8 @@
 @startuml
 !$pathToRoot = ".."
-!$pathToSourceSources1 = "$pathToRoot/../sources1"
-!$pathToSourceSources2 = "$pathToRoot/../sources2"
-!$pathToDocsBase = "$pathToRoot/multiroot_example"
+!$pathToSourceSources1 = "../../sources1"
+!$pathToSourceSources2 = "../../sources2"
+!$pathToDocsBase = "../multiroot_example"
 package "multiroot_example" as p\$_0 #00FF00 {
     class "[[$pathToSourceSources1/multiroot_example/BasicClass1.kt BasicClass1]]" as BasicClass1 {
     }

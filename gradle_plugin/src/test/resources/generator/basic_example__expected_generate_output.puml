@@ -1,7 +1,7 @@
 @startuml
 !$pathToRoot = ".."
-!$pathToSourceSources = "$pathToRoot/../sources"
-!$pathToDocsBase = "$pathToRoot/basic_example"
+!$pathToSourceSources = "../../sources"
+!$pathToDocsBase = "../basic_example"
 package "basic_example" as p\$_0 #00FF00 {
     class "[[$pathToSourceSources/basic_example/BasicClass.kt BasicClass]]" as BasicClass {
     }

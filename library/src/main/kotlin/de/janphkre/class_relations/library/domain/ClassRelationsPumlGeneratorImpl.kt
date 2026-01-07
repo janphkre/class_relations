@@ -76,9 +76,9 @@ internal class ClassRelationsPumlGeneratorImpl(
         val filePathReverse = "..".repeat(pathDepth, PATH_DELIMITER)
         appendContent("!\$pathToRoot = \"${filePathReverse}\"")
         for ((codeBaseName, link) in sourcesLinks) {
-            appendContent("!\$pathToSource${codeBaseName} = \"\$pathToRoot${PATH_DELIMITER}${link}\"")
+            appendContent("!\$pathToSource${codeBaseName} = \"${filePathReverse}${PATH_DELIMITER}${link}\"")
         }
-        appendContent("!\$pathToDocsBase = \"\$pathToRoot${PATH_DELIMITER}${generatorSettings.projectPackagePrefix.replace(PACKAGE_DELIMITER, PATH_DELIMITER)}\"")
+        appendContent("!\$pathToDocsBase = \"${filePathReverse}${PATH_DELIMITER}${generatorSettings.projectPackagePrefix.replace(PACKAGE_DELIMITER, PATH_DELIMITER)}\"")
     }
 
     private fun StringBuilder.createSelfPackageStructure(filePackage: List<String>) {
