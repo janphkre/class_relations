@@ -79,7 +79,6 @@ class GroupingPlugin: Plugin<Project> {
             if (libComponents != null) {
                 return@provider libComponents.namespace
             }
-            println("Could not find project package, returning project name")
             extension.projectBasePrefix.orNull?.let { "${it}.${project.name}"} ?: project.name
         }
     }
