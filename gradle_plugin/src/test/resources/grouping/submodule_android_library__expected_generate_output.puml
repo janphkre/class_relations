@@ -1,0 +1,27 @@
+@startuml
+!$pathToRoot = "../../../.."
+!$pathToSourceSrcMainJava = "$pathToRoot/../../../src/main/java"
+!$pathToDocsBase = "$pathToRoot/multi_module_example/android/example/submodule_library"
+package "multi_module_example.android.example" as p\$_0 #ffffff {
+    package "submodule_library" as p\$_1 #00FF00 {
+        class "[[$pathToSourceSrcMainJava/multi_module_example/android/example/submodule_library/ParameterClassA.kt ParameterClassA]]" as ParameterClassA {
+        }
+        interface "[[$pathToSourceSrcMainJava/multi_module_example/android/example/submodule_library/UsageClassC.kt UsageClassC]]" as UsageClassC {
+            {method} methodA
+        }
+        package "[[$pathToDocsBase/subpackage/example_multi.puml subpackage]]" as p\$_2 #ffffff {
+            interface "ParameterClassB"
+            interface "UsageClassE"
+        }
+        package "[[$pathToDocsBase/adjacent/example_multi.puml adjacent]]" as p\$_3 #ffffff {
+        }
+    }
+}
+package "com.other" as p\$_4 #ffffff {
+    interface "ParameterClassE"
+}
+
+ParameterClassA .up.|> ParameterClassE
+ParameterClassA o-down- ParameterClassB
+UsageClassC -down-> UsageClassE
+@enduml

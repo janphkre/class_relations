@@ -40,7 +40,7 @@ plugins {
 
 pumlGenerate {
     destination = "build/generated/puml_class_relations"
-    sources = ["src"]
+    sources = ["src/main/kotlin"]
     projectPackagePrefix = "readme.example"
     selfColor = "#00FF00"
     spaceCount = 4
@@ -85,10 +85,10 @@ plugins {
 }
 
 
-pumlGenerate {
+pumlGenerateAll {
     destination = "build/generated/puml_class_relations"
-    sources = ["src"]
-    projectPackagePrefix = "readme.example"
+    sources = ["src/main/java"]
+    projectBasePrefix = "readme.example"
     selfColor = "#00FF00"
     spaceCount = 4
     generatedFileName = "class_relations.puml"

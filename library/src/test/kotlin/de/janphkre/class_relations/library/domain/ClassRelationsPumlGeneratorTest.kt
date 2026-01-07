@@ -41,6 +41,9 @@ class ClassRelationsPumlGeneratorTest {
     @Test
     fun testBaseRootPackagesExample() = verifyGenerator("base_root_packages")
 
+    @Test
+    fun testInterfaceWithUsages() = verifyGenerator("interface_with_usages")
+
     private fun verifyGenerator(id: String) {
         val (generatorSettings, klasses, packages) = readInput(id)
         val generator = ClassRelationsPumlGenerator.getInstance(

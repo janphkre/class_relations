@@ -1,0 +1,34 @@
+@startuml
+!$pathToRoot = "../../../.."
+!$pathToSourceSrcMainJava = "$pathToRoot/../../../src/main/java"
+!$pathToDocsBase = "$pathToRoot/multi_module_example/android/example/submodule_app"
+package "multi_module_example.android.example" as p\$_0 #ffffff {
+    package "submodule_app" as p\$_1 #00FF00 {
+        class "[[$pathToSourceSrcMainJava/multi_module_example/android/example/submodule_app/ClassWithDistinctDeps.kt ClassWithDistinctDeps]]" as ClassWithDistinctDeps {
+        }
+        class "[[$pathToSourceSrcMainJava/multi_module_example/android/example/submodule_app/ClassWithUsages.kt ClassWithUsages]]" as ClassWithUsages {
+            {method} methodA
+            {method} methodB
+            {method} methodC
+        }
+    }
+    package "[[$pathToRoot/../../../../submodule_library/destination/generated/class_relations/multi_module_example/android/example/submodule_library/example_multi.puml submodule_library]]" as p\$_2 #ffffff {
+        interface "ParameterClassA"
+        interface "UsageClassC"
+    }
+}
+package "com.other" as p\$_3 #ffffff {
+    interface "ParameterClassE"
+}
+package "io.other" as p\$_4 #ffffff {
+    interface "UsageClassE"
+    interface "UsageClassF"
+}
+
+ClassWithDistinctDeps o-down- ParameterClassA
+ClassWithDistinctDeps o-down- ParameterClassE
+ClassWithUsages -down-> UsageClassC
+ClassWithUsages -down-> UsageClassE
+ClassWithUsages -down-> UsageClassF
+ClassWithUsages -down-> Unit
+@enduml

@@ -1,0 +1,47 @@
+{
+  "generatorSettings": {
+    "projectBasePrefix": "com.example",
+    "projectPackagePrefix": "com.example",
+    "selfColor": "#00FFFF",
+    "spaceCount": 4,
+    "generatedFileName": "example_relations.puml"
+  },
+  "files": [
+    {
+      "name": "InterfaceWithUsages",
+      "package": "com.example.a",
+      "filePath": "src/main/com/example/a/InterfaceWithUsages.kt",
+      "type": "interface",
+      "codeBaseName": "SrcMainBaseInterfaceUsages",
+      "fileImports": [
+        {
+          "package": "com.other",
+          "name": "ParameterClassA"
+        },
+        {
+          "package": "io.other",
+          "name": "ParameterClassB"
+        }
+      ],
+      "parameters": [],
+      "inheritances": [
+        {
+          "package": "io.other",
+          "name": "ParameterClassB"
+        }
+      ],
+      "methods": [
+        "methodA",
+        "methodB",
+        "methodC",
+        "methodD"
+      ],
+      "methodParameters": [
+        {
+          "package": "com.other",
+          "name": "ParameterClassA"
+        }
+      ]
+    }
+  ]
+}

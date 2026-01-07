@@ -1,0 +1,19 @@
+@startuml
+!$pathToRoot = "../.."
+!$pathToSourceSources = "$pathToRoot/../sources"
+!$pathToDocsBase = "$pathToRoot/multi_module_example/submodule_b"
+package "multi_module_example" as p\$_0 #ffffff {
+    package "submodule_b" as p\$_1 #00FF00 {
+        interface "[[$pathToSourceSources/multi_module_example/submodule_b/ParameterClassA.kt ParameterClassA]]" as ParameterClassA {
+        }
+        interface "[[$pathToSourceSources/multi_module_example/submodule_b/UsageClassC.kt UsageClassC]]" as UsageClassC {
+            {method} methodA
+        }
+    }
+}
+package "com.other" as p\$_2 #ffffff {
+    interface "ParameterClassE"
+}
+
+ParameterClassA .up.|> ParameterClassE
+@enduml

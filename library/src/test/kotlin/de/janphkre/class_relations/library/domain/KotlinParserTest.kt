@@ -54,6 +54,9 @@ internal class KotlinParserTest {
     fun testClassWithAliasDeps() = verifyParser("ClassWithAliasDeps", "example/file/path10", "SrcMainBaseAlias")
 
     @Test
+    fun testInterfaceWithUsages() = verifyParser("InterfaceWithUsages", "example/file/path20", "SrcMainBaseInterfaceUsages")
+
+    @Test
     fun testMultipleClassesHaveSameInstance() {
         val idFirst = "UsageClassB"
         val filePathFirst = "example/file/path11"

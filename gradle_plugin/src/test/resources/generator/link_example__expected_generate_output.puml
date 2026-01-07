@@ -19,6 +19,9 @@ package "basic_example" as p\$_0 #00FF00 {
     }
     enum "[[$pathToSourceSources/basic_example/EnumClass.kt EnumClass]]" as EnumClass {
     }
+    interface "[[$pathToSourceSources/basic_example/InterfaceWithUsages.kt InterfaceWithUsages]]" as InterfaceWithUsages {
+        {method} methodA
+    }
 }
 package "[[$pathToRoot/../external_com_example/example_relations.puml com.example]]" as p\$_1 #ffffff {
     package "b" as p\$_2 #ffffff {
@@ -48,4 +51,5 @@ ClassWithUsages -down-> UsageClassC
 ClassWithUsages -down-> UsageClassE
 ClassWithUsages -down-> UsageClassF
 ClassWithUsages -down-> Unit
+InterfaceWithUsages -down-> UsageClassE
 @enduml

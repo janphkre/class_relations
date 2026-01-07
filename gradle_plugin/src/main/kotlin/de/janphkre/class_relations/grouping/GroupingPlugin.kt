@@ -17,10 +17,8 @@ package de.janphkre.class_relations.grouping
 
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.LibraryExtension
-import de.janphkre.class_relations.generator.GeneratorExtension
 import de.janphkre.class_relations.generator.GeneratorPlugin
 import de.janphkre.class_relations.generator.GeneratorPlugin.Companion.DEFAULT_DESTINATION
-import de.janphkre.class_relations.generator.GeneratorPlugin.Companion.PLUGIN_NAME
 import de.janphkre.class_relations.generator.GeneratorPlugin.Companion.TASK_GROUP
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -34,19 +32,35 @@ import java.io.File
  */
 class GroupingPlugin: Plugin<Project> {
     override fun apply(target: Project) {
-        val extension = target.extensions.create(PLUGIN_NAME, GeneratorExtension::class.java)
+        val extension = target.extensions.create(PLUGIN_NAME, GroupingExtension::class.java)
         val childrenPaths = target.subprojects.map { subProject ->
+            val subPackage = subProject.getPackageOfProject(extension)
             val destination = target.layout.buildDirectory.map {
-                File(it.asFile, extension.destination.convention(DEFAULT_DESTINATION).get())
+                val destination = extension.destination.orElse(DEFAULT_DESTINATION).get()
+                val generatedFileName = extension.generatedFileName.get()
+                val packagePath = subPackage.get().replace(".", "/")
+                File(subProject.projectDir, "$destination/$packagePath/$generatedFileName")
             }
-            subProject.getPackageOfProject() to destination
+            subPackage to destination
         }
         val subTasks = target.subprojects.map { subProject ->
             val generatorPlugin = GeneratorPlugin()
-            val list: Provider<List<Pair<String, File>>> = extension.externalLinks.map { base ->
+            val list: Provider<List<Pair<String, File>>> = extension.externalLinks.orElse(emptyList()).map { base ->
                 childrenPaths.map { (path, file) -> path.get() to file.get() }.plus(base)
             }
-            generatorPlugin.apply(subProject, extension, list)
+            val childPackage = subProject.getPackageOfProject(extension)
+            val generatorExtension = GeneratorExtensionGroupingImpl(
+                projectBasePrefix =  extension.projectBasePrefix,
+                projectPackagePrefix = extension.projectBasePrefix,
+                selfColor = extension.selfColor,
+                spaceCount = extension.spaceCount,
+                generatedFileName = extension.generatedFileName,
+                destination = extension.destination,
+                sources = extension.sources,
+                filters = extension.filters,
+                externalLinks = extension.externalLinks,
+            )
+            generatorPlugin.apply(subProject, generatorExtension, childPackage, list)
         }
         target.tasks.register(GeneratorPlugin.TASK_NAME) { task ->
             task.group = TASK_GROUP
@@ -54,7 +68,7 @@ class GroupingPlugin: Plugin<Project> {
         }
     }
 
-    private fun Project.getPackageOfProject(): Provider<String> {
+    private fun Project.getPackageOfProject(extension: GroupingExtension): Provider<String> {
         return providers.provider {
             val appComponents = project.extensions.findByType(AppExtension::class.java)
 
@@ -65,7 +79,12 @@ class GroupingPlugin: Plugin<Project> {
             if (libComponents != null) {
                 return@provider libComponents.namespace
             }
-            null
+            println("Could not find project package, returning project name")
+            extension.projectBasePrefix.orNull?.let { "${it}.${project.name}"} ?: project.name
         }
+    }
+
+    companion object {
+        internal const val PLUGIN_NAME = "pumlGenerateAll"
     }
 }

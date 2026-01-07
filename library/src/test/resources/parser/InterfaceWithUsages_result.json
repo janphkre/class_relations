@@ -1,0 +1,35 @@
+{
+  "name": "InterfaceWithUsages",
+  "package": "com.example.a",
+  "type": "interface",
+  "codeBaseName": "SrcMainBaseInterfaceUsages",
+  "fileImports": [
+    {
+      "package": "com.other",
+      "name": "ParameterClassA"
+    },
+    {
+      "package": "io.other",
+      "name": "ParameterClassB"
+    }
+  ],
+  "parameters": [],
+  "inheritances": [
+    {
+      "package": "io.other",
+      "name": "ParameterClassB"
+    }
+  ],
+  "methods": [
+    "methodA",
+    "methodB",
+    "methodC",
+    "methodD"
+  ],
+  "methodParameters": [
+    {
+      "package": "com.other",
+      "name": "ParameterClassA"
+    }
+  ]
+}
