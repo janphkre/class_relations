@@ -42,7 +42,7 @@ class GeneratorPlugin : Plugin<Project> {
             val inputSources = extension.sources.convention(
                 listOf(DEFAULT_SOURCE)
             ).map { sources -> sources.map { File(target.projectDir, it) }.filter { file -> file.exists() } }
-
+            task.onlyIf { inputSources.get().isNotEmpty() }
             task.sources.set(inputSources)
             for (input in inputSources.get()) {
                 task.inputs.dir(input)
