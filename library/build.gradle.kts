@@ -10,7 +10,7 @@ publishing {
         create<MavenPublication>("library") {
             groupId = "com.github.janphkre.class_relations"
             artifactId = "library"
-            version = "1.2.2"
+            version = "1.2.3"
 
             from(components["java"])
 
@@ -24,7 +24,7 @@ publishing {
 }
 
 group = "com.github.janphkre.class_relations"
-version = "1.2.2"
+version = "1.2.3"
 
 repositories {
     mavenCentral()
