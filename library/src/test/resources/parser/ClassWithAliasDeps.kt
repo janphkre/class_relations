@@ -1,3 +1,4 @@
+@file:Suppress("DEPRECATION")
 package com.example.a
 
 import com.example.b.ParameterClassA

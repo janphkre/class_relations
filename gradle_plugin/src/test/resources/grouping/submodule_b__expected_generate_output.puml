@@ -1,7 +1,7 @@
 @startuml
 !$pathToRoot = "../.."
-!$pathToSourceSources = "$pathToRoot/../sources"
-!$pathToDocsBase = "$pathToRoot/multi_module_example/submodule_b"
+!$pathToSourceSources = "../../../sources"
+!$pathToDocsBase = "../../multi_module_example/submodule_b"
 package "multi_module_example" as p\$_0 #ffffff {
     package "submodule_b" as p\$_1 #00FF00 {
         interface "[[$pathToSourceSources/multi_module_example/submodule_b/ParameterClassA.kt ParameterClassA]]" as ParameterClassA {

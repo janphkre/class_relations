@@ -53,7 +53,7 @@ internal class KotlinParserImpl(
         kotlinFileSummary as AstSuccess
         val packageHeader: PackageHeader? = kotlinFileSummary.success.find { it is PackageHeader } as? PackageHeader
         val klassDeclaration: KlassDeclaration? = kotlinFileSummary.success.find { it is KlassDeclaration } as? KlassDeclaration
-        val importList: DefaultAstNode? = kotlinFileSummary.success.find { it is DefaultAstNode } as? DefaultAstNode
+        val importList: DefaultAstNode? = kotlinFileSummary.success.find { it is DefaultAstNode && it.description == "importList" } as? DefaultAstNode
 
         val filePackage = packageHeader?.identifier?.map { it.identifier } ?: emptyList()
         val fileImportItems = importList?.children?.map { import ->

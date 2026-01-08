@@ -1,7 +1,7 @@
 @startuml
 !$pathToRoot = "../.."
-!$pathToSourceSources = "$pathToRoot/../sources"
-!$pathToDocsBase = "$pathToRoot/multi_module_example/submodule_a"
+!$pathToSourceSources = "../../../sources"
+!$pathToDocsBase = "../../multi_module_example/submodule_a"
 package "multi_module_example" as p\$_0 #ffffff {
     package "submodule_a" as p\$_1 #00FF00 {
         class "[[$pathToSourceSources/multi_module_example/submodule_a/ClassWithDistinctDeps.kt ClassWithDistinctDeps]]" as ClassWithDistinctDeps {

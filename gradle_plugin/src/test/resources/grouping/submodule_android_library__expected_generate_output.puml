@@ -1,7 +1,7 @@
 @startuml
 !$pathToRoot = "../../../.."
-!$pathToSourceSrcMainJava = "$pathToRoot/../../../src/main/java"
-!$pathToDocsBase = "$pathToRoot/multi_module_example/android/example/submodule_library"
+!$pathToSourceSrcMainJava = "../../../../../../../src/main/java"
+!$pathToDocsBase = "../../../../multi_module_example/android/example/submodule_library"
 package "multi_module_example.android.example" as p\$_0 #ffffff {
     package "submodule_library" as p\$_1 #00FF00 {
         class "[[$pathToSourceSrcMainJava/multi_module_example/android/example/submodule_library/ParameterClassA.kt ParameterClassA]]" as ParameterClassA {
