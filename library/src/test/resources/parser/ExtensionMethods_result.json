@@ -1,0 +1,13 @@
+{
+  "name": "ExtensionMethods",
+  "package": "com.example.a",
+  "type": "",
+  "codeBaseName": "SrcMainBase",
+  "fileImports": [],
+  "parameters": [],
+  "inheritances": [],
+  "methods": [
+    "methodA",
+    "methodB"
+  ]
+}

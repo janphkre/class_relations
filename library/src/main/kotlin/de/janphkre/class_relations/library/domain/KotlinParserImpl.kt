@@ -52,7 +52,7 @@ internal class KotlinParserImpl(
         }
         kotlinFileSummary as AstSuccess
         val packageHeader: PackageHeader? = kotlinFileSummary.success.find { it is PackageHeader } as? PackageHeader
-        val klassDeclaration: KlassDeclaration? = kotlinFileSummary.success.find { it is KlassDeclaration } as? KlassDeclaration
+        val klassDeclaration: KlassDeclaration? = kotlinFileSummary.success.find { it is KlassDeclaration && it.keyword != "fun" } as? KlassDeclaration
         val importList: DefaultAstNode? = kotlinFileSummary.success.find { it is DefaultAstNode && it.description == "importList" } as? DefaultAstNode
 
         val filePackage = packageHeader?.identifier?.map { it.identifier } ?: emptyList()
@@ -67,14 +67,20 @@ internal class KotlinParserImpl(
                 packageList = identifier.dropLast(1)
             )
         } ?: emptyList()
-        val methods = (klassDeclaration?.expressions?.find { it.description == "classBody" } as? DefaultAstNode)?.children?.filterIsInstance<KlassDeclaration>()
+        val methods = (klassDeclaration?.expressions?.find { it.description == "classBody" } as? DefaultAstNode)?.children?.filterIsInstance<KlassDeclaration>() ?: kotlinFileSummary.success.filterIsInstance<KlassDeclaration>().filter { it.keyword == "fun" }
+        val type = klassDeclaration?.getType() ?: KlassType.UNKNOWN
+        val name = if (type == KlassType.UNKNOWN) {
+            presentableName
+        } else {
+            klassDeclaration?.identifier?.identifier ?: presentableName
+        }
         return KlassWithRelations(
             item = klassItemFactory.createItem(
-                name = klassDeclaration?.identifier?.identifier ?: presentableName,
+                name = name,
                 packageList = filePackage
             ),
             type = KlassTypeData(
-                type = klassDeclaration?.getType() ?: KlassType.UNKNOWN,
+                type = type,
                 methods = methods?.mapNotNull { it.identifier?.identifier } ?: emptyList(),
                 filePath = filePathInRoot,
                 codeBaseName = rootName
