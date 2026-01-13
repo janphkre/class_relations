@@ -25,7 +25,8 @@ internal class ClassRelationsPumlGeneratorImpl(
 ) : ClassRelationsPumlGenerator {
 
     private val projectBasePrefix = generatorSettings.projectBasePrefix.split('.')
-    private val projectRemainderPrefix = generatorSettings.projectPackagePrefix.split('.').drop(projectBasePrefix.size)
+    private val projectPackagePrefix = generatorSettings.projectPackagePrefix.split('.')
+    private val projectRemainderPrefix = projectPackagePrefix.drop(projectBasePrefix.size)
     private val openPackages = Stack<String>()
     private var packageIndex = 0
 
@@ -90,13 +91,13 @@ internal class ClassRelationsPumlGeneratorImpl(
             beginSelfPackage(filePackage.joinToString(PACKAGE_SEPARATOR))
             return
         }
-        var qualifiedName = generatorSettings.projectBasePrefix
+        var qualifiedName = projectBasePrefix
         beginPackage(generatorSettings.projectBasePrefix, qualifiedName)
         val packages = filePackage.drop(projectBasePrefix.size)
         var packageLink = ""
         for (i in 0 until packages.size - 1) {
             packageLink += "/${packages[i]}"
-            qualifiedName += "${PACKAGE_SEPARATOR}${packages[i]}"
+            qualifiedName = qualifiedName + packages[i]
             beginPackage(packages[i], qualifiedName)
         }
         beginSelfPackage(packages.last())
@@ -149,11 +150,11 @@ internal class ClassRelationsPumlGeneratorImpl(
 
     private fun KlassImport.getCurrentImports(childPackages: Collection<String>): List<KlassImport.Package> {
         val currentImports = collectCurrentImportListFromOpenPackages()
-        var qualifiedName = openPackages.joinToString(PACKAGE_SEPARATOR)
+        var qualifiedName: Collection<String> = openPackages.first().split(PACKAGE_SEPARATOR) + openPackages.drop(1).map { it }
         var childPackageImports: List<KlassImport> = childPackages.map {
             KlassImport.Package(
                 name = it,
-                qualifiedName = "${qualifiedName}${PACKAGE_SEPARATOR}${it}",
+                qualifiedName = qualifiedName + it,
                 elements = emptyList()
             )
         }
@@ -165,11 +166,8 @@ internal class ClassRelationsPumlGeneratorImpl(
                     qualifiedName,
                     childPackageImports
                 )
-                val endSeparator = qualifiedName.lastIndexOf(PACKAGE_DELIMITER)
-                qualifiedName = if (endSeparator >= 0) {
-                    qualifiedName.substring(0, endSeparator)
-                } else {
-                    ""
+                if (qualifiedName.isNotEmpty()) {
+                    qualifiedName = qualifiedName.take(qualifiedName.size - 1)
                 }
                 childPackageImports = listOf(packageImport)
                 additionalImports.add(packageImport)
@@ -179,7 +177,7 @@ internal class ClassRelationsPumlGeneratorImpl(
             childPackageImports = childPackageImports.filterNot { existingPackages.contains(it.name)  }
         }
 
-        if (currentImports.size > 0) {
+        if (currentImports.isNotEmpty()) {
             var replacementImportChild = currentImports[currentImports.size - 1].let { import ->
                 import.copy(
                     elements = import.elements.plus(childPackageImports)
@@ -224,7 +222,7 @@ internal class ClassRelationsPumlGeneratorImpl(
     }
 
     private fun groupAllImports(imports: List<KlassItem>): Pair<KlassImport.Package, KlassImport.Package> {
-        if (imports.isEmpty()) return KlassImport.Package("", "", emptyList()) to KlassImport.Package("", "", emptyList())
+        if (imports.isEmpty()) return KlassImport.Package("", emptyList(), emptyList()) to KlassImport.Package("", emptyList(), emptyList())
         val projectImports = ArrayList<KlassItem>(imports.size)
         val externalImports = ArrayList<KlassItem>(imports.size)
         imports.forEach { input ->
@@ -236,30 +234,30 @@ internal class ClassRelationsPumlGeneratorImpl(
         }
         return KlassImport.Package(
             "",
-            "",
+            emptyList(),
             listOf(KlassImport.Package(
                 name = generatorSettings.projectBasePrefix,
-                qualifiedName = generatorSettings.projectBasePrefix,
+                qualifiedName = projectBasePrefix,
                 elements = groupProjectImportsInner(
                     projectImports,
-                    generatorSettings.projectBasePrefix
+                    projectBasePrefix
                 )
             ))
         ) to KlassImport.Package(
             "",
-            "",
+            emptyList(),
             groupExternalImportsInnerRoot(externalImports)
         )
     }
 
-    private fun groupProjectImportsInner(input: List<KlassItem>, qualifiedName: String): List<KlassImport> {
+    private fun groupProjectImportsInner(input: List<KlassItem>, qualifiedName: List<String>): List<KlassImport> {
         return input.groupBy { if (it.filePackage.isEmpty()) null else it.filePackage.first() }
             .map { (key, subLists) ->
                 if (key == null) {
                     return@map subLists.distinct().map { KlassImport.Klass(it.name) }
                 }
                 val nested = subLists.distinct().map { it.copy(filePackage = it.filePackage.drop(1)) }
-                val qualifiedNestedName = "${qualifiedName}${PACKAGE_SEPARATOR}${key}"
+                val qualifiedNestedName = qualifiedName + key
                 val nestedImports = groupProjectImportsInner(nested, qualifiedNestedName)
                 listOf(KlassImport.Package(
                     name = key,
@@ -270,39 +268,41 @@ internal class ClassRelationsPumlGeneratorImpl(
     }
 
     private fun groupExternalImportsInnerRoot(input: List<KlassItem>): List<KlassImport> {
-        return input.groupBy { if (it.filePackage.isEmpty()) null else it.filePackage.take(2).joinToString(".") }
+        return input.map { item -> item to if (item.filePackage.isEmpty()) null else item.filePackage.take(2) }
+            .groupBy { (_, filePackage) -> filePackage?.joinToString(PACKAGE_SEPARATOR) }
             .map { (key, subLists) ->
                 if (key == null) {
-                    return@map subLists.distinct().map { KlassImport.Klass(it.name) }
+                    return@map subLists.distinct().map { (item, _) -> KlassImport.Klass(item.name) }
                 }
-                val nested = subLists.distinct().map { it.copy(filePackage = it.filePackage.drop(2)) }
-                val nestedImports = groupExternalImportsInnerNested(nested, key)
+                val nested = subLists.distinct().map { (item, _) -> item.copy(filePackage = item.filePackage.drop(2)) }
+                val qualifiedName = subLists.firstOrNull()?.second ?: emptyList()
+                val nestedImports = groupExternalImportsInnerNested(nested, qualifiedName)
                 if (nestedImports.size == 1) {
                     val nestedImport = nestedImports.first()
                     if (nestedImport is KlassImport.Package) {
                         return@map listOf(KlassImport.Package(
-                            name = "${key}.${nestedImport.name}",
-                            qualifiedName = "${key}.${nestedImport.name}",
+                            name = key + nestedImport.name,
+                            qualifiedName = qualifiedName + nestedImport.name,
                             elements = nestedImport.elements
                         ))
                     }
                 }
                 listOf(KlassImport.Package(
                     name = key,
-                    qualifiedName = key,
+                    qualifiedName = qualifiedName,
                     elements = nestedImports
                 ))
             }.flatten()
     }
 
-    private fun groupExternalImportsInnerNested(input: List<KlassItem>, qualifiedName: String): List<KlassImport> {
+    private fun groupExternalImportsInnerNested(input: List<KlassItem>, qualifiedName: List<String>): List<KlassImport> {
         return input.groupBy { if (it.filePackage.isEmpty()) null else it.filePackage.first() }
             .map { (key, subLists) ->
                 if (key == null) {
                     return@map subLists.distinct().map { KlassImport.Klass(it.name) }
                 }
                 val nested = subLists.distinct().map { it.copy(filePackage = it.filePackage.drop(1)) }
-                val qualifiedNestedName = "${qualifiedName}${PACKAGE_SEPARATOR}${key}"
+                val qualifiedNestedName = qualifiedName + key
                 val nestedImports = groupExternalImportsInnerNested(nested, qualifiedNestedName)
                 if (nestedImports.size == 1) {
                     val nestedImport = nestedImports.first()
@@ -310,7 +310,7 @@ internal class ClassRelationsPumlGeneratorImpl(
                         val name = "${key}.${nestedImport.name}"
                         return@map listOf(KlassImport.Package(
                             name = name,
-                            qualifiedName = "${qualifiedName}${PACKAGE_SEPARATOR}${name}",
+                            qualifiedName = qualifiedNestedName + nestedImport.name,
                             elements = nestedImport.elements
                         ))
                     }
@@ -374,9 +374,9 @@ internal class ClassRelationsPumlGeneratorImpl(
         appendContent("}")
     }
 
-    private fun StringBuilder.beginPackage(name: String, qualifiedName: String) {
-        val packageName = if (qualifiedName.startsWith(generatorSettings.projectPackagePrefix)) {
-            if (qualifiedName == generatorSettings.projectPackagePrefix) {
+    private fun StringBuilder.beginPackage(name: String, qualifiedName: Collection<String>) {
+        val packageName = if (qualifiedName.startsWith(projectPackagePrefix)) {
+            if (qualifiedName.size == projectPackagePrefix.size) {
                 "[[\$pathToDocsBase${PATH_DELIMITER}${generatorSettings.generatedFileName} $name]]"
             } else {
                 val prefixSize = 1 + projectRemainderPrefix.size
@@ -388,7 +388,7 @@ internal class ClassRelationsPumlGeneratorImpl(
                 "[[\$pathToDocsBase${PATH_DELIMITER}${linkTarget}${PATH_DELIMITER}${generatorSettings.generatedFileName} $name]]"
             }
         } else {
-            val externalLink = externalLinks[qualifiedName]
+            val externalLink = externalLinks[qualifiedName.joinToString(".")]
             if (externalLink != null) {
                 "[[\$pathToRoot${PATH_DELIMITER}$externalLink $name]]"
             } else {
@@ -427,6 +427,18 @@ internal class ClassRelationsPumlGeneratorImpl(
     private fun StringBuilder.appendContent(string: String) {
         append(" ".repeat(openPackages.size * generatorSettings.spaceCount))
         appendLine(string)
+    }
+
+    private fun Collection<String>.startsWith(prefix: List<String>): Boolean {
+        if (this.size < prefix.size) {
+            return false
+        }
+        prefix.zip(this.take(prefix.size)).forEach { (prefixElement, thisElement) ->
+            if (thisElement != prefixElement) {
+                return false
+            }
+        }
+        return true
     }
 
     private companion object {

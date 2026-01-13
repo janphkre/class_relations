@@ -44,12 +44,15 @@ class ClassRelationsPumlGeneratorTest {
     @Test
     fun testInterfaceWithUsages() = verifyGenerator("interface_with_usages")
 
+    @Test
+    fun testSimilarPackages() = verifyGenerator("similar_packages")
+
     private fun verifyGenerator(id: String) {
         val (generatorSettings, klasses, packages) = readInput(id)
         val generator = ClassRelationsPumlGenerator.getInstance(
             generatorSettings,
             mapOf("ExampleRootGenerated" to "example/root/generated"),
-            emptyMap()
+            mapOf("org.example.an_external_link" to "example/an_external_link")
         )
         val result = generator.generate(
             klasses = klasses,

@@ -1,0 +1,49 @@
+{
+  "generatorSettings": {
+    "projectBasePrefix": "org.example",
+    "projectPackagePrefix": "org.example.a",
+    "selfColor": "#00FFFF",
+    "spaceCount": 4,
+    "generatedFileName": "example_relations.puml"
+  },
+  "files": [
+    {
+      "name": "ExampleClassName1",
+      "package": "org.example.a",
+      "methods": [
+        "methodA",
+        "methodB",
+        "methodC"
+      ],
+      "type": "class",
+      "filePath": "src/main/org/example/a/ExampleClassName1.kt",
+      "fileImports": [
+        {
+          "package": "org.example.ba",
+          "name": "ExampleClassName2"
+        },
+        {
+          "package": "org.example.an_external_link",
+          "name": "ExampleClassName3"
+        },
+        {
+          "package": "org.example.bac",
+          "name": "ExampleClassName4"
+        },
+        {
+          "package": "io.different",
+          "name": "Something"
+        },
+        {
+          "package": "org.example.a.c",
+          "name": "ExampleClassName5"
+        }
+      ],
+      "parameters": [],
+      "inheritances": []
+    }
+  ],
+  "packages": [
+    { "name":  "c" }
+  ]
+}

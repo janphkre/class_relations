@@ -1,7 +1,7 @@
 @startuml
 !$pathToRoot = "../../.."
-!$pathToSourceExampleRootGenerated = "$pathToRoot/example/root/generated"
-!$pathToDocsBase = "$pathToRoot/com/example"
+!$pathToSourceExampleRootGenerated = "../../../example/root/generated"
+!$pathToDocsBase = "../../../com/example"
 package "[[$pathToDocsBase/example_relations.puml com.example]]" as p\$_0 #ffffff {
     package "a" as p\$_1 #00FFFF {
         interface "[[$pathToSourceExampleRootGenerated/src/main/com/example/a/InterfaceWithUsages.kt InterfaceWithUsages]]" as InterfaceWithUsages {
