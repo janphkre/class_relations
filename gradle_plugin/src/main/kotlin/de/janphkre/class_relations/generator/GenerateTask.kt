@@ -93,7 +93,12 @@ abstract class GenerateTask: DefaultTask() {
         }) }
             .filter { it.file.extension == KOTLIN_FILE_TYPE }
             .forEach { file ->
-                parser.readDefinition(file, sourceNames)
+                try {
+                    parser.readDefinition(file, sourceNames)
+                } catch (e: Exception) {
+                    throw RuntimeException("Failed to parse file ${file.file.absolutePath}", e)
+                }
+
             }
     }
 
