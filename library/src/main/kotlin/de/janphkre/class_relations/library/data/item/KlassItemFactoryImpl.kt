@@ -82,7 +82,7 @@ class KlassItemFactoryImpl: KlassItemFactory {
     }
 
     private fun filterItem(item: KlassItem) {
-        for (filter in filters) {
+        for (filter in filters.toList()) {
             filter.filterItem(item)
             if (item.isDisabled) {
                 return
